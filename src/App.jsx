@@ -4,6 +4,13 @@ import { Layers, X } from 'lucide-react';
 import './index.css';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { AppProvider } from './context/AppContext';
+import SelectDataset from './components/SelectDataset';
+import SelectAdm0 from './components/SelectAdm0';
+import SelectAdm1 from './components/SelectAdm1';
+import FinalScreen from './components/FinalScreen';
+
 export default function App() {
   const mapContainer = useRef(null);
   const map = useRef(null);
@@ -84,90 +91,99 @@ export default function App() {
   }, [showLeftSidebar, showRightSidebar]);
 
   return (
-    <div className="relative w-screen h-screen font-sans overflow-hidden">
-      {/* Left sidebar toggle button */}
-      {!showLeftSidebar && (
-        <button
-          onClick={() => setShowLeftSidebar(true)}
-          className="absolute top-4 left-4 z-30 p-2 bg-white shadow rounded-full hover:bg-gray-100"
-          title="Control habitat layers"
-        >
-          <Layers className="w-5 h-5" />
-        </button>
-      )}
-
-      {/* Right sidebar toggle button */}
-      {!showRightSidebar && (
-        <button
-          onClick={() => setShowRightSidebar(true)}
-          className="absolute top-4 right-4 z-30 p-2 bg-white shadow rounded-full hover:bg-gray-100"
-          title="Control basemap layers"
-        >
-          <Layers className="w-5 h-5" />
-        </button>
-      )}
-
-      {/* Left sidebar */}
-      <div
-        style={{ width: showLeftSidebar ? sidebarWidth : '0' }}
-        className={`fixed top-0 left-0 h-full bg-white shadow-lg z-20 transition-all duration-300 ease-in-out overflow-hidden ${
-          showLeftSidebar ? 'p-6' : 'p-0'
-        }`}
-      >
-        <div
-          className={`transition-opacity duration-300 ${
-            showLeftSidebar ? 'opacity-100' : 'opacity-0 pointer-events-none'
-          }`}
-        >
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold">Habitat Layers</h2>
-            <button onClick={() => setShowLeftSidebar(false)} className="hover:text-gray-600">
-              <X className="w-6 h-6" />
+    <AppProvider>
+      <Router>
+        <div className="relative w-screen h-screen font-sans overflow-hidden">
+          {/* Left sidebar toggle button */}
+          {!showLeftSidebar && (
+            <button
+              onClick={() => setShowLeftSidebar(true)}
+              className="absolute top-4 left-4 z-30 p-2 bg-white shadow rounded-full hover:bg-gray-100"
+              title="Control habitat layers"
+            >
+              <Layers className="w-5 h-5" />
             </button>
-          </div>
-          <p className="text-gray-700">Left sidebar content placeholder.</p>
-        </div>
-      </div>
+          )}
 
-      {/* Right sidebar */}
-      <div
-        style={{ width: showRightSidebar ? sidebarWidth : '0' }}
-        className={`fixed top-0 right-0 h-full bg-white shadow-lg z-20 transition-all duration-300 ease-in-out overflow-hidden ${
-          showRightSidebar ? 'p-6' : 'p-0'
-        }`}
-      >
-        <div
-          className={`transition-opacity duration-300 ${
-            showRightSidebar ? 'opacity-100' : 'opacity-0 pointer-events-none'
-          }`}
-        >
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold">Basemap Layers</h2>
-            <button onClick={() => setShowRightSidebar(false)} className="hover:text-gray-600">
-              <X className="w-6 h-6" />
+          {/* Right sidebar toggle button */}
+          {!showRightSidebar && (
+            <button
+              onClick={() => setShowRightSidebar(true)}
+              className="absolute top-4 right-4 z-30 p-2 bg-white shadow rounded-full hover:bg-gray-100"
+              title="Control basemap layers"
+            >
+              <Layers className="w-5 h-5" />
             </button>
-          </div>
-          <p className="text-gray-700">Right sidebar content placeholder.</p>
-        </div>
-      </div>
+          )}
 
-      {/* Map container */}
-      <div
-        style={{
-          transform: `translateX(${
-            showLeftSidebar && showRightSidebar
-              ? '0'
-              : showLeftSidebar
-              ? `calc(${sidebarWidth} / 2)`
-              : showRightSidebar
-              ? `calc(-1 * ${sidebarWidth} / 2)`
-              : '0'
-          })`,
-        }}
-        className="transition-all duration-300 ease-in-out h-full"
-        ref={mapContainer}
-      />
-    </div>
+          {/* Left sidebar */}
+          <div
+            style={{ width: showLeftSidebar ? sidebarWidth : '0' }}
+            className={`fixed top-0 left-0 h-full bg-white shadow-lg z-20 transition-all duration-300 ease-in-out overflow-hidden ${
+              showLeftSidebar ? 'p-6' : 'p-0'
+            }`}
+          >
+            <div
+              className={`transition-opacity duration-300 ${
+                showLeftSidebar ? 'opacity-100' : 'opacity-0 pointer-events-none'
+              }`}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold">Habitat Layers</h2>
+                <button onClick={() => setShowLeftSidebar(false)} className="hover:text-gray-600">
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+                <Routes>
+                  <Route path="/" element={<SelectDataset />} />
+                  <Route path="/:datasetKey" element={<SelectAdm0 />} />
+                  <Route path="/:datasetKey/:adm0Key" element={<SelectAdm1 />} />
+                  <Route path="/:datasetKey/:adm0Key/:adm1Key" element={<FinalScreen />} />
+                </Routes>
+            </div>
+          </div>
+
+          {/* Right sidebar */}
+          <div
+            style={{ width: showRightSidebar ? sidebarWidth : '0' }}
+            className={`fixed top-0 right-0 h-full bg-white shadow-lg z-20 transition-all duration-300 ease-in-out overflow-hidden ${
+              showRightSidebar ? 'p-6' : 'p-0'
+            }`}
+          >
+            <div
+              className={`transition-opacity duration-300 ${
+                showRightSidebar ? 'opacity-100' : 'opacity-0 pointer-events-none'
+              }`}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold">Basemap Layers</h2>
+                <button onClick={() => setShowRightSidebar(false)} className="hover:text-gray-600">
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+              <p className="text-gray-700">Right sidebar content placeholder.</p>
+            </div>
+          </div>
+
+          {/* Map container */}
+          <div
+            style={{
+              transform: `translateX(${
+                showLeftSidebar && showRightSidebar
+                  ? '0'
+                  : showLeftSidebar
+                  ? `calc(${sidebarWidth} / 2)`
+                  : showRightSidebar
+                  ? `calc(-1 * ${sidebarWidth} / 2)`
+                  : '0'
+              })`,
+            }}
+            className="transition-all duration-300 ease-in-out h-full"
+            ref={mapContainer}
+          />
+        </div>
+      </Router>
+    </AppProvider>
   );
 }
 
