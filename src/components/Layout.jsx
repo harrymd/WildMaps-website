@@ -32,13 +32,13 @@ export default function Layout() {
   return (
     <div className="relative w-screen h-screen font-sans overflow-hidden">
       {!showLeft && (
-        <SidebarToggleButton position="left" onClick={() => setShowLeft(true)} title="Control habitat layers" />
+        <SidebarToggleButton position="left" onClick={() => setShowLeft(true)} title="Choose a dataset to inspect" />
       )}
       {!showRight && (
         <SidebarToggleButton position="right" onClick={() => setShowRight(true)} title="Control basemap layers" />
       )}
 
-      <Sidebar title="Habitat Layers" isOpen={showLeft} onClose={() => setShowLeft(false)} width={sidebarWidth}>
+      <Sidebar title="Dataset browser" isOpen={showLeft} onClose={() => setShowLeft(false)} width={sidebarWidth}>
         <Routes>
           <Route path="/" element={<SelectDataset />} />
           <Route path="/:datasetKey" element={<SelectAdm0 />} />

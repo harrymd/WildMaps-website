@@ -4,7 +4,7 @@ import { useAppContext } from '../context/AppContext';
 
 const SelectAdm1 = () => {
   const { datasetKey, adm0Key } = useParams();
-  const { data, setAdm1Key, adm1Key } = useAppContext();
+  const { data, admData, setAdm1Key, adm1Key } = useAppContext();
   const navigate = useNavigate();
   //const dataset = data.raw?.[datasetKey];
   const dataset = data?.[datasetKey];
@@ -43,11 +43,13 @@ const SelectAdm1 = () => {
 
   return (
     <div>
-      <h2 className="text-2xl mb-4">Select Region (Adm1)</h2>
+      <h2 className="text-2xl mb-4">Select region of {admData.adm0[adm0Key]?.name}</h2>
       <ul className="mb-4">
         {options.map((key) => (
           <li key={key} onClick={() => handleSelect(key)} className={`cursor-pointer px-2 py-1 ${key === adm1Key ? 'bg-blue-100' : ''}`}>
-            {key}
+            {key === 'all_adm1'
+              ? 'All regions (entire extent of country)'
+              : admData.adm1[key]?.name}
           </li>
         ))}
       </ul>
