@@ -6,8 +6,10 @@ const SelectAdm0 = () => {
   const { datasetKey } = useParams();
   const { data, setAdm0Key, adm0Key, setDatasetKey, setAdm1Key } = useAppContext();
   const navigate = useNavigate();
-  const dataset = data.raw?.[datasetKey];
+  //const dataset = data.raw?.[datasetKey];
+  const dataset = data?.[datasetKey];
   const options = ['all_adm0', ...(dataset?.adm0_list || [])];
+  console.log(options);
 
   // Redirect immediately to the next step if there is only one option.
   useEffect(() => {

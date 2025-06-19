@@ -5,7 +5,8 @@ const FinalScreen = () => {
   const { datasetKey, adm0Key, adm1Key } = useParams();
   const navigate = useNavigate();
   const { data, setDatasetKey, setAdm0Key, setAdm1Key } = useAppContext();
-  const dataset = data.raw?.[datasetKey];
+  //const dataset = data.raw?.[datasetKey];
+  const dataset = data?.[datasetKey];
   const adm1_list_filtered = adm0Key === 'all_adm0'
     ? dataset?.adm1_list || []
     : dataset?.adm1_list?.filter(a => a.slice(0, 3) === adm0Key.slice(0, 3)) || [];

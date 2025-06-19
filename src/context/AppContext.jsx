@@ -12,12 +12,13 @@ export const AppProvider = ({ children }) => {
     fetch('/results.json')
       .then((res) => res.json())
       .then((dataset) => {
-        const transformed = {};
-        for (const key in dataset) {
-          const { species, study_area, source_text } = dataset[key];
-          transformed[key] = { species, study_area, source_text };
-        }
-        setData({ raw: dataset, summary: transformed });
+        //const transformed = {};
+        //for (const key in dataset) {
+        //  const { species, study_area, source_text } = dataset[key];
+        //  transformed[key] = { species, study_area, source_text };
+        //}
+        //setData({ raw: dataset, summary: transformed });
+        setData(dataset);
       });
   }, []);
 

@@ -6,7 +6,8 @@ const SelectAdm1 = () => {
   const { datasetKey, adm0Key } = useParams();
   const { data, setAdm1Key, adm1Key } = useAppContext();
   const navigate = useNavigate();
-  const dataset = data.raw?.[datasetKey];
+  //const dataset = data.raw?.[datasetKey];
+  const dataset = data?.[datasetKey];
   const filtered = dataset?.adm1_list?.filter(a => a.slice(0, 3) === adm0Key.slice(0, 3)) || [];
   const options = ['all_adm1', ...filtered];
   
@@ -32,6 +33,14 @@ const SelectAdm1 = () => {
     if (adm1Key) navigate(`/${datasetKey}/${adm0Key}/${adm1Key}`);
   };
 
+  const handlePrevious= () => {
+    if (dataset?.adm0_list.length === 1) {
+      navigate(`/`);
+    } else {
+      if (datasetKey) navigate(`/${datasetKey}`);
+    }
+  };
+
   return (
     <div>
       <h2 className="text-2xl mb-4">Select Region (Adm1)</h2>
@@ -43,7 +52,7 @@ const SelectAdm1 = () => {
         ))}
       </ul>
       <div className="flex gap-2">
-        <button onClick={() => navigate(`/${datasetKey}`)} className="bg-gray-500 text-white px-4 py-2 rounded">Previous</button>
+        <button onClick={handlePrevious} className="bg-gray-500 text-white px-4 py-2 rounded">Previous</button>
         <button onClick={handleNext} disabled={!adm1Key} className="bg-blue-500 text-white px-4 py-2 rounded disabled:opacity-50">Next</button>
       </div>
     </div>

@@ -28,7 +28,8 @@ const SelectDataset = () => {
           </tr>
         </thead>
         <tbody>
-          {Object.entries(data.summary || {}).map(([key, { species, study_area, source_text }]) => (
+          {/*Object.entries(data.summary || {}).map(([key, { species, study_area, source_text }]) => (*/}
+          {Object.entries(data || {}).map(([key, { species, study_area, source_text }]) => (
             <tr key={key} onClick={() => handleSelect(key)} className={`cursor-pointer ${key === datasetKey ? 'bg-blue-100' : ''}`}>
               <td className="border px-2">{key}</td>
               <td className="border px-2">{species}</td>

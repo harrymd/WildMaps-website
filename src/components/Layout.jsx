@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useAppContext } from '../context/AppContext';
 import Sidebar from './Sidebar';
 import SidebarToggleButton from './SidebarToggleButton';
 import MapContainer from './MapContainer';
@@ -13,6 +14,10 @@ const sidebarWidth = 'min(50vw, 35rem)';
 export default function Layout() {
   const [showLeft, setShowLeft] = useState(false);
   const [showRight, setShowRight] = useState(false);
+  const { datasetKey } = useAppContext();
+  //const subfolder = datasetKey ? datasetKey.slice(0, 3) : null;
+  const datasetSubFolder = "burns_2025";
+  const datasetZoomStr = '06';
 
   const transformStyle = `translateX(${
     showLeft && showRight
@@ -46,7 +51,11 @@ export default function Layout() {
         <p className="text-gray-700">Right sidebar content placeholder.</p>
       </Sidebar>
 
-      <MapContainer transformStyle={transformStyle} />
+      <MapContainer transformStyle={transformStyle}
+        datasetKey = {datasetKey}
+        datasetSubFolder = {datasetSubFolder}
+        datasetZoomStr = {datasetZoomStr}
+      />
     </div>
   );
 }
