@@ -1,24 +1,84 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useAppContext } from '../context/AppContext';
 import useMapPanOnDatasetChange from '../hooks/useMapPanOnDatasetChange.js';
+//import useMapMoveListener from '../hooks/useMapMoveListener.js';
 import maplibregl from 'maplibre-gl';
 
 //export default function useMap(containerRef, datasetKey, datasetSubFolder, datasetZoomStr) {
 export default function useMap(containerRef) {
   const mapRef = useRef(null);
+  const overlayStyleRef = useRef(null);
+
+  async function applyOverlayStyle(map) {
+    if (!overlayStyleRef.current) {
+      const response = await fetch('style/liberty_overlay.json');
+      overlayStyleRef.current = await response.json();
+    }
+
+    const overlayStyle = overlayStyleRef.current;
+
+    // Add overlay sources
+    for (const [name, source] of Object.entries(overlayStyle.sources)) {
+      if (!map.getSource(name)) {
+        map.addSource(name, source);
+      }
+    }
+
+    // Add overlay layers
+    for (const layer of overlayStyle.layers) {
+      const layerId = `overlay-${layer.id}`;
+      if (!map.getLayer(layerId)) {
+        map.addLayer({ ...layer, id: layerId });
+      }
+    }
+  }
+
   const { data, datasetKey, adm0Key, adm1Key } = useAppContext();
+
+  const [mapVisible, setMapVisible] = useState(false);
+  const defaultBounds = [90.0, -10.0, 125.0, 10.0];
 
   useEffect(() => {
     if (mapRef.current || !containerRef.current) return;
 
     mapRef.current = new maplibregl.Map({
       container: containerRef.current,
-      style: 'https://tiles.openfreemap.org/styles/liberty',
+      //style: 'https://tiles.openfreemap.org/styles/liberty',
+      //style: 'style/liberty_filled.json'
+      style: 'style/liberty_underlay.json'
       //center: [114.5, 1.2], // Borneo
       //zoom: 5.5, // Borneo
-      center: [102, -0.5], //
-      zoom: 4,
+      //center: [102, -0.5], //
+      //zoom: 4,
     });
+
+	mapRef.current.on('load', async () => {
+	  await applyOverlayStyle(mapRef.current);
+	});
+
+    mapRef.current.on('load', () => {
+      mapRef.current.fitBounds(
+        [[defaultBounds[0], defaultBounds[1]],
+			[defaultBounds[2], defaultBounds[3]]],
+        { 	padding: 40,
+			duration: 0,
+			essential: true}
+      );
+      //setMapVisible(true); // Show map once it has loaded and bounds are set.
+      // Delay visibility until fitBounds has taken effect
+      // Small timeout allows map to render with new bounds
+      //setTimeout(() => {
+      setMapVisible(true);
+      //}, 0); // you can increase to ~50ms if needed
+    });
+
+    //const [lastUserMove, setLastUserMove] = useState(null);
+    //mapRef.current.on('load', () => {
+    //  useMapMoveListener(mapRef, (info) => {
+    //    console.log('User moved the map:', info);
+    //    //setLastUserMove(info);
+    //  });
+    //});
 
     mapRef.current.addControl(new maplibregl.NavigationControl({ showZoom: true, showCompass: false }), 'bottom-right');
 
@@ -68,6 +128,16 @@ export default function useMap(containerRef) {
   
     // If datasetKey is set, add the new raster tile layer
     if (datasetKey && datasetSubFolder && datasetMaxZoomStr) {
+	
+	  // Remove overlay layers temporarily
+      const overlayLayerIds = map.getStyle().layers
+        .filter(layer => layer.id.startsWith('overlay-'))
+        .map(layer => layer.id);
+      
+      for (const id of overlayLayerIds) {
+        map.removeLayer(id);
+      }
+
       const urlTemplate = `https://habitat-web-map.s3.eu-west-2.amazonaws.com/code_output/raster_tiles/SDM/${datasetSubFolder}/${datasetKey}_zoom_${datasetMaxZoomStr}/{z}/{x}/{y}.png`;
       
       // Behaviour of minzoom and maxzoom:
@@ -84,19 +154,25 @@ export default function useMap(containerRef) {
         minzoom: 0,                   
         maxzoom: datasetMaxZoom,                  
       });
+
+	  //const beforeId = overlayLayerIds.length > 0 ? overlayLayerIds[0] : undefined;
   
       map.addLayer({
         id: layerId,
         type: 'raster',
         source: sourceId,
-        paint: {
-          'raster-opacity': 0.7
-          },
+        //paint: {
+        //  'raster-opacity': 0.7
+        //  },
+      //}, beforeId);
       });
+		
+	  // Re-apply overlay layers.
+	  applyOverlayStyle(map);
     }
   }, [data, datasetKey]);
 
   useMapPanOnDatasetChange(mapRef, data, datasetKey, adm0Key, adm1Key);
 
-  return mapRef;
+  return { mapRef, mapVisible} ;
 }

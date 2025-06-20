@@ -16,8 +16,8 @@ export default function Layout() {
   const [showRight, setShowRight] = useState(false);
   const { datasetKey } = useAppContext();
   //const subfolder = datasetKey ? datasetKey.slice(0, 3) : null;
-  const datasetSubFolder = "burns_2025";
-  const datasetZoomStr = '06';
+  //const datasetSubFolder = "burns_2025";
+  //const datasetZoomStr = '06';
 
   const transformStyle = `translateX(${
     showLeft && showRight
@@ -52,9 +52,10 @@ export default function Layout() {
       </Sidebar>
 
       <MapContainer transformStyle={transformStyle}
-        datasetKey = {datasetKey}
-        datasetSubFolder = {datasetSubFolder}
-        datasetZoomStr = {datasetZoomStr}
+        //mapVisible = {mapVisible}
+        //datasetKey = {datasetKey}
+        //datasetSubFolder = {datasetSubFolder}
+        //datasetZoomStr = {datasetZoomStr}
       />
     </div>
   );

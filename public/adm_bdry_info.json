@@ -1,0 +1,99 @@
+{
+    "adm0": {
+        "BRN": {
+            "name": "Brunei"
+        },
+        "IDN": {
+            "name": "Indonesia"
+        },
+        "MYS": {
+            "name": "Malaysia"
+        }
+    },
+    "adm1": {
+        "BRN_001": {
+            "name": "Belait",
+            "adm0_iso3": "BRN"
+        },
+        "BRN_002": {
+            "name": "Brunei-Muara",
+            "adm0_iso3": "BRN"
+        },
+        "BRN_003": {
+            "name": "Temburong",
+            "adm0_iso3": "BRN"
+        },
+        "BRN_004": {
+            "name": "Tutong",
+            "adm0_iso3": "BRN"
+        },
+        "IDN_001": {
+            "name": "Aceh",
+            "adm0_iso3": "IDN"
+        },
+        "IDN_003": {
+            "name": "Bangka-Belitung Islands",
+            "adm0_iso3": "IDN"
+        },
+        "IDN_005": {
+            "name": "Bengkulu",
+            "adm0_iso3": "IDN"
+        },
+        "IDN_007": {
+            "name": "Central Kalimantan",
+            "adm0_iso3": "IDN"
+        },
+        "IDN_010": {
+            "name": "East Kalimantan",
+            "adm0_iso3": "IDN"
+        },
+        "IDN_014": {
+            "name": "Jambi",
+            "adm0_iso3": "IDN"
+        },
+        "IDN_015": {
+            "name": "Lampung",
+            "adm0_iso3": "IDN"
+        },
+        "IDN_017": {
+            "name": "North Kalimantan",
+            "adm0_iso3": "IDN"
+        },
+        "IDN_020": {
+            "name": "North Sumatra",
+            "adm0_iso3": "IDN"
+        },
+        "IDN_022": {
+            "name": "Riau",
+            "adm0_iso3": "IDN"
+        },
+        "IDN_023": {
+            "name": "Riau Islands",
+            "adm0_iso3": "IDN"
+        },
+        "IDN_024": {
+            "name": "South Kalimantan",
+            "adm0_iso3": "IDN"
+        },
+        "IDN_026": {
+            "name": "South Sumatra",
+            "adm0_iso3": "IDN"
+        },
+        "IDN_030": {
+            "name": "West Kalimantan",
+            "adm0_iso3": "IDN"
+        },
+        "IDN_034": {
+            "name": "West Sumatra",
+            "adm0_iso3": "IDN"
+        },
+        "MYS_013": {
+            "name": "Sabah",
+            "adm0_iso3": "MYS"
+        },
+        "MYS_014": {
+            "name": "Sarawak",
+            "adm0_iso3": "MYS"
+        }
+    }
+}

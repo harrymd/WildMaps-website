@@ -9,6 +9,7 @@ export const AppProvider = ({ children }) => {
   const [datasetKey, setDatasetKey] = useState(null);
   const [adm0Key, setAdm0Key] = useState(null);
   const [adm1Key, setAdm1Key] = useState(null);
+  const [pageBbox, setPageBbox] = useState([-122.5, 37.7, -122.4, 37.8]);
 
   // Load the data about the raster files.
   useEffect(() => {

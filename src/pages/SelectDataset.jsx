@@ -40,13 +40,21 @@ const SelectDataset = () => {
           ))}
         </tbody>
       </table>
-      <button
-        onClick={handleNext}
-        disabled={!datasetKey}
-        className="bg-blue-500 text-white px-4 py-2 rounded disabled:opacity-50"
-      >
-        Next
-      </button>
+      <div className="flex gap-2">
+        <button
+          //onClick={}
+          className="bg-gray-500 text-white px-4 py-2 rounded"
+        >
+          Reset view
+        </button>
+        <button
+          onClick={handleNext}
+          disabled={!datasetKey}
+          className="bg-blue-500 text-white px-4 py-2 rounded disabled:opacity-50"
+        >
+          Next
+        </button>
+      </div>
     </div>
   );
 };
