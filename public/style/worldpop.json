@@ -1,0 +1,22 @@
+{
+  "version": 8,
+  "sources": {
+    "worldpop": {
+      "type": "raster",
+      "tiles": ["https://habitat-web-map.s3.eu-west-2.amazonaws.com/code_output/raster_tiles/population/worldpop_06/{z}/{x}/{y}.png"],
+      "tileSize": 256,
+      "minzoom": 0,
+      "maxzoom": 6 
+    }
+  },
+  "layers": [
+    {
+      "id": "population-density",
+      "type": "raster",
+      "source": "worldpop",
+      "paint": {
+        "raster-opacity": 1.0 
+      }
+    }
+  ]
+}

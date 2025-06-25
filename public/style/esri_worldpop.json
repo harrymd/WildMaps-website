@@ -1,0 +1,54 @@
+{
+  "version": 8,
+  "name": "WorldPop Population Density",
+  "metadata": {
+    "mapbox:autocomposite": false,
+    "mapbox:type": "overlay"
+  },
+  "sources": {
+    "worldpop-default": {
+      "type": "raster",
+      "tiles": [
+        "https://worldpop.arcgis.com/arcgis/rest/services/WorldPop_Population_Density_1km/ImageServer/exportImage?bbox={bbox-epsg-3857}&format=png&transparent=true&f=image&size=256,256&bboxSR=3857&imageSR=3857"
+      ],
+      "tileSize": 256,
+      "attribution": "WorldPop (www.worldpop.org)",
+      "minzoom": 0,
+      "maxzoom": 18
+    },
+    "worldpop-stretch": {
+      "type": "raster",
+      "tiles": [
+        "https://worldpop.arcgis.com/arcgis/rest/services/WorldPop_Population_Density_1km/ImageServer/exportImage?bbox={bbox-epsg-3857}&format=png&transparent=true&f=image&size=256,256&bboxSR=3857&imageSR=3857&renderingRule={\"rasterFunction\":\"Stretch\"}"
+      ],
+      "tileSize": 256,
+      "attribution": "WorldPop (www.worldpop.org)",
+      "minzoom": 0,
+      "maxzoom": 18
+    },
+    "worldpop-simple-colormap": {
+      "type": "raster",
+      "tiles": [
+        "https://worldpop.arcgis.com/arcgis/rest/services/WorldPop_Population_Density_1km/ImageServer/exportImage?bbox={bbox-epsg-3857}&format=png&transparent=true&f=image&size=256,256&bboxSR=3857&imageSR=3857&renderingRule={\"rasterFunction\":\"Colormap\"}"
+      ],
+      "tileSize": 256,
+      "attribution": "WorldPop (www.worldpop.org)",
+      "minzoom": 0,
+      "maxzoom": 18
+    }
+  },
+  "layers": [
+    {
+      "id": "worldpop-population-layer",
+      "type": "raster",
+      "source": "worldpop-stretch",
+      "layout": {
+        "visibility": "visible"
+      },
+      "paint": {
+        "raster-opacity": 0.7,
+        "raster-fade-duration": 300
+      }
+    }
+  ]
+}

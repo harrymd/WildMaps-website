@@ -21,7 +21,20 @@ const UNDERLAYS = {
     label: 'Altitude',
     //value: 'style/mapzen_elevation.json'
     value: 'style/mapzen_elevation_and_hillshade.json'
+  },
+  POPULATION: {
+    label: 'Population density',
+    //value: 'style/mapzen_elevation.json'
+    value: 'style/worldpop.json'
+  },
+  PROTECTED_AREAS : {
+    label: 'Protected areas',
+    value: 'style/wdpa.json'
   }
+  //POP : {
+  //  label: 'Population density',
+  //  value: 'style/esri_worldpop.json'
+  //}
   //HILLSHADE: {
   //  label: 'Hillshade',
   //  value: 'style/amazon_hillshade.json'
