@@ -1,178 +1,282 @@
-import { useEffect, useState, useRef } from 'react';
-import { useAppContext } from '../context/AppContext';
-import useMapPanOnDatasetChange from '../hooks/useMapPanOnDatasetChange.js';
-//import useMapMoveListener from '../hooks/useMapMoveListener.js';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import maplibregl from 'maplibre-gl';
 
-//export default function useMap(containerRef, datasetKey, datasetSubFolder, datasetZoomStr) {
-export default function useMap(containerRef) {
+const useMap = (layers, containerRef) => {
   const mapRef = useRef(null);
-  const overlayStyleRef = useRef(null);
+  const [map, setMap] = useState(null);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const layersRef = useRef({});
+  const currentProjection = useRef('mercator');
 
-  async function applyOverlayStyle(map) {
-    if (!overlayStyleRef.current) {
-      const response = await fetch('style/liberty_overlay.json');
-      overlayStyleRef.current = await response.json();
-    }
-
-    const overlayStyle = overlayStyleRef.current;
-
-    // Add overlay sources
-    for (const [name, source] of Object.entries(overlayStyle.sources)) {
-      if (!map.getSource(name)) {
-        map.addSource(name, source);
+  // Fetch style info for layers that only have URL
+  const fetchLayerInfo = useCallback(async (layerKey, layerData) => {
+    if (!layerData.info && layerData.url) {
+      try {
+        const response = await fetch(layerData.url);
+        const info = await response.json();
+        return { ...layerData, info };
+      } catch (error) {
+        console.error(`Failed to fetch layer info for ${layerKey}:`, error);
+        return layerData;
       }
     }
+    return layerData;
+  }, []);
 
-    // Add overlay layers
-    for (const layer of overlayStyle.layers) {
-      const layerId = `overlay-${layer.id}`;
-      if (!map.getLayer(layerId)) {
-        map.addLayer({ ...layer, id: layerId });
-      }
-    }
-  }
-
-  const { data, datasetKey, adm0Key, adm1Key } = useAppContext();
-
-  const [mapVisible, setMapVisible] = useState(false);
-  const defaultBounds = [90.0, -10.0, 125.0, 10.0];
-
+  // Initialize map
   useEffect(() => {
-    if (mapRef.current || !containerRef.current) return;
+    if (!containerRef?.current) return;
 
-    mapRef.current = new maplibregl.Map({
+    const mapInstance = new maplibregl.Map({
       container: containerRef.current,
-      //style: 'https://tiles.openfreemap.org/styles/liberty',
-      //style: 'style/liberty_filled.json'
-      style: 'style/liberty_underlay.json'
-      //center: [114.5, 1.2], // Borneo
-      //zoom: 5.5, // Borneo
-      //center: [102, -0.5], //
-      //zoom: 4,
+      style: {
+        version: 8,
+        sources: {},
+        layers: [
+          {
+            id: 'background',
+            type: 'background',
+            paint: {
+              'background-color': '#a4bcfa'
+            }
+          }
+        ]
+      },
+      center: [105.0, 13],
+      zoom: 2.5,
+      projection: 'globe'
     });
 
-	mapRef.current.on('load', async () => {
-	  await applyOverlayStyle(mapRef.current);
-	});
-
-    mapRef.current.on('load', () => {
-      mapRef.current.fitBounds(
-        [[defaultBounds[0], defaultBounds[1]],
-			[defaultBounds[2], defaultBounds[3]]],
-        { 	padding: 40,
-			duration: 0,
-			essential: true}
-      );
-      //setMapVisible(true); // Show map once it has loaded and bounds are set.
-      // Delay visibility until fitBounds has taken effect
-      // Small timeout allows map to render with new bounds
-      //setTimeout(() => {
-      setMapVisible(true);
-      //}, 0); // you can increase to ~50ms if needed
+    mapInstance.on('load', () => {
+      setIsLoaded(true);
     });
 
-    //const [lastUserMove, setLastUserMove] = useState(null);
-    //mapRef.current.on('load', () => {
-    //  useMapMoveListener(mapRef, (info) => {
-    //    console.log('User moved the map:', info);
-    //    //setLastUserMove(info);
-    //  });
-    //});
-
-    mapRef.current.addControl(new maplibregl.NavigationControl({ showZoom: true, showCompass: false }), 'bottom-right');
-
-    //mapRef.current.on('load', () => {
-    //  mapRef.current.addSource('source--country-borders', {
-    //    type: 'vector',
-    //    tiles: [
-    //      "https://habitat-web-map.s3.eu-west-2.amazonaws.com/geoBoundaries_CGAZ_ADM0_tiles/{z}/{x}/{y}.pbf"
-    //    ],
-    //    minzoom: 0,
-    //    maxzoom: 14
-    //  });
-
-    //  mapRef.current.addLayer({
-    //    id: 'country-borders',
-    //    type: 'line',
-    //    source: 'source--country-borders',
-    //    'source-layer': 'geoBoundaries_CGAZ_ADM0',
-    //    paint: {
-    //      'line-color': '#ff6600',
-    //      'line-width': 1.2
-    //    }
-    //  });
-    //});
-
-  }, [containerRef]);
-  
-  // Add/change dataset raster layer.
-  useEffect(() => {
-    if (!mapRef.current || !mapRef.current.isStyleLoaded()) return;
-  
-    const map = mapRef.current;
-    const sourceId = 'source--datasetRaster';
-    const layerId = 'layer--datasetRaster';
-	//
-  	//const { data, datasetKey} = useAppContext();
-  	const datasetSubFolder = data?.[datasetKey]?.folder;
-  	const datasetMaxZoom = 6;
-  	const datasetMaxZoomStr = datasetMaxZoom.toString().padStart(2, '0');
-  	const datasetBounds = data?.[datasetKey]?.raster_summary?.bounds ?? [];
-  	const [datasetMinLng, datasetMinLat, datasetMaxLng, datasetMaxLat] =
-  	        datasetBounds;
-
-    // Remove existing raster source/layer
-    if (map.getLayer(layerId)) map.removeLayer(layerId);
-    if (map.getSource(sourceId)) map.removeSource(sourceId);
-  
-    // If datasetKey is set, add the new raster tile layer
-    if (datasetKey && datasetSubFolder && datasetMaxZoomStr) {
-	
-	  // Remove overlay layers temporarily
-      const overlayLayerIds = map.getStyle().layers
-        .filter(layer => layer.id.startsWith('overlay-'))
-        .map(layer => layer.id);
+    // Handle projection switching based on zoom
+    const handleProjectionSwitch = () => {
+      // Only change projection if style is loaded
+      if (!mapInstance.isStyleLoaded()) return;
       
-      for (const id of overlayLayerIds) {
-        map.removeLayer(id);
+      const zoom = mapInstance.getZoom();
+      const shouldUseGlobe = zoom < 4;
+      const targetProjection = shouldUseGlobe ? 'globe' : 'mercator';
+      
+      if (currentProjection.current !== targetProjection) {
+        try {
+          mapInstance.setProjection({ type: targetProjection });
+          currentProjection.current = targetProjection;
+        } catch (error) {
+          console.error('Failed to set projection:', error);
+        }
+      }
+    };
+
+    mapInstance.on('zoom', handleProjectionSwitch);
+    mapInstance.on('zoomend', handleProjectionSwitch);
+    
+    // Set initial projection after style loads
+    mapInstance.on('styledata', handleProjectionSwitch);
+
+    mapRef.current = mapInstance;
+    setMap(mapInstance);
+
+    return () => {
+      mapInstance.remove();
+      mapRef.current = null;
+      setMap(null);
+      setIsLoaded(false);
+    };
+  }, [containerRef]);
+
+  // Update layers when layers prop changes
+  useEffect(() => {
+    if (!map || !isLoaded || !layers) return;
+
+    const updateLayers = async () => {
+      // Store current viewport
+      const currentCenter = map.getCenter();
+      const currentZoom = map.getZoom();
+      const currentBearing = map.getBearing();
+      const currentPitch = map.getPitch();
+
+      // Process layers and fetch missing info
+      const processedLayers = {};
+      const layerKeys = Object.keys(layers);
+      
+      for (const key of layerKeys) {
+        processedLayers[key] = await fetchLayerInfo(key, layers[key]);
       }
 
-      const urlTemplate = `https://habitat-web-map.s3.eu-west-2.amazonaws.com/code_output/raster_tiles/SDM/${datasetSubFolder}/${datasetKey}_zoom_${datasetMaxZoomStr}/{z}/{x}/{y}.png`;
-      
-      // Behaviour of minzoom and maxzoom:
-      // When zoomed out beyond minzoom, no tiles will be requested.
-      // When zoomed in beyond maxzoom, the highest-resolution tiles available
-      // will be requested (which can result in blurry tiles).
-      // If the desired behaviour is to hide the tiles when zoomed in beyond
-      // maxzoom, then you need to set maxzoom in the *layer* not the *source*.
-      map.addSource(sourceId, {
-        type: 'raster',
-        tiles: [urlTemplate],
-        tileSize: 256,
-        bounds: [datasetMinLng, datasetMinLat, datasetMaxLng, datasetMaxLat],
-        minzoom: 0,                   
-        maxzoom: datasetMaxZoom,                  
+      // Remove layers that are no longer in the layers object
+      const currentLayerKeys = Object.keys(layersRef.current);
+      for (const key of currentLayerKeys) {
+        if (!processedLayers[key]) {
+          // Remove all layers and sources associated with this layer
+          const layerInfo = layersRef.current[key];
+          if (layerInfo && layerInfo.info && layerInfo.info.layers) {
+            // Remove layers in reverse order
+            for (let i = layerInfo.info.layers.length - 1; i >= 0; i--) {
+              const layerId = `${key}-${layerInfo.info.layers[i].id}`;
+              if (map.getLayer(layerId)) {
+                map.removeLayer(layerId);
+              }
+            }
+            // Remove sources
+            if (layerInfo.info.sources) {
+              Object.keys(layerInfo.info.sources).forEach(sourceId => {
+                const fullSourceId = `${key}-${sourceId}`;
+                if (map.getSource(fullSourceId)) {
+                  map.removeSource(fullSourceId);
+                }
+              });
+            }
+          }
+          delete layersRef.current[key];
+        }
+      }
+
+      // Add or update layers in the correct order
+      for (const key of layerKeys) {
+        const layerData = processedLayers[key];
+        const existingLayer = layersRef.current[key];
+
+        // Check if layer needs to be updated
+        const needsUpdate = !existingLayer || 
+          JSON.stringify(existingLayer) !== JSON.stringify(layerData);
+
+        if (needsUpdate) {
+          // Remove existing layer if it exists
+          if (existingLayer && existingLayer.info && existingLayer.info.layers) {
+            for (let i = existingLayer.info.layers.length - 1; i >= 0; i--) {
+              const layerId = `${key}-${existingLayer.info.layers[i].id}`;
+              if (map.getLayer(layerId)) {
+                map.removeLayer(layerId);
+              }
+            }
+            if (existingLayer.info.sources) {
+              Object.keys(existingLayer.info.sources).forEach(sourceId => {
+                const fullSourceId = `${key}-${sourceId}`;
+                if (map.getSource(fullSourceId)) {
+                  map.removeSource(fullSourceId);
+                }
+              });
+            }
+          }
+
+          // Add new layer
+          if (layerData.info) {
+            try {
+              // Merge style-level properties (glyphs, sprite, etc.)
+              const currentStyle = map.getStyle();
+              const styleUpdates = {};
+              
+              if (layerData.info.glyphs && !currentStyle.glyphs) {
+                styleUpdates.glyphs = layerData.info.glyphs;
+              }
+              
+              if (layerData.info.sprite && !currentStyle.sprite) {
+                styleUpdates.sprite = layerData.info.sprite;
+              }
+              
+              // Apply style updates if needed
+              if (Object.keys(styleUpdates).length > 0) {
+                const updatedStyle = {
+                  ...currentStyle,
+                  ...styleUpdates
+                };
+                map.setStyle(updatedStyle);
+                // Wait for style to load before continuing
+                await new Promise(resolve => {
+                  if (map.isStyleLoaded()) {
+                    resolve();
+                  } else {
+                    map.once('styledata', resolve);
+                  }
+                });
+              }
+
+              // Add sources first
+              if (layerData.info.sources) {
+                Object.entries(layerData.info.sources).forEach(([sourceId, sourceConfig]) => {
+                  const fullSourceId = `${key}-${sourceId}`;
+                  if (!map.getSource(fullSourceId)) {
+                    map.addSource(fullSourceId, sourceConfig);
+                  }
+                });
+              }
+
+              // Add layers
+              if (layerData.info.layers) {
+                layerData.info.layers.forEach((layer, index) => {
+                  const layerId = `${key}-${layer.id}`;
+                  const layerConfig = {
+                    ...layer,
+                    id: layerId
+                  };
+
+                  // Handle source reference - only prefix if source exists in the style's sources
+                  if (layer.source) {
+                    if (layerData.info.sources && layerData.info.sources[layer.source]) {
+                      layerConfig.source = `${key}-${layer.source}`;
+                    } else {
+                      // Source might be external or built-in, keep original reference
+                      layerConfig.source = layer.source;
+                    }
+                  }
+
+                  // Handle source-layer (for vector tiles)
+                  if (layer['source-layer']) {
+                    layerConfig['source-layer'] = layer['source-layer'];
+                  }
+
+                  // Find the correct position to insert the layer
+                  let beforeId = null;
+                  const allLayers = map.getStyle().layers;
+                  const currentKeyIndex = layerKeys.indexOf(key);
+                  
+                  // Look for the first layer of the next layer group
+                  for (let i = currentKeyIndex + 1; i < layerKeys.length; i++) {
+                    const nextKey = layerKeys[i];
+                    const nextLayerData = layersRef.current[nextKey];
+                    if (nextLayerData && nextLayerData.info && nextLayerData.info.layers) {
+                      beforeId = `${nextKey}-${nextLayerData.info.layers[0].id}`;
+                      if (map.getLayer(beforeId)) {
+                        break;
+                      }
+                    }
+                  }
+
+                  try {
+                    map.addLayer(layerConfig, beforeId);
+                  } catch (error) {
+                    console.error(`Failed to add layer ${layerId}:`, error, layerConfig);
+                  }
+                });
+              }
+
+              layersRef.current[key] = layerData;
+            } catch (error) {
+              console.error(`Failed to add layer ${key}:`, error);
+            }
+          }
+        }
+      }
+
+      // Restore viewport
+      map.jumpTo({
+        center: currentCenter,
+        zoom: currentZoom,
+        bearing: currentBearing,
+        pitch: currentPitch
       });
+    };
 
-	  //const beforeId = overlayLayerIds.length > 0 ? overlayLayerIds[0] : undefined;
-  
-      map.addLayer({
-        id: layerId,
-        type: 'raster',
-        source: sourceId,
-        //paint: {
-        //  'raster-opacity': 0.7
-        //  },
-      //}, beforeId);
-      });
-		
-	  // Re-apply overlay layers.
-	  applyOverlayStyle(map);
-    }
-  }, [data, datasetKey]);
+    updateLayers();
+  }, [layers, map, isLoaded, fetchLayerInfo]);
 
-  useMapPanOnDatasetChange(mapRef, data, datasetKey, adm0Key, adm1Key);
+  return {
+    map,
+    isLoaded
+  };
+};
 
-  return { mapRef, mapVisible} ;
-}
+export default useMap;

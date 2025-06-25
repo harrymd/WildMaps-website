@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useAppContext } from '../context/AppContext';
+import BasemapControls from './BasemapControls';
 import Sidebar from './Sidebar';
 import SidebarToggleButton from './SidebarToggleButton';
 import MapContainer from './MapContainer';
@@ -12,12 +13,32 @@ import FinalScreen from '../pages/FinalScreen';
 const sidebarWidth = 'min(50vw, 35rem)';
 
 export default function Layout() {
-  const [showLeft, setShowLeft] = useState(false);
+  const [showLeft, setShowLeft] = useState(true);
   const [showRight, setShowRight] = useState(false);
   const { datasetKey } = useAppContext();
-  //const subfolder = datasetKey ? datasetKey.slice(0, 3) : null;
-  //const datasetSubFolder = "burns_2025";
-  //const datasetZoomStr = '06';
+  //const [underlayStyle, setUnderlayStyle] =
+  //  useState('style/liberty_underlay.json');
+  const [layers, setLayers] = useState({
+    underlay: {
+      url: 'style/liberty_underlay.json'
+    },
+    overlay: {
+      url: 'style/liberty_overlay.json'
+    }
+  });
+  
+  //const [layers, setLayers] = useState({
+  //  //underlay: 'style/liberty_underlay.json',  // Good.
+  //  //underlay: 'style/esri_world_imagery.json', // Good.
+  //  //underlay: 'style/mapzen_elevation.json', // Decoding issues.
+  //  //underlay: 'style/esri_terrain.json',  // Ugly.
+  //  //underlay: 'style/amazon_elevation.json', // Decoding issues.
+  //  underlay: 'style/amazon_hillshade.json', // Rendering issues.
+  //  //underlay: 'style/esri_shaded_relief.json', // Rendering issues.
+  //  base: null,
+  //  data: null,
+  //  overlay: 'style/liberty_overlay.json',
+  //});
 
   const transformStyle = `translateX(${
     showLeft && showRight
@@ -30,7 +51,7 @@ export default function Layout() {
   })`;
 
   return (
-    <div className="relative w-screen h-screen font-sans overflow-hidden">
+    <div className="relative w-screen h-screen font-sans overflow-hidden bg-blue-950">
       {!showLeft && (
         <SidebarToggleButton position="left" onClick={() => setShowLeft(true)} title="Choose a dataset to inspect" />
       )}
@@ -47,15 +68,21 @@ export default function Layout() {
         </Routes>
       </Sidebar>
 
+      <BasemapControls
+        isOpen={showRight}
+        onClose={() => setShowRight(false)}
+        layers={layers}
+        setLayers={setLayers}
+      />
+      {/*
       <Sidebar title="Basemap Layers" isOpen={showRight} onClose={() => setShowRight(false)} side="right" width={sidebarWidth}>
         <p className="text-gray-700">Right sidebar content placeholder.</p>
       </Sidebar>
+      */}
 
-      <MapContainer transformStyle={transformStyle}
-        //mapVisible = {mapVisible}
-        //datasetKey = {datasetKey}
-        //datasetSubFolder = {datasetSubFolder}
-        //datasetZoomStr = {datasetZoomStr}
+      <MapContainer
+        transformStyle={transformStyle}
+        layers={layers}
       />
     </div>
   );
