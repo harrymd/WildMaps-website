@@ -13,32 +13,26 @@ const UNDERLAYS = {
     label: 'Satellite imagery',
     value: 'style/esri_world_imagery.json'
   },
-  //ALTITUDE: {
-  //  label: 'Altitude',
-  //  value: 'style/amazon_elevation.json'
-  //}
   ALTITUDE: {
     label: 'Altitude',
-    //value: 'style/mapzen_elevation.json'
     value: 'style/mapzen_elevation_and_hillshade.json'
   },
   POPULATION: {
     label: 'Population density',
-    //value: 'style/mapzen_elevation.json'
     value: 'style/worldpop.json'
+  }
+};
+
+// Define overlay options
+const OVERLAYS = {
+  NONE: {
+    label: 'No overlay',
+    value: null
   },
-  PROTECTED_AREAS : {
+  PROTECTED_AREAS: {
     label: 'Protected areas',
     value: 'style/wdpa.json'
   }
-  //POP : {
-  //  label: 'Population density',
-  //  value: 'style/esri_worldpop.json'
-  //}
-  //HILLSHADE: {
-  //  label: 'Hillshade',
-  //  value: 'style/amazon_hillshade.json'
-  //}
 };
 
 export default function BasemapControls({
@@ -47,6 +41,27 @@ export default function BasemapControls({
   layers,
   setLayers
 }) {
+  // Get current baselayer value (null if no baselayer)
+  const currentBaselayer = layers.baselayer?.url || null;
+
+  const handleOverlayChange = (overlayValue) => {
+    setLayers((prev) => {
+      const newLayers = { ...prev };
+      
+      if (overlayValue === null) {
+        // Remove baselayer
+        delete newLayers.baselayer;
+      } else {
+        // Add or replace baselayer
+        newLayers.baselayer = {
+          url: overlayValue
+        };
+      }
+      
+      return newLayers;
+    });
+  };
+
   return (
     <Sidebar
       title="Basemap controls"
@@ -55,7 +70,7 @@ export default function BasemapControls({
       side="right"
       width="300px"
     >
-      <div className="p-4 space-y-4">
+      <div className="p-4 space-y-6">
         <fieldset>
           <legend className="font-medium mb-2">Select a base map</legend>
           <div className="flex flex-col space-y-2">
@@ -74,6 +89,24 @@ export default function BasemapControls({
                       },
                     }))
                   }
+                />
+                <span>{label}</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend className="font-medium mb-2">Select an overlay layer</legend>
+          <div className="flex flex-col space-y-2">
+            {Object.values(OVERLAYS).map(({ label, value }) => (
+              <label key={value || 'none'} className="flex items-center space-x-2">
+                <input
+                  type="radio"
+                  name="overlay"
+                  value={value || ''}
+                  checked={currentBaselayer === value}
+                  onChange={() => handleOverlayChange(value)}
                 />
                 <span>{label}</span>
               </label>

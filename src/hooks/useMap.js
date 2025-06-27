@@ -100,7 +100,8 @@ const useMap = (layers, containerRef) => {
 
       // Process layers and fetch missing info
       const processedLayers = {};
-      const layerKeys = Object.keys(layers);
+      // Process layers in a specific order: underlay -> baselayer -> overlay
+      const layerKeys = ['underlay', 'baselayer', 'overlay'].filter(key => layers[key]);
       
       for (const key of layerKeys) {
         processedLayers[key] = await fetchLayerInfo(key, layers[key]);
@@ -232,15 +233,33 @@ const useMap = (layers, containerRef) => {
                   let beforeId = null;
                   const allLayers = map.getStyle().layers;
                   const currentKeyIndex = layerKeys.indexOf(key);
-                  
-                  // Look for the first layer of the next layer group
-                  for (let i = currentKeyIndex + 1; i < layerKeys.length; i++) {
-                    const nextKey = layerKeys[i];
-                    const nextLayerData = layersRef.current[nextKey];
-                    if (nextLayerData && nextLayerData.info && nextLayerData.info.layers) {
-                      beforeId = `${nextKey}-${nextLayerData.info.layers[0].id}`;
-                      if (map.getLayer(beforeId)) {
-                        break;
+
+                  // Special handling for layer positioning
+                  if (key === 'baselayer') {
+                    // For baselayer, position it below the permanent 'overlay' layer but above underlay
+                    // Find the overlay layer (your permanent labels layer)
+                    const overlayLayers = allLayers.filter(layer => layer.id.startsWith('overlay-'));
+                    if (overlayLayers.length > 0) {
+                      // Insert baselayer just before the permanent overlay layer
+                      beforeId = overlayLayers[0].id;
+                    } else {
+                      // If no overlay layer found, put at the top
+                      beforeId = null;
+                    }
+                  } else if (key === 'overlay') {
+                    // Permanent overlay layer should always be on top
+                    beforeId = null;
+                  } else {
+                    // For other layers (like underlay), use the existing logic
+                    // Look for the first layer of the next layer group
+                    for (let i = currentKeyIndex + 1; i < layerKeys.length; i++) {
+                      const nextKey = layerKeys[i];
+                      const nextLayerData = layersRef.current[nextKey];
+                      if (nextLayerData && nextLayerData.info && nextLayerData.info.layers) {
+                        beforeId = `${nextKey}-${nextLayerData.info.layers[0].id}`;
+                        if (map.getLayer(beforeId)) {
+                          break;
+                        }
                       }
                     }
                   }
