@@ -16,7 +16,6 @@ export default function Layout() {
   const [showLeft, setShowLeft] = useState(true);
   const [showRight, setShowRight] = useState(false);
   const { datasetKey } = useAppContext();
-  //const [underlayStyle, setUnderlayStyle] =
   //  useState('style/liberty_underlay.json');
   const [layers, setLayers] = useState({
     underlay: {
@@ -27,19 +26,6 @@ export default function Layout() {
     }
   });
   
-  //const [layers, setLayers] = useState({
-  //  //underlay: 'style/liberty_underlay.json',  // Good.
-  //  //underlay: 'style/esri_world_imagery.json', // Good.
-  //  //underlay: 'style/mapzen_elevation.json', // Decoding issues.
-  //  //underlay: 'style/esri_terrain.json',  // Ugly.
-  //  //underlay: 'style/amazon_elevation.json', // Decoding issues.
-  //  underlay: 'style/amazon_hillshade.json', // Rendering issues.
-  //  //underlay: 'style/esri_shaded_relief.json', // Rendering issues.
-  //  base: null,
-  //  data: null,
-  //  overlay: 'style/liberty_overlay.json',
-  //});
-
   const transformStyle = `translateX(${
     showLeft && showRight
       ? '0'
@@ -74,15 +60,11 @@ export default function Layout() {
         layers={layers}
         setLayers={setLayers}
       />
-      {/*
-      <Sidebar title="Basemap Layers" isOpen={showRight} onClose={() => setShowRight(false)} side="right" width={sidebarWidth}>
-        <p className="text-gray-700">Right sidebar content placeholder.</p>
-      </Sidebar>
-      */}
 
       <MapContainer
         transformStyle={transformStyle}
         layers={layers}
+        setLayers={setLayers}
       />
     </div>
   );

@@ -1,12 +1,18 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
 import maplibregl from 'maplibre-gl';
+import { useEffect, useRef, useState, useCallback } from 'react';
 
-const useMap = (layers, containerRef) => {
+import { useAppContext } from '../context/AppContext';
+import useUpdateMapOnDatasetChange from '../hooks/useUpdateMapOnDatasetChange.js';
+//import useMapPanOnDatasetChange from '../hooks/useMapPanOnDatasetChange.js';
+//import useShowDatasetOnDatasetChange from '../hooks/useShowDatasetOnDatasetChange.js';
+
+const useMap = (layers, containerRef, setLayers) => {
   const mapRef = useRef(null);
   const [map, setMap] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const layersRef = useRef({});
   const currentProjection = useRef('mercator');
+  const { data, datasetKey, adm0Key, adm1Key } = useAppContext();
 
   // Fetch style info for layers that only have URL
   const fetchLayerInfo = useCallback(async (layerKey, layerData) => {
@@ -87,7 +93,7 @@ const useMap = (layers, containerRef) => {
     };
   }, [containerRef]);
 
-  // Update layers when layers prop changes
+  // Update layers when layers prop changes.
   useEffect(() => {
     if (!map || !isLoaded || !layers) return;
 
@@ -101,7 +107,8 @@ const useMap = (layers, containerRef) => {
       // Process layers and fetch missing info
       const processedLayers = {};
       // Process layers in a specific order: underlay -> baselayer -> overlay
-      const layerKeys = ['underlay', 'baselayer', 'overlay'].filter(key => layers[key]);
+      const layerKeys = ['underlay', 'data', 'baselayer', 'overlay'].filter(
+        key => layers[key]);
       
       for (const key of layerKeys) {
         processedLayers[key] = await fetchLayerInfo(key, layers[key]);
@@ -291,6 +298,15 @@ const useMap = (layers, containerRef) => {
 
     updateLayers();
   }, [layers, map, isLoaded, fetchLayerInfo]);
+
+  // Update the layers and pan the map, when the dataset is changed.
+  useUpdateMapOnDatasetChange(mapRef, data, datasetKey, setLayers); 
+
+  //// Show the raster when the dataset is selected.
+  //useShowDatasetOnDatasetChange(data, datasetKey, setLayers);
+  //
+  //// Pan the map when the dataset is selected.
+  //useMapPanOnDatasetChange(mapRef, data, datasetKey);
 
   return {
     map,
