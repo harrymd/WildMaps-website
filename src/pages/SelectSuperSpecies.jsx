@@ -30,7 +30,7 @@ const SelectSuperSpecies = () => {
     const uniqueSuperSpecies = [...new Set(
       Object.values(filteredData)
         .map(entry => entry.superspecies)
-        .filter(superspecies => superspecies && superspecies !== 'Unknown superspecies')
+        .filter(superspecies => superspecies && superspecies !== 'Unknown taxon')
     )];
     
     // Create options with emoji and description, then sort by description
@@ -59,7 +59,7 @@ const SelectSuperSpecies = () => {
       context.push(`Region: **${allParams.region}**`);
     }
     if (allParams.subregion) {
-      context.push(`SubRegion: **${allParams.subregion}**`);
+      context.push(`Sub-region: **${allParams.subregion}**`);
     }
     
     if (context.length > 0) {
@@ -82,8 +82,8 @@ const SelectSuperSpecies = () => {
     <GeneralSelectComponent
       route="/superspecies"
       paramKey="superspecies"
-      title="SuperSpecies"
-      description="Click on a row to select a superspecies:"
+      title="taxon"
+      description="Click on a row to select a taxon:"
       getOptions={getSuperSpeciesOptions}
       getContextDisplay={getContextDisplay}
       tableHeaders={[]} // Empty array = no headers

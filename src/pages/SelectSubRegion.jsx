@@ -80,8 +80,8 @@ const SelectSubRegion = () => {
     <GeneralSelectComponent
       route="/subregion"
       paramKey="subregion"
-      title="SubRegion"
-      description="Click on a row to select a subregion:"
+      title="sub-region"
+      description="Click on a row to select a sub-region:"
       getOptions={getSubRegionOptions}
       getContextDisplay={getContextDisplay}
       tableHeaders={[]} // No headers

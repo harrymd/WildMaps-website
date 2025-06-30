@@ -55,7 +55,7 @@ const SelectRegion = () => {
     <GeneralSelectComponent
       route="/region"
       paramKey="region"
-      title="Region"
+      title="region"
       description="Click on a row to select a region:"
       getOptions={getRegionOptions}
       getContextDisplay={getContextDisplay}

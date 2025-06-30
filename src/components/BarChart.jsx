@@ -1,7 +1,15 @@
 import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 
-const BarChart = ({ data, width = 500, height = 300, title = 'Bar Chart', xLabel = '', yLabel = '' }) => {
+const BarChart = ({ 
+  data, 
+  width = 500, 
+  height = 300, 
+  title = 'Bar Chart', 
+  xLabel = '', 
+  yLabel = '',
+  colors = null // New prop: array of colors for stack levels (bottom to top)
+}) => {
   const svgRef = useRef();
 
   useEffect(() => {
@@ -34,10 +42,14 @@ const BarChart = ({ data, width = 500, height = 300, title = 'Bar Chart', xLabel
 
       y.domain([0, d3.max(stackedData[stackedData.length - 1], d => d[1])]).nice();
 
-      // Color scale
-      const color = d3.scaleOrdinal()
-        .domain(keys)
-        .range(d3.schemeCategory10);
+      // Color scale - use custom colors if provided, otherwise default
+      const color = colors && colors.length === keys.length
+        ? d3.scaleOrdinal()
+            .domain(keys)
+            .range(colors)
+        : d3.scaleOrdinal()
+            .domain(keys)
+            .range(d3.schemeCategory10);
 
       g.selectAll('.serie')
         .data(stackedData)
@@ -61,7 +73,7 @@ const BarChart = ({ data, width = 500, height = 300, title = 'Bar Chart', xLabel
         .attr('y', d => y(d.value))
         .attr('width', x.bandwidth())
         .attr('height', d => innerHeight - y(d.value))
-        .attr('fill', '#4A90E2');
+        .attr('fill', colors && colors.length > 0 ? colors[0] : '#4A90E2');
     }
 
     // Axes
@@ -91,7 +103,7 @@ const BarChart = ({ data, width = 500, height = 300, title = 'Bar Chart', xLabel
         .text(yLabel);
     }
 
-  }, [data, width, height, xLabel, yLabel]);
+  }, [data, width, height, xLabel, yLabel, colors]);
 
   return (
     <div className="mt-6">

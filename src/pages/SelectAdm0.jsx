@@ -47,17 +47,17 @@ const SelectAdm0 = () => {
   const getContextDisplay = (allParams) => {
     const context = [];
     if (allParams.superspecies) {
-      context.push(`SuperSpecies: **${allParams.superspecies}**`);
+      context.push(`Taxon: **${allParams.superspecies}**`);
     }
     if (allParams.region) {
       context.push(`Region: **${allParams.region}**`);
     }
     if (allParams.subregion) {
-      context.push(`SubRegion: **${allParams.subregion}**`);
+      context.push(`Sub-region: **${allParams.subregion}**`);
     }
     if (allParams.datasetKey && data?.[allParams.datasetKey]) {
       const dataset = data[allParams.datasetKey];
-      context.push(`Dataset: **${dataset.common_name || 'Unknown'}**`);
+      context.push(`Dataset: **${(dataset.source_text || 'Unknown') + ' - ' + (dataset.common_name || 'Unknown species')}**`);
     }
     
     if (context.length > 0) {
