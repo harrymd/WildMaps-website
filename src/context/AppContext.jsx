@@ -1,4 +1,3 @@
-// context/AppContext.jsx
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import Papa from 'papaparse';
 
@@ -19,9 +18,6 @@ export const AppProvider = ({ children }) => {
   const [speciesData, setSpeciesData] = useState({});
   const [regionData, setRegionData] = useState({});
   const [subregionData, setSubregionData] = useState({});
-  //const [datasetKey, setDatasetKey] = useState(null);
-  //const [adm0Key, setAdm0Key] = useState(null);
-  //const [adm1Key, setAdm1Key] = useState(null);
 
   // Load the data about the administrative boundaries
   useEffect(() => {
@@ -42,7 +38,6 @@ export const AppProvider = ({ children }) => {
           dynamicTyping: true,
           skipEmptyLines: true,
           complete: (results) => {
-            // Convert array to object with common_name as key
             const speciesMap = {};
             results.data.forEach((row) => {
               if (row.common_name) {
@@ -75,7 +70,6 @@ export const AppProvider = ({ children }) => {
           dynamicTyping: true,
           skipEmptyLines: true,
           complete: (results) => {
-            // Convert array to object with superspecies as key
             const superSpeciesMap = {};
             results.data.forEach((row) => {
               if (row.superspecies) {
@@ -108,7 +102,6 @@ export const AppProvider = ({ children }) => {
           dynamicTyping: true,
           skipEmptyLines: true,
           complete: (results) => {
-            // Convert array to object with region name as key
             const regionMap = {};
             results.data.forEach((row) => {
               if (row.name) {
@@ -140,13 +133,13 @@ export const AppProvider = ({ children }) => {
           dynamicTyping: true,
           skipEmptyLines: true,
           complete: (results) => {
-            // Convert array to object with subregion name as key
             const subregionMap = {};
             results.data.forEach((row) => {
               if (row.subregion) {
                 subregionMap[row.subregion] = {
-                  // Add any other subregion attributes here if they exist in the CSV
-                  name: row.subregion
+                  name: row.subregion,
+                  region: row.region,
+                  bbox: [row.lon_min, row.lat_min, row.lon_max, row.lat_max]
                 };
               }
             });
@@ -165,7 +158,6 @@ export const AppProvider = ({ children }) => {
 
   // Load main dataset and do multi-step enrichment
   useEffect(() => {
-    // Wait until all CSV files are loaded
     if (Object.keys(speciesData).length === 0 || 
         Object.keys(superSpeciesData).length === 0 || 
         Object.keys(regionData).length === 0 ||
@@ -178,7 +170,7 @@ export const AppProvider = ({ children }) => {
       .then((dataset) => {
         console.log('Starting multi-step enrichment...');
         
-        // Step 1: Enrich with species data (common_name -> superspecies, scientific_name)
+        // Step 1: Enrich with species data
         const stepOneEnriched = {};
         Object.entries(dataset).forEach(([key, entry]) => {
           const speciesInfo = speciesData[entry.common_name];
@@ -214,7 +206,7 @@ export const AppProvider = ({ children }) => {
       .catch((error) => {
         console.error('Error loading main dataset:', error);
       });
-  }, [speciesData, superSpeciesData, regionData, subregionData]); // Run when all CSV datasets are ready
+  }, [speciesData, superSpeciesData, regionData, subregionData]);
 
   const value = {
     data,
@@ -229,12 +221,6 @@ export const AppProvider = ({ children }) => {
     setRegionData,
     subregionData,
     setSubregionData,
-    //datasetKey,
-    //setDatasetKey,
-    //adm0Key,
-    //setAdm0Key,
-    //adm1Key,
-    //setAdm1Key,
   };
 
   return (

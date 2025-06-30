@@ -4,8 +4,6 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { useFilterState } from '../hooks/useFilterState';
 import useUpdateMapOnDatasetChange from '../hooks/useUpdateMapOnDatasetChange.js';
-//import useMapPanOnDatasetChange from '../hooks/useMapPanOnDatasetChange.js';
-//import useShowDatasetOnDatasetChange from '../hooks/useShowDatasetOnDatasetChange.js';
 
 const useMap = (layers, containerRef, setLayers) => {
   const mapRef = useRef(null);
@@ -14,12 +12,6 @@ const useMap = (layers, containerRef, setLayers) => {
   const layersRef = useRef({});
   const currentProjection = useRef('mercator');
   const { data } = useAppContext(); 
-  const { getParam } = useFilterState(); // Add this
-
-  // Get all keys from URL parameters
-  const datasetKey = getParam('datasetKey');
-  const adm0Key = getParam('adm0Key');
-  const adm1Key = getParam('adm1Key');
 
   // Fetch style info for layers that only have URL
   const fetchLayerInfo = useCallback(async (layerKey, layerData) => {
@@ -307,14 +299,34 @@ const useMap = (layers, containerRef, setLayers) => {
     updateLayers();
   }, [layers, map, isLoaded, fetchLayerInfo]);
 
-  // Update the layers and pan the map, when the dataset is changed.
-  useUpdateMapOnDatasetChange(mapRef, data, setLayers); 
+  // Listen for custom panning events (region, subregion, etc.)
+  // In useMap.js, update the listener useEffect:
+  useEffect(() => {
+    const handlePanToLocation = (event) => {
+      if (map && event.detail.bounds) {
+        map.fitBounds(event.detail.bounds, {
+          padding: 40,
+          duration: 2000
+        });
+      }
+    };
+  
+    // Listen for location panning events
+    window.addEventListener('panToRegion', handlePanToLocation);
+    window.addEventListener('panToSubregion', handlePanToLocation);
+    window.addEventListener('panToCountry', handlePanToLocation);
+    window.addEventListener('panToAdm1', handlePanToLocation);  // Add this line
+    
+    return () => {
+      window.removeEventListener('panToRegion', handlePanToLocation);
+      window.removeEventListener('panToSubregion', handlePanToLocation);
+      window.removeEventListener('panToCountry', handlePanToLocation);
+      window.removeEventListener('panToAdm1', handlePanToLocation);  // Add this line
+    };
+  }, [map]);
 
-  //// Show the raster when the dataset is selected.
-  //useShowDatasetOnDatasetChange(data, datasetKey, setLayers);
-  //
-  //// Pan the map when the dataset is selected.
-  //useMapPanOnDatasetChange(mapRef, data, datasetKey);
+  // Update the layers when the dataset is changed (no panning)
+  useUpdateMapOnDatasetChange(mapRef, data, setLayers); 
 
   return {
     map,

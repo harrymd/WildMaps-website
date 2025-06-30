@@ -1,19 +1,16 @@
-// FinalScreen.jsx
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 import { useFilterState } from '../hooks/useFilterState';
-import { getPreviousRoute } from '../utils/navigationUtils';
 import BarChart from '../Components/BarChart';
 
 const FinalScreen = () => {
   const navigate = useNavigate();
-  const { data, setDatasetKey, setAdm0Key, setAdm1Key } = useAppContext();
+  const { data } = useAppContext();
   const { getParam, getAllParams } = useFilterState();
   
   const datasetKey = getParam('datasetKey');
   const adm0Key = getParam('adm0Key');
   const adm1Key = getParam('adm1Key');
-  const startingFilter = getParam('startingFilter');
   const allParams = getAllParams();
   
   const dataset = data?.[datasetKey];
@@ -22,17 +19,13 @@ const FinalScreen = () => {
     : dataset?.adm1_list?.filter(a => a.slice(0, 3) === adm0Key.slice(0, 3)) || [];
 
   const handleReset = () => {
-    setDatasetKey(null);
-    setAdm0Key(null);
-    setAdm1Key(null);
     navigate('/');
   };
 
   const handlePrevious = () => {
-    const navigate = useNavigate();
     const dataset = data?.[datasetKey];
     
-    // Check if SelectAdm1 would auto-redirect (only one region option)
+    // Check if SelectAdm1 would auto-redirect
     let skipAdm1 = false;
     if (dataset && adm0Key) {
       let adm1Options;
@@ -42,33 +35,26 @@ const FinalScreen = () => {
         const filtered = dataset?.adm1_list?.filter(a => a.slice(0, 3) === adm0Key.slice(0, 3)) || [];
         adm1Options = ['all_adm1', ...filtered];
       }
-      skipAdm1 = adm1Options.length <= 2; // Only 'all_adm1' or 'all_adm1' + one option
+      skipAdm1 = adm1Options.length <= 2;
     }
     
-    // Check if SelectAdm0 would auto-redirect (only one country option)
+    // Check if SelectAdm0 would auto-redirect
     let skipAdm0 = false;
     if (dataset && dataset.adm0_list) {
       const adm0Options = ['all_adm0', ...dataset.adm0_list];
-      skipAdm0 = adm0Options.length <= 2; // Only 'all_adm0' or 'all_adm0' + one option
+      skipAdm0 = adm0Options.length <= 2;
     }
     
     const currentParams = new URLSearchParams(window.location.search);
     
     if (skipAdm1 && skipAdm0) {
-      // Skip both SelectAdm1 and SelectAdm0, go back to SelectDataset
       currentParams.delete('adm0Key');
       currentParams.delete('adm1Key');
-      currentParams.delete('datasetKey');
       navigate(`/dataset?${currentParams.toString()}`);
     } else if (skipAdm1) {
-      // Skip SelectAdm1, go back to SelectAdm0
       currentParams.delete('adm1Key');
-      currentParams.delete('datasetKey');
       navigate(`/adm0?${currentParams.toString()}`);
     } else {
-      // Normal back to SelectAdm1
-      console.log('AAA');
-      currentParams.delete('datasetKey');
       navigate(`/adm1?${currentParams.toString()}`);
     }
   };
@@ -84,7 +70,7 @@ const FinalScreen = () => {
     sub_data = dataset?.['adm1-zone']?.[adm1Key];
   }
   
-  // Calculate fraction of protected areas in each bin.
+  // Calculate fraction of protected areas in each bin
   let chartData_PA_frac = [];
   if (sub_data?.area_km2_by_bin_in_PA) {
     const area_PA = sub_data.area_km2_by_bin_in_PA;
@@ -95,11 +81,11 @@ const FinalScreen = () => {
     }));
   }
 
-  // Step 2: Extract PA and not_PA arrays
+  // Extract PA and not_PA arrays
   const area_PA = sub_data?.area_km2_by_bin_in_PA || [];
   const area_not_PA = sub_data?.area_km2_by_bin_not_in_PA || [];
   
-  // Step 3: Construct stacked data in the format expected by the chart
+  // Construct stacked data
   let chartData_areas_stacked = [];
   if (area_PA.length === labels.length && area_not_PA.length === labels.length) {
     for (let i = 0; i < labels.length; i++) {
@@ -111,7 +97,6 @@ const FinalScreen = () => {
     }
   }
 
-  // Helper function to get display names
   const getDisplayValue = (key, type) => {
     if (!key) return 'Not selected';
     
@@ -131,7 +116,6 @@ const FinalScreen = () => {
     <div>
       <h2 className="text-2xl mb-4">Summary</h2>
       
-      {/* Show selection path */}
       <div className="mb-6 p-4 bg-gray-50 rounded">
         <h3 className="text-lg font-semibold mb-2">Your Selection Path:</h3>
         <ul className="space-y-1">
@@ -160,14 +144,14 @@ const FinalScreen = () => {
       </div>
       
       <BarChart data={chartData_PA_frac}
-        title = 'Composition of protected area by suitability'
-        xLabel  = 'Suitability'
-        yLabel  = 'Proportion within protected areas'
+        title='Composition of protected area by suitability'
+        xLabel='Suitability'
+        yLabel='Proportion within protected areas'
       />
       <BarChart data={chartData_areas_stacked}
-        title = 'Level of protection by suitability category'
-        xLabel  = 'Suitability'
-        yLabel  = 'Area (km²)'
+        title='Level of protection by suitability category'
+        xLabel='Suitability'
+        yLabel='Area (km²)'
       />
       <div className="flex gap-2">
         <button 

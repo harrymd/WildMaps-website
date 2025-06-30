@@ -37,7 +37,6 @@ function updateDatasetLayer(data, datasetKey, setLayers) {
   // Load the dataset configuration
   const datasetSubFolder = data?.[datasetKey]?.folder;
   const datasetMaxZoom = data?.[datasetKey]?.max_zoom;
-  console.log(data?.[datasetKey]);
   //const datasetMaxZoomStr = datasetMaxZoom.toString().padStart(2, '0');
   const datasetMaxZoomStr = 'auto';
   const datasetBounds = data?.[datasetKey]?.raster_summary?.bounds ?? [];

@@ -31,8 +31,6 @@ const SelectDataset = () => {
       );
     }
   
-    console.log('Filtered datasets:', Object.keys(filteredData).length, 'entries');
-  
     // Return filtered datasets as table rows
     return Object.entries(filteredData).map(([key, entry]) => ({
       value: key,

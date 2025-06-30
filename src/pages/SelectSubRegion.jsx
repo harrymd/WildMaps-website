@@ -1,0 +1,93 @@
+// SelectSubRegion.jsx
+import GeneralSelectComponent from '../components/GeneralSelectComponent';
+import { useAppContext } from '../context/AppContext';
+import { useMapPanning } from '../hooks/useMapPanning';
+
+const SelectSubRegion = () => {
+  const { subregionData } = useAppContext();
+  const { handleLocationSelection } = useMapPanning('subregion', subregionData, 'panToSubregion');
+
+  const getSubRegionOptions = (allParams, data) => {
+    let filteredData = data || {};
+    
+    // Filter by superspecies if selected
+    if (allParams.superspecies) {
+      filteredData = Object.fromEntries(
+        Object.entries(filteredData).filter(([key, entry]) => 
+          entry.superspecies === allParams.superspecies
+        )
+      );
+    }
+    
+    // Filter by region if selected
+    if (allParams.region) {
+      filteredData = Object.fromEntries(
+        Object.entries(filteredData).filter(([key, entry]) => 
+          entry.regions && entry.regions.includes(allParams.region)
+        )
+      );
+    }
+    
+    // Get all subregions from filtered data (flattening the subregions arrays)
+    const allSubregions = Object.values(filteredData)
+      .flatMap(entry => entry.subregions || [])
+      .filter(subregion => subregion && subregion.trim() !== '');
+    
+    // Get unique subregions
+    const uniqueSubregions = [...new Set(allSubregions)];
+    
+    // Sort alphabetically and return as options
+    //return uniqueSubregions
+    //  .sort((a, b) => a.localeCompare(b))
+    //  .map(subregion => ({
+    //    value: subregion,
+    //    cells: [subregion]
+    //  }));
+    return uniqueSubregions
+      .sort((a, b) => a.localeCompare(b))
+      .map(subregion => ({
+        value: subregion,
+        cells: [subregion === 'none' ? 'Entire region' : subregion]
+      }));
+  };
+
+  const getContextDisplay = (allParams) => {
+    const context = [];
+    if (allParams.superspecies) {
+      context.push(`SuperSpecies: **${allParams.superspecies}**`);
+    }
+    if (allParams.region) {
+      context.push(`Region: **${allParams.region}**`);
+    }
+    
+    if (context.length > 0) {
+      return (
+        <div className="mb-4">
+          {context.map((item, index) => (
+            <p key={index} className="mb-1">
+              {item.split('**').map((part, i) => 
+                i % 2 === 1 ? <strong key={i}>{part}</strong> : part
+              )}
+            </p>
+          ))}
+        </div>
+      );
+    }
+    return null;
+  };
+
+  return (
+    <GeneralSelectComponent
+      route="/subregion"
+      paramKey="subregion"
+      title="SubRegion"
+      description="Click on a row to select a subregion:"
+      getOptions={getSubRegionOptions}
+      getContextDisplay={getContextDisplay}
+      tableHeaders={[]} // No headers
+      onSelect={handleLocationSelection}
+    />
+  );
+};
+
+export default SelectSubRegion;

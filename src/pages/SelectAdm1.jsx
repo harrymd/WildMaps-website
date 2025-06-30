@@ -1,20 +1,32 @@
-// SelectAdm1.jsx
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom'; // Add this line
+import { useNavigate } from 'react-router-dom';
 import GeneralSelectComponent from '../components/GeneralSelectComponent';
 import { useAppContext } from '../context/AppContext';
 import { useFilterState } from '../hooks/useFilterState';
 import { getNextRoute, getPreviousRoute } from '../utils/navigationUtils';
+import { useMapPanning } from '../hooks/useMapPanning';
 
 const SelectAdm1 = () => {
-  const { data, admData, setAdm1Key } = useAppContext();
+  const { data, admData } = useAppContext();
   const { getParam, setParamAndNavigate } = useFilterState();
+  const navigate = useNavigate();
+  
+  // Transform admData.adm1 to the format expected by useMapPanning
+  const adm1BboxData = {};
+  if (admData.adm1) {
+    Object.entries(admData.adm1).forEach(([adm1Code, adm1Info]) => {
+      if (adm1Info.bbox) {
+        adm1BboxData[adm1Code] = { bbox: adm1Info.bbox };
+      }
+    });
+  }
+  
+  const { handleLocationSelection } = useMapPanning('adm1Key', adm1BboxData, 'panToAdm1');
   
   const datasetKey = getParam('datasetKey');
   const adm0Key = getParam('adm0Key');
   const dataset = data?.[datasetKey];
   const startingFilter = getParam('startingFilter');
-  const navigate = useNavigate()
 
   const getAdm1Options = (allParams, data) => {
     const datasetKey = allParams.datasetKey;
@@ -32,7 +44,6 @@ const SelectAdm1 = () => {
       }];
     }
 
-    // Use the same filtering logic as your original code
     const filtered = dataset?.adm1_list?.filter(a => a.slice(0, 3) === adm0Key.slice(0, 3)) || [];
     const options = ['all_adm1', ...filtered];
     
@@ -84,58 +95,55 @@ const SelectAdm1 = () => {
     return null;
   };
 
-  // Custom handler to set the old context variables
-  const handleAdm1Selection = (adm1Key) => {
-    setAdm1Key(adm1Key);
-  };
-
   // Custom back handler that skips auto-redirect steps
   const handleBack = () => {
     const dataset = data?.[getParam('datasetKey')];
     
-    // Check if SelectAdm0 would auto-redirect (only one country option)
+    // Check if SelectAdm0 would auto-redirect
     if (dataset && dataset.adm0_list && ['all_adm0', ...dataset.adm0_list].length === 2) {
-      // Skip SelectAdm0 and go back to the step before it
       const prevPrevRoute = getPreviousRoute('/adm0', startingFilter);
       const currentParams = new URLSearchParams(window.location.search);
-      // Remove adm0Key and adm1Key from params since we're going back further
       currentParams.delete('adm0Key');
       currentParams.delete('adm1Key');
       navigate(`${prevPrevRoute}?${currentParams.toString()}`);
     } else {
-      // Normal back to SelectAdm0
       const prevRoute = getPreviousRoute('/adm1', startingFilter);
       const currentParams = new URLSearchParams(window.location.search);
-      currentParams.delete('adm1Key'); // Remove current selection
+      currentParams.delete('adm1Key');
       navigate(`${prevRoute}?${currentParams.toString()}`);
     }
   };
 
-  // Auto-redirect logic if there's only one option (matching your original logic)
+  // Auto-redirect logic
   useEffect(() => {
-    if (dataset && adm0Key && adm0Key !== 'all_adm0') {
+    const currentAdm1Key = getParam('adm1Key');
+    
+    // Don't auto-redirect if user already has a selection
+    if (currentAdm1Key) {
+      return;
+    }
+    
+    if (dataset && adm0Key) {
+      if (adm0Key === 'all_adm0') {
+        const nextRoute = getNextRoute('/adm1', startingFilter);
+        setParamAndNavigate('adm1Key', 'all_adm1', nextRoute);
+        return;
+      }
+      
       const filtered = dataset?.adm1_list?.filter(a => a.slice(0, 3) === adm0Key.slice(0, 3)) || [];
       const options = ['all_adm1', ...filtered];
       
       if (options.length === 2) {
-        // Only one real option (plus "all"), auto-select it
         const selectedAdm1 = options[1];
-        setAdm1Key(selectedAdm1);
-        
-        // Navigate to next step
         const nextRoute = getNextRoute('/adm1', startingFilter);
         setParamAndNavigate('adm1Key', selectedAdm1, nextRoute);
       }
-    } else if (adm0Key === 'all_adm0') {
-      // Auto-select all_adm1 if all_adm0 was selected
-      setAdm1Key('all_adm1');
-      const nextRoute = getNextRoute('/adm1', startingFilter);
-      setParamAndNavigate('adm1Key', 'all_adm1', nextRoute);
     }
-  }, [dataset, adm0Key, startingFilter, setAdm1Key, setParamAndNavigate]);
+  }, [dataset, adm0Key, startingFilter, setParamAndNavigate, getParam]);
 
   // Don't render if auto-redirecting
-  if (dataset && adm0Key) {
+  const currentAdm1Key = getParam('adm1Key');
+  if (!currentAdm1Key && dataset && adm0Key) {
     if (adm0Key === 'all_adm0') {
       return <div>Redirecting...</div>;
     }
@@ -148,7 +156,6 @@ const SelectAdm1 = () => {
     }
   }
 
-  // Custom title that includes the country name
   const getTitle = () => {
     if (adm0Key && adm0Key !== 'all_adm0') {
       const countryName = admData.adm0?.[adm0Key]?.name || adm0Key;
@@ -165,9 +172,9 @@ const SelectAdm1 = () => {
       description="Click on a row to select a region:"
       getOptions={getAdm1Options}
       getContextDisplay={getContextDisplay}
-      tableHeaders={[]} // No headers
-      onSelect={handleAdm1Selection}
+      tableHeaders={[]}
       customBackHandler={handleBack}
+      onSelect={handleLocationSelection}
     />
   );
 };
