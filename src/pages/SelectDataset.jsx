@@ -1,61 +1,54 @@
-import { useNavigate } from 'react-router-dom';
-import { useAppContext } from '../context/AppContext';
+import GeneralSelectComponent from '../components/GeneralSelectComponent';
 
 const SelectDataset = () => {
-  const { data, setDatasetKey, datasetKey, setAdm0Key, setAdm1Key } = useAppContext();
-  const navigate = useNavigate();
-
-  const handleSelect = (key) => {
-    setDatasetKey(key);
-    setAdm0Key(null);
-    setAdm1Key(null);
-  };
-
-  const handleNext = () => {
-    if (datasetKey) navigate(`/${datasetKey}`);
+  const getDatasetOptions = (allParams, data) => {
+    let filteredData = data || {};
+  
+    // Filter by superspecies if selected
+    if (allParams.superspecies) {
+      filteredData = Object.fromEntries(
+        Object.entries(filteredData).filter(([key, entry]) =>
+          entry.superspecies === allParams.superspecies
+        )
+      );
+    }
+  
+    // Filter by region if selected
+    if (allParams.region) {
+      filteredData = Object.fromEntries(
+        Object.entries(filteredData).filter(([key, entry]) =>
+          entry.regions && entry.regions.includes(allParams.region)
+        )
+      );
+    }
+  
+    // Filter by subregion if selected
+    if (allParams.subregion) {
+      filteredData = Object.fromEntries(
+        Object.entries(filteredData).filter(([key, entry]) =>
+          entry.subregions && entry.subregions.includes(allParams.subregion)
+        )
+      );
+    }
+  
+    console.log('Filtered datasets:', Object.keys(filteredData).length, 'entries');
+  
+    // Return filtered datasets as table rows
+    return Object.entries(filteredData).map(([key, entry]) => ({
+      value: key,
+      cells: [entry.common_name || 'Unknown species', entry.source_text || 'No source']
+    }));
   };
 
   return (
-    <div>
-      <h2 className="text-2xl mb-4">Select dataset</h2>
-      <p className = "mb-4">Click on a row to select a study (it will show on the map):</p>
-      <table className="w-full mb-4 border">
-        <thead>
-          <tr>
-            {/*<th className="border px-2">Key</th>*/}
-            <th className="border px-2 text-left">Species</th>
-            <th className="border px-2 text-left">Study Area</th>
-            <th className="border px-2 text-left">Source</th>
-          </tr>
-        </thead>
-        <tbody>
-          {/*Object.entries(data.summary || {}).map(([key, { species, study_area, source_text }]) => (*/}
-          {Object.entries(data || {}).map(([key, { species, study_area, source_text }]) => (
-            <tr key={key} onClick={() => handleSelect(key)} className={`cursor-pointer ${key === datasetKey ? 'bg-blue-100' : ''}`}>
-              {/*<td className="border px-2">{key}</td>*/}
-              <td className="border px-2">{species}</td>
-              <td className="border px-2">{study_area}</td>
-              <td className="border px-2">{source_text}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <div className="flex gap-2">
-        <button
-          //onClick={}
-          className="bg-gray-500 text-white px-4 py-2 rounded"
-        >
-          Reset view
-        </button>
-        <button
-          onClick={handleNext}
-          disabled={!datasetKey}
-          className="bg-blue-500 text-white px-4 py-2 rounded disabled:opacity-50"
-        >
-          Next
-        </button>
-      </div>
-    </div>
+    <GeneralSelectComponent
+      route="/dataset"
+      paramKey="datasetKey"
+      title="Dataset"
+      description="Click on a row to select a study (it will show on the map):"
+      getOptions={getDatasetOptions}
+      tableHeaders={['Species', 'Source']}
+    />
   );
 };
 

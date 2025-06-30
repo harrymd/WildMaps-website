@@ -20,6 +20,14 @@ const UNDERLAYS = {
   POPULATION: {
     label: 'Population density',
     value: 'style/worldpop.json'
+  },
+  LAND_use: {
+    label: 'Land use',
+    value: 'style/landcover.json'
+  },
+  ECOREGIONS: {
+    label: 'Ecoregions',
+    value: 'style/ecoregions.json'
   }
 };
 

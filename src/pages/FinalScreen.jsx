@@ -1,12 +1,21 @@
-import { useNavigate, useParams } from 'react-router-dom';
+// FinalScreen.jsx
+import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
+import { useFilterState } from '../hooks/useFilterState';
+import { getPreviousRoute } from '../utils/navigationUtils';
 import BarChart from '../Components/BarChart';
 
 const FinalScreen = () => {
-  const { datasetKey, adm0Key, adm1Key } = useParams();
   const navigate = useNavigate();
   const { data, setDatasetKey, setAdm0Key, setAdm1Key } = useAppContext();
-  //const dataset = data.raw?.[datasetKey];
+  const { getParam, getAllParams } = useFilterState();
+  
+  const datasetKey = getParam('datasetKey');
+  const adm0Key = getParam('adm0Key');
+  const adm1Key = getParam('adm1Key');
+  const startingFilter = getParam('startingFilter');
+  const allParams = getAllParams();
+  
   const dataset = data?.[datasetKey];
   const adm1_list_filtered = adm0Key === 'all_adm0'
     ? dataset?.adm1_list || []
@@ -17,6 +26,51 @@ const FinalScreen = () => {
     setAdm0Key(null);
     setAdm1Key(null);
     navigate('/');
+  };
+
+  const handlePrevious = () => {
+    const navigate = useNavigate();
+    const dataset = data?.[datasetKey];
+    
+    // Check if SelectAdm1 would auto-redirect (only one region option)
+    let skipAdm1 = false;
+    if (dataset && adm0Key) {
+      let adm1Options;
+      if (adm0Key === 'all_adm0') {
+        adm1Options = ['all_adm1'];
+      } else {
+        const filtered = dataset?.adm1_list?.filter(a => a.slice(0, 3) === adm0Key.slice(0, 3)) || [];
+        adm1Options = ['all_adm1', ...filtered];
+      }
+      skipAdm1 = adm1Options.length <= 2; // Only 'all_adm1' or 'all_adm1' + one option
+    }
+    
+    // Check if SelectAdm0 would auto-redirect (only one country option)
+    let skipAdm0 = false;
+    if (dataset && dataset.adm0_list) {
+      const adm0Options = ['all_adm0', ...dataset.adm0_list];
+      skipAdm0 = adm0Options.length <= 2; // Only 'all_adm0' or 'all_adm0' + one option
+    }
+    
+    const currentParams = new URLSearchParams(window.location.search);
+    
+    if (skipAdm1 && skipAdm0) {
+      // Skip both SelectAdm1 and SelectAdm0, go back to SelectDataset
+      currentParams.delete('adm0Key');
+      currentParams.delete('adm1Key');
+      currentParams.delete('datasetKey');
+      navigate(`/dataset?${currentParams.toString()}`);
+    } else if (skipAdm1) {
+      // Skip SelectAdm1, go back to SelectAdm0
+      currentParams.delete('adm1Key');
+      currentParams.delete('datasetKey');
+      navigate(`/adm0?${currentParams.toString()}`);
+    } else {
+      // Normal back to SelectAdm1
+      console.log('AAA');
+      currentParams.delete('datasetKey');
+      navigate(`/adm1?${currentParams.toString()}`);
+    }
   };
 
   const labels = ['Low', 'Low-med', 'High-med', 'High'];
@@ -57,14 +111,54 @@ const FinalScreen = () => {
     }
   }
 
+  // Helper function to get display names
+  const getDisplayValue = (key, type) => {
+    if (!key) return 'Not selected';
+    
+    switch (type) {
+      case 'dataset':
+        return dataset?.common_name || key;
+      case 'adm0':
+        return key === 'all_adm0' ? 'All countries' : key;
+      case 'adm1':
+        return key === 'all_adm1' ? 'All regions' : key;
+      default:
+        return key;
+    }
+  };
+
   return (
     <div>
       <h2 className="text-2xl mb-4">Summary</h2>
-      <ul className="mb-4">
-        <li><strong>Dataset:</strong> {datasetKey}</li>
-        <li><strong>Adm0:</strong>{adm0Key} (out of {dataset?.adm0_list?.length ?? 0} options)</li>
-        <li><strong>Adm1:</strong>{adm1Key} (out of {adm1_list_filtered?.length ?? 0} options)</li>
-      </ul>
+      
+      {/* Show selection path */}
+      <div className="mb-6 p-4 bg-gray-50 rounded">
+        <h3 className="text-lg font-semibold mb-2">Your Selection Path:</h3>
+        <ul className="space-y-1">
+          {allParams.startingFilter && (
+            <li><strong>Starting Filter:</strong> {allParams.startingFilter === 'region' ? 'Region First' : 'SuperSpecies First'}</li>
+          )}
+          {allParams.superspecies && (
+            <li><strong>SuperSpecies:</strong> {allParams.superspecies}</li>
+          )}
+          {allParams.region && (
+            <li><strong>Region:</strong> {allParams.region}</li>
+          )}
+          {allParams.subregion && (
+            <li><strong>SubRegion:</strong> {allParams.subregion}</li>
+          )}
+          {datasetKey && (
+            <li><strong>Dataset:</strong> {getDisplayValue(datasetKey, 'dataset')}</li>
+          )}
+          {adm0Key && (
+            <li><strong>Country:</strong> {getDisplayValue(adm0Key, 'adm0')} (out of {dataset?.adm0_list?.length ?? 0} options)</li>
+          )}
+          {adm1Key && (
+            <li><strong>Region:</strong> {getDisplayValue(adm1Key, 'adm1')} (out of {adm1_list_filtered?.length ?? 0} options)</li>
+          )}
+        </ul>
+      </div>
+      
       <BarChart data={chartData_PA_frac}
         title = 'Composition of protected area by suitability'
         xLabel  = 'Suitability'
@@ -76,10 +170,18 @@ const FinalScreen = () => {
         yLabel  = 'Area (km²)'
       />
       <div className="flex gap-2">
-        <button onClick={() =>
-          navigate(adm0Key === 'all_adm0' ? `/${datasetKey}` : `/${datasetKey}/${adm0Key}`)}
-          className="bg-gray-500 text-white px-4 py-2 rounded">Previous</button>
-        <button onClick={handleReset} className="bg-red-500 text-white px-4 py-2 rounded">Reset Parameters</button>
+        <button 
+          onClick={handlePrevious}
+          className="bg-gray-500 text-white px-4 py-2 rounded"
+        >
+          Previous
+        </button>
+        <button 
+          onClick={handleReset} 
+          className="bg-red-500 text-white px-4 py-2 rounded"
+        >
+          Reset Parameters
+        </button>
       </div>
     </div>
   );

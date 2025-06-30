@@ -1,6 +1,10 @@
 import { useEffect } from 'react';
+import { useFilterState } from '../hooks/useFilterState';
 
-export default function useUpdateMapOnDatasetChange(mapRef, data, datasetKey, setLayers) {
+export default function useUpdateMapOnDatasetChange(mapRef, data, setLayers) {
+
+  const { getParam } = useFilterState();
+  const datasetKey = getParam('datasetKey');
   
   useEffect(() => {
     const map = mapRef.current;
@@ -32,14 +36,16 @@ function updateDatasetLayer(data, datasetKey, setLayers) {
 
   // Load the dataset configuration
   const datasetSubFolder = data?.[datasetKey]?.folder;
-  const datasetMaxZoom = 6;
-  const datasetMaxZoomStr = datasetMaxZoom.toString().padStart(2, '0');
+  const datasetMaxZoom = data?.[datasetKey]?.max_zoom;
+  console.log(data?.[datasetKey]);
+  //const datasetMaxZoomStr = datasetMaxZoom.toString().padStart(2, '0');
+  const datasetMaxZoomStr = 'auto';
   const datasetBounds = data?.[datasetKey]?.raster_summary?.bounds ?? [];
   const [datasetMinLng, datasetMinLat, datasetMaxLng, datasetMaxLat] = datasetBounds;
 
   // Only add the layer if we have the required data
   if (datasetSubFolder && datasetMaxZoomStr) {
-    const urlTemplate = `https://habitat-web-map.s3.eu-west-2.amazonaws.com/code_output/raster_tiles/SDM/${datasetSubFolder}/${datasetKey}_zoom_${datasetMaxZoomStr}/{z}/{x}/{y}.png`;
+    const urlTemplate = `https://wildcru-wildmaps.s3.eu-west-2.amazonaws.com/code_output/raster_tiles/SDM/${datasetSubFolder}/${datasetKey}_zoom_${datasetMaxZoomStr}/{z}/{x}/{y}.png`;
     
     // Create the data layer configuration
     const dataLayerConfig = {

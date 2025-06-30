@@ -1,16 +1,341 @@
 {
     "adm0": {
+        "120": {
+            "name": "Isla Brasilera"
+        },
+        "ARG": {
+            "name": "Argentina"
+        },
+        "BLZ": {
+            "name": "Belize"
+        },
+        "BOL": {
+            "name": "Bolivia"
+        },
+        "BRA": {
+            "name": "Brazil"
+        },
         "BRN": {
             "name": "Brunei"
+        },
+        "CHL": {
+            "name": "Chile"
+        },
+        "COL": {
+            "name": "Colombia"
+        },
+        "CRI": {
+            "name": "Costa Rica"
+        },
+        "ECU": {
+            "name": "Ecuador"
+        },
+        "FRA": {
+            "name": "France"
+        },
+        "GTM": {
+            "name": "Guatemala"
+        },
+        "GUY": {
+            "name": "Guyana"
+        },
+        "HND": {
+            "name": "Honduras"
         },
         "IDN": {
             "name": "Indonesia"
         },
+        "MEX": {
+            "name": "Mexico"
+        },
         "MYS": {
             "name": "Malaysia"
+        },
+        "NIC": {
+            "name": "Nicaragua"
+        },
+        "PAN": {
+            "name": "Panama"
+        },
+        "PER": {
+            "name": "Peru"
+        },
+        "PRY": {
+            "name": "Paraguay"
+        },
+        "SLV": {
+            "name": "El Salvador"
+        },
+        "SUR": {
+            "name": "Suriname"
+        },
+        "URY": {
+            "name": "Uruguay"
+        },
+        "USA": {
+            "name": "United States"
+        },
+        "VEN": {
+            "name": "Venezuela"
         }
     },
     "adm1": {
+        "120_001": {
+            "name": "Isla Brasilera",
+            "adm0_iso3": "120"
+        },
+        "ARG_001": {
+            "name": "Buenos Aires",
+            "adm0_iso3": "ARG"
+        },
+        "ARG_002": {
+            "name": "Catamarca",
+            "adm0_iso3": "ARG"
+        },
+        "ARG_003": {
+            "name": "Chaco",
+            "adm0_iso3": "ARG"
+        },
+        "ARG_004": {
+            "name": "Chubut",
+            "adm0_iso3": "ARG"
+        },
+        "ARG_005": {
+            "name": "Ciudad Aut\u00f3noma de Buenos Aires",
+            "adm0_iso3": "ARG"
+        },
+        "ARG_006": {
+            "name": "Corrientes",
+            "adm0_iso3": "ARG"
+        },
+        "ARG_007": {
+            "name": "C\u00f3rdoba",
+            "adm0_iso3": "ARG"
+        },
+        "ARG_008": {
+            "name": "Formosa",
+            "adm0_iso3": "ARG"
+        },
+        "ARG_009": {
+            "name": "Jujuy",
+            "adm0_iso3": "ARG"
+        },
+        "ARG_010": {
+            "name": "La Pampa",
+            "adm0_iso3": "ARG"
+        },
+        "ARG_011": {
+            "name": "La Roja",
+            "adm0_iso3": "ARG"
+        },
+        "ARG_012": {
+            "name": "Mendoza",
+            "adm0_iso3": "ARG"
+        },
+        "ARG_013": {
+            "name": "Misiones",
+            "adm0_iso3": "ARG"
+        },
+        "ARG_014": {
+            "name": "Neuqu\u00e9n",
+            "adm0_iso3": "ARG"
+        },
+        "ARG_015": {
+            "name": "R\u00edo Negro",
+            "adm0_iso3": "ARG"
+        },
+        "ARG_016": {
+            "name": "Salta",
+            "adm0_iso3": "ARG"
+        },
+        "ARG_017": {
+            "name": "San Juan",
+            "adm0_iso3": "ARG"
+        },
+        "ARG_018": {
+            "name": "San Luis",
+            "adm0_iso3": "ARG"
+        },
+        "ARG_020": {
+            "name": "Santa Fe",
+            "adm0_iso3": "ARG"
+        },
+        "ARG_021": {
+            "name": "Santiago del Estero",
+            "adm0_iso3": "ARG"
+        },
+        "ARG_023": {
+            "name": "Tucum\u00e1n",
+            "adm0_iso3": "ARG"
+        },
+        "BLZ_001": {
+            "name": "Belize",
+            "adm0_iso3": "BLZ"
+        },
+        "BLZ_002": {
+            "name": "Cayo",
+            "adm0_iso3": "BLZ"
+        },
+        "BLZ_003": {
+            "name": "Corozal",
+            "adm0_iso3": "BLZ"
+        },
+        "BLZ_004": {
+            "name": "Orange Walk",
+            "adm0_iso3": "BLZ"
+        },
+        "BLZ_005": {
+            "name": "Stann Creek",
+            "adm0_iso3": "BLZ"
+        },
+        "BLZ_006": {
+            "name": "Toledo",
+            "adm0_iso3": "BLZ"
+        },
+        "BOL_001": {
+            "name": "Beni",
+            "adm0_iso3": "BOL"
+        },
+        "BOL_002": {
+            "name": "Chuquisaca",
+            "adm0_iso3": "BOL"
+        },
+        "BOL_003": {
+            "name": "Cochabamba",
+            "adm0_iso3": "BOL"
+        },
+        "BOL_004": {
+            "name": "La Paz",
+            "adm0_iso3": "BOL"
+        },
+        "BOL_005": {
+            "name": "Oruro",
+            "adm0_iso3": "BOL"
+        },
+        "BOL_006": {
+            "name": "Pando",
+            "adm0_iso3": "BOL"
+        },
+        "BOL_007": {
+            "name": "Potos\u00ed",
+            "adm0_iso3": "BOL"
+        },
+        "BOL_008": {
+            "name": "Santa Cruz",
+            "adm0_iso3": "BOL"
+        },
+        "BOL_009": {
+            "name": "Tarija",
+            "adm0_iso3": "BOL"
+        },
+        "BRA_001": {
+            "name": "Acre",
+            "adm0_iso3": "BRA"
+        },
+        "BRA_002": {
+            "name": "Alagoas",
+            "adm0_iso3": "BRA"
+        },
+        "BRA_003": {
+            "name": "Amapa",
+            "adm0_iso3": "BRA"
+        },
+        "BRA_004": {
+            "name": "Amazonas",
+            "adm0_iso3": "BRA"
+        },
+        "BRA_005": {
+            "name": "Bahia",
+            "adm0_iso3": "BRA"
+        },
+        "BRA_006": {
+            "name": "Ceara",
+            "adm0_iso3": "BRA"
+        },
+        "BRA_007": {
+            "name": "Distrito Federal",
+            "adm0_iso3": "BRA"
+        },
+        "BRA_008": {
+            "name": "Espirito Santo",
+            "adm0_iso3": "BRA"
+        },
+        "BRA_009": {
+            "name": "Goias",
+            "adm0_iso3": "BRA"
+        },
+        "BRA_010": {
+            "name": "Maranhao",
+            "adm0_iso3": "BRA"
+        },
+        "BRA_011": {
+            "name": "Mato Grosso",
+            "adm0_iso3": "BRA"
+        },
+        "BRA_012": {
+            "name": "Mato Grosso do Sul",
+            "adm0_iso3": "BRA"
+        },
+        "BRA_013": {
+            "name": "Minas Gerais",
+            "adm0_iso3": "BRA"
+        },
+        "BRA_014": {
+            "name": "Para",
+            "adm0_iso3": "BRA"
+        },
+        "BRA_015": {
+            "name": "Paraiba",
+            "adm0_iso3": "BRA"
+        },
+        "BRA_016": {
+            "name": "Parana",
+            "adm0_iso3": "BRA"
+        },
+        "BRA_017": {
+            "name": "Pernambuco",
+            "adm0_iso3": "BRA"
+        },
+        "BRA_018": {
+            "name": "Piaui",
+            "adm0_iso3": "BRA"
+        },
+        "BRA_019": {
+            "name": "Rio Granda do Norte",
+            "adm0_iso3": "BRA"
+        },
+        "BRA_020": {
+            "name": "Rio Grande do Sul",
+            "adm0_iso3": "BRA"
+        },
+        "BRA_021": {
+            "name": "Rio de Jeneiro",
+            "adm0_iso3": "BRA"
+        },
+        "BRA_022": {
+            "name": "Rondonia",
+            "adm0_iso3": "BRA"
+        },
+        "BRA_023": {
+            "name": "Roraima",
+            "adm0_iso3": "BRA"
+        },
+        "BRA_024": {
+            "name": "Santa Catarina",
+            "adm0_iso3": "BRA"
+        },
+        "BRA_025": {
+            "name": "Sao Paulo",
+            "adm0_iso3": "BRA"
+        },
+        "BRA_026": {
+            "name": "Sergipe",
+            "adm0_iso3": "BRA"
+        },
+        "BRA_027": {
+            "name": "Tocantins",
+            "adm0_iso3": "BRA"
+        },
         "BRN_001": {
             "name": "Belait",
             "adm0_iso3": "BRN"
@@ -26,6 +351,466 @@
         "BRN_004": {
             "name": "Tutong",
             "adm0_iso3": "BRN"
+        },
+        "CHL_002": {
+            "name": "Regi\u00c3\u00b3n de Antofagasta",
+            "adm0_iso3": "CHL"
+        },
+        "CHL_003": {
+            "name": "Regi\u00c3\u00b3n de Arica y Parinacota",
+            "adm0_iso3": "CHL"
+        },
+        "CHL_004": {
+            "name": "Regi\u00c3\u00b3n de Atacama",
+            "adm0_iso3": "CHL"
+        },
+        "CHL_011": {
+            "name": "Regi\u00c3\u00b3n de Tarapac\u00c3\u00a1",
+            "adm0_iso3": "CHL"
+        },
+        "COL_001": {
+            "name": "Amazonas",
+            "adm0_iso3": "COL"
+        },
+        "COL_002": {
+            "name": "Antioquia",
+            "adm0_iso3": "COL"
+        },
+        "COL_003": {
+            "name": "Arauca",
+            "adm0_iso3": "COL"
+        },
+        "COL_005": {
+            "name": "Atl\u00e1ntico",
+            "adm0_iso3": "COL"
+        },
+        "COL_006": {
+            "name": "Bogota Capital District",
+            "adm0_iso3": "COL"
+        },
+        "COL_007": {
+            "name": "Bol\u00edvar",
+            "adm0_iso3": "COL"
+        },
+        "COL_008": {
+            "name": "Boyac\u00e1",
+            "adm0_iso3": "COL"
+        },
+        "COL_009": {
+            "name": "Caldas",
+            "adm0_iso3": "COL"
+        },
+        "COL_010": {
+            "name": "Caquet\u00e1",
+            "adm0_iso3": "COL"
+        },
+        "COL_011": {
+            "name": "Casanare",
+            "adm0_iso3": "COL"
+        },
+        "COL_012": {
+            "name": "Cauca",
+            "adm0_iso3": "COL"
+        },
+        "COL_013": {
+            "name": "Cesar",
+            "adm0_iso3": "COL"
+        },
+        "COL_014": {
+            "name": "Choc\u00f3",
+            "adm0_iso3": "COL"
+        },
+        "COL_015": {
+            "name": "Cundinamarca",
+            "adm0_iso3": "COL"
+        },
+        "COL_016": {
+            "name": "C\u00f3rdoba",
+            "adm0_iso3": "COL"
+        },
+        "COL_017": {
+            "name": "Guain\u00eda",
+            "adm0_iso3": "COL"
+        },
+        "COL_018": {
+            "name": "Guaviare",
+            "adm0_iso3": "COL"
+        },
+        "COL_019": {
+            "name": "Huila",
+            "adm0_iso3": "COL"
+        },
+        "COL_020": {
+            "name": "La Guajira",
+            "adm0_iso3": "COL"
+        },
+        "COL_021": {
+            "name": "Magdalena",
+            "adm0_iso3": "COL"
+        },
+        "COL_022": {
+            "name": "Meta",
+            "adm0_iso3": "COL"
+        },
+        "COL_023": {
+            "name": "Nari\u00f1o",
+            "adm0_iso3": "COL"
+        },
+        "COL_024": {
+            "name": "Norte de Santander",
+            "adm0_iso3": "COL"
+        },
+        "COL_025": {
+            "name": "Putumayo",
+            "adm0_iso3": "COL"
+        },
+        "COL_026": {
+            "name": "Quind\u00edo",
+            "adm0_iso3": "COL"
+        },
+        "COL_027": {
+            "name": "Risaralda",
+            "adm0_iso3": "COL"
+        },
+        "COL_028": {
+            "name": "Santander",
+            "adm0_iso3": "COL"
+        },
+        "COL_029": {
+            "name": "Sucre",
+            "adm0_iso3": "COL"
+        },
+        "COL_030": {
+            "name": "Tolima",
+            "adm0_iso3": "COL"
+        },
+        "COL_031": {
+            "name": "Valle del Cauca",
+            "adm0_iso3": "COL"
+        },
+        "COL_032": {
+            "name": "Vaup\u00e9s",
+            "adm0_iso3": "COL"
+        },
+        "COL_033": {
+            "name": "Vichada",
+            "adm0_iso3": "COL"
+        },
+        "CRI_001": {
+            "name": "Provincia Alajuela",
+            "adm0_iso3": "CRI"
+        },
+        "CRI_002": {
+            "name": "Provincia Cartago",
+            "adm0_iso3": "CRI"
+        },
+        "CRI_003": {
+            "name": "Provincia Guanacaste",
+            "adm0_iso3": "CRI"
+        },
+        "CRI_004": {
+            "name": "Provincia Heredia",
+            "adm0_iso3": "CRI"
+        },
+        "CRI_005": {
+            "name": "Provincia Lim\u00f3n",
+            "adm0_iso3": "CRI"
+        },
+        "CRI_006": {
+            "name": "Provincia Puntarenas",
+            "adm0_iso3": "CRI"
+        },
+        "CRI_007": {
+            "name": "Provincia San Jos\u00e9",
+            "adm0_iso3": "CRI"
+        },
+        "ECU_001": {
+            "name": "Azuay",
+            "adm0_iso3": "ECU"
+        },
+        "ECU_002": {
+            "name": "Bol\u00edvar",
+            "adm0_iso3": "ECU"
+        },
+        "ECU_003": {
+            "name": "Carchi",
+            "adm0_iso3": "ECU"
+        },
+        "ECU_004": {
+            "name": "Ca\u00f1ar",
+            "adm0_iso3": "ECU"
+        },
+        "ECU_005": {
+            "name": "Chimborazo",
+            "adm0_iso3": "ECU"
+        },
+        "ECU_006": {
+            "name": "Cotopaxi",
+            "adm0_iso3": "ECU"
+        },
+        "ECU_007": {
+            "name": "El Oro",
+            "adm0_iso3": "ECU"
+        },
+        "ECU_008": {
+            "name": "Esmeraldas",
+            "adm0_iso3": "ECU"
+        },
+        "ECU_010": {
+            "name": "Guayas",
+            "adm0_iso3": "ECU"
+        },
+        "ECU_011": {
+            "name": "Imbabura",
+            "adm0_iso3": "ECU"
+        },
+        "ECU_012": {
+            "name": "Loja",
+            "adm0_iso3": "ECU"
+        },
+        "ECU_013": {
+            "name": "Los R\u00edos",
+            "adm0_iso3": "ECU"
+        },
+        "ECU_014": {
+            "name": "Manabi",
+            "adm0_iso3": "ECU"
+        },
+        "ECU_015": {
+            "name": "Morona Santiago",
+            "adm0_iso3": "ECU"
+        },
+        "ECU_016": {
+            "name": "Napo",
+            "adm0_iso3": "ECU"
+        },
+        "ECU_017": {
+            "name": "Orellana",
+            "adm0_iso3": "ECU"
+        },
+        "ECU_018": {
+            "name": "Pastaza",
+            "adm0_iso3": "ECU"
+        },
+        "ECU_019": {
+            "name": "Pichincha",
+            "adm0_iso3": "ECU"
+        },
+        "ECU_020": {
+            "name": "Santa Elena",
+            "adm0_iso3": "ECU"
+        },
+        "ECU_021": {
+            "name": "Santo Domingo de los Ts\u00e1chilas",
+            "adm0_iso3": "ECU"
+        },
+        "ECU_022": {
+            "name": "Sucumbios",
+            "adm0_iso3": "ECU"
+        },
+        "ECU_023": {
+            "name": "Tungurahua",
+            "adm0_iso3": "ECU"
+        },
+        "ECU_024": {
+            "name": "Zamora Chinchipe",
+            "adm0_iso3": "ECU"
+        },
+        "GTM_001": {
+            "name": "Alta Verapaz",
+            "adm0_iso3": "GTM"
+        },
+        "GTM_002": {
+            "name": "Baja Verapaz",
+            "adm0_iso3": "GTM"
+        },
+        "GTM_003": {
+            "name": "Chimaltenango",
+            "adm0_iso3": "GTM"
+        },
+        "GTM_004": {
+            "name": "Chiquimula",
+            "adm0_iso3": "GTM"
+        },
+        "GTM_005": {
+            "name": "El Progreso",
+            "adm0_iso3": "GTM"
+        },
+        "GTM_006": {
+            "name": "Escuintla",
+            "adm0_iso3": "GTM"
+        },
+        "GTM_007": {
+            "name": "Guatemala",
+            "adm0_iso3": "GTM"
+        },
+        "GTM_008": {
+            "name": "Huehuetenango",
+            "adm0_iso3": "GTM"
+        },
+        "GTM_009": {
+            "name": "Izabal",
+            "adm0_iso3": "GTM"
+        },
+        "GTM_010": {
+            "name": "Jalapa",
+            "adm0_iso3": "GTM"
+        },
+        "GTM_011": {
+            "name": "Jutiapa",
+            "adm0_iso3": "GTM"
+        },
+        "GTM_012": {
+            "name": "Pet\u00e9n",
+            "adm0_iso3": "GTM"
+        },
+        "GTM_013": {
+            "name": "Quetzaltenango",
+            "adm0_iso3": "GTM"
+        },
+        "GTM_014": {
+            "name": "Quich\u00e9",
+            "adm0_iso3": "GTM"
+        },
+        "GTM_015": {
+            "name": "Retalhuleu",
+            "adm0_iso3": "GTM"
+        },
+        "GTM_016": {
+            "name": "Sacatep\u00e9quez",
+            "adm0_iso3": "GTM"
+        },
+        "GTM_017": {
+            "name": "San Marcos",
+            "adm0_iso3": "GTM"
+        },
+        "GTM_018": {
+            "name": "Santa Rosa",
+            "adm0_iso3": "GTM"
+        },
+        "GTM_019": {
+            "name": "Solol\u00e1",
+            "adm0_iso3": "GTM"
+        },
+        "GTM_020": {
+            "name": "Suchitep\u00e9quez",
+            "adm0_iso3": "GTM"
+        },
+        "GTM_021": {
+            "name": "Totonicap\u00e1n",
+            "adm0_iso3": "GTM"
+        },
+        "GTM_022": {
+            "name": "Zacapa",
+            "adm0_iso3": "GTM"
+        },
+        "GUY_001": {
+            "name": "Barina-Waini",
+            "adm0_iso3": "GUY"
+        },
+        "GUY_002": {
+            "name": "Cuyuni-Mazaruni",
+            "adm0_iso3": "GUY"
+        },
+        "GUY_003": {
+            "name": "Demerara-Mahaica",
+            "adm0_iso3": "GUY"
+        },
+        "GUY_004": {
+            "name": "East Berbice-Corentyne",
+            "adm0_iso3": "GUY"
+        },
+        "GUY_005": {
+            "name": "Essequibo Islands-West Demerara",
+            "adm0_iso3": "GUY"
+        },
+        "GUY_006": {
+            "name": "Mahaica-Berbice",
+            "adm0_iso3": "GUY"
+        },
+        "GUY_007": {
+            "name": "Pomeroon-Supenaam",
+            "adm0_iso3": "GUY"
+        },
+        "GUY_008": {
+            "name": "Potaro-Siparuni",
+            "adm0_iso3": "GUY"
+        },
+        "GUY_009": {
+            "name": "Upper Demerara-Berbice",
+            "adm0_iso3": "GUY"
+        },
+        "GUY_010": {
+            "name": "Upper Takutu-Upper Essequibo",
+            "adm0_iso3": "GUY"
+        },
+        "HND_001": {
+            "name": "Atl\u00e1ntida",
+            "adm0_iso3": "HND"
+        },
+        "HND_003": {
+            "name": "Choluteca",
+            "adm0_iso3": "HND"
+        },
+        "HND_004": {
+            "name": "Col\u00f3n",
+            "adm0_iso3": "HND"
+        },
+        "HND_005": {
+            "name": "Comayagua",
+            "adm0_iso3": "HND"
+        },
+        "HND_006": {
+            "name": "Cop\u00e1n",
+            "adm0_iso3": "HND"
+        },
+        "HND_007": {
+            "name": "Cort\u00e9s",
+            "adm0_iso3": "HND"
+        },
+        "HND_008": {
+            "name": "El Para\u00edso",
+            "adm0_iso3": "HND"
+        },
+        "HND_009": {
+            "name": "Francisco Moraz\u00e1n",
+            "adm0_iso3": "HND"
+        },
+        "HND_010": {
+            "name": "Gracias a Dios",
+            "adm0_iso3": "HND"
+        },
+        "HND_011": {
+            "name": "Intibuc\u00e1",
+            "adm0_iso3": "HND"
+        },
+        "HND_012": {
+            "name": "La Paz",
+            "adm0_iso3": "HND"
+        },
+        "HND_013": {
+            "name": "Lempira",
+            "adm0_iso3": "HND"
+        },
+        "HND_014": {
+            "name": "Ocotepeque",
+            "adm0_iso3": "HND"
+        },
+        "HND_015": {
+            "name": "Olancho",
+            "adm0_iso3": "HND"
+        },
+        "HND_016": {
+            "name": "Santa B\u00e1rbara",
+            "adm0_iso3": "HND"
+        },
+        "HND_017": {
+            "name": "Valle",
+            "adm0_iso3": "HND"
+        },
+        "HND_018": {
+            "name": "Yoro",
+            "adm0_iso3": "HND"
         },
         "IDN_001": {
             "name": "Aceh",
@@ -87,6 +872,134 @@
             "name": "West Sumatra",
             "adm0_iso3": "IDN"
         },
+        "MEX_001": {
+            "name": "Aguascalientes",
+            "adm0_iso3": "MEX"
+        },
+        "MEX_002": {
+            "name": "Baja California",
+            "adm0_iso3": "MEX"
+        },
+        "MEX_003": {
+            "name": "Baja California Sur",
+            "adm0_iso3": "MEX"
+        },
+        "MEX_004": {
+            "name": "Campeche",
+            "adm0_iso3": "MEX"
+        },
+        "MEX_005": {
+            "name": "Chiapas",
+            "adm0_iso3": "MEX"
+        },
+        "MEX_006": {
+            "name": "Chihuahua",
+            "adm0_iso3": "MEX"
+        },
+        "MEX_007": {
+            "name": "Coahuila de Zaragoza",
+            "adm0_iso3": "MEX"
+        },
+        "MEX_008": {
+            "name": "Colima",
+            "adm0_iso3": "MEX"
+        },
+        "MEX_009": {
+            "name": "Distrito Federal",
+            "adm0_iso3": "MEX"
+        },
+        "MEX_010": {
+            "name": "Durango",
+            "adm0_iso3": "MEX"
+        },
+        "MEX_011": {
+            "name": "Guanajuato",
+            "adm0_iso3": "MEX"
+        },
+        "MEX_012": {
+            "name": "Guerrero",
+            "adm0_iso3": "MEX"
+        },
+        "MEX_013": {
+            "name": "Hidalgo",
+            "adm0_iso3": "MEX"
+        },
+        "MEX_014": {
+            "name": "Jalisco",
+            "adm0_iso3": "MEX"
+        },
+        "MEX_015": {
+            "name": "Mexico",
+            "adm0_iso3": "MEX"
+        },
+        "MEX_016": {
+            "name": "Michoacan de Ocampo",
+            "adm0_iso3": "MEX"
+        },
+        "MEX_017": {
+            "name": "Morelos",
+            "adm0_iso3": "MEX"
+        },
+        "MEX_018": {
+            "name": "Nayarit",
+            "adm0_iso3": "MEX"
+        },
+        "MEX_019": {
+            "name": "Nuevo Leon",
+            "adm0_iso3": "MEX"
+        },
+        "MEX_020": {
+            "name": "Oaxaca",
+            "adm0_iso3": "MEX"
+        },
+        "MEX_021": {
+            "name": "Puebla",
+            "adm0_iso3": "MEX"
+        },
+        "MEX_022": {
+            "name": "Queretaro de Arteaga",
+            "adm0_iso3": "MEX"
+        },
+        "MEX_023": {
+            "name": "Quintana Roo",
+            "adm0_iso3": "MEX"
+        },
+        "MEX_024": {
+            "name": "San Luis Potosi",
+            "adm0_iso3": "MEX"
+        },
+        "MEX_025": {
+            "name": "Sinaloa",
+            "adm0_iso3": "MEX"
+        },
+        "MEX_026": {
+            "name": "Sonora",
+            "adm0_iso3": "MEX"
+        },
+        "MEX_027": {
+            "name": "Tabasco",
+            "adm0_iso3": "MEX"
+        },
+        "MEX_028": {
+            "name": "Tamaulipas",
+            "adm0_iso3": "MEX"
+        },
+        "MEX_029": {
+            "name": "Tlaxcala",
+            "adm0_iso3": "MEX"
+        },
+        "MEX_030": {
+            "name": "Veracruz de Ignacio de la Llave",
+            "adm0_iso3": "MEX"
+        },
+        "MEX_031": {
+            "name": "Yucatan",
+            "adm0_iso3": "MEX"
+        },
+        "MEX_032": {
+            "name": "Zacatecas",
+            "adm0_iso3": "MEX"
+        },
         "MYS_013": {
             "name": "Sabah",
             "adm0_iso3": "MYS"
@@ -94,6 +1007,570 @@
         "MYS_014": {
             "name": "Sarawak",
             "adm0_iso3": "MYS"
+        },
+        "NIC_001": {
+            "name": "Boaco",
+            "adm0_iso3": "NIC"
+        },
+        "NIC_002": {
+            "name": "Carazo",
+            "adm0_iso3": "NIC"
+        },
+        "NIC_003": {
+            "name": "Chinandega",
+            "adm0_iso3": "NIC"
+        },
+        "NIC_004": {
+            "name": "Chontales",
+            "adm0_iso3": "NIC"
+        },
+        "NIC_005": {
+            "name": "Estel\u00ed",
+            "adm0_iso3": "NIC"
+        },
+        "NIC_006": {
+            "name": "Granada",
+            "adm0_iso3": "NIC"
+        },
+        "NIC_007": {
+            "name": "Jinotega (Departamento)",
+            "adm0_iso3": "NIC"
+        },
+        "NIC_008": {
+            "name": "Leon",
+            "adm0_iso3": "NIC"
+        },
+        "NIC_009": {
+            "name": "Madriz",
+            "adm0_iso3": "NIC"
+        },
+        "NIC_010": {
+            "name": "Managua",
+            "adm0_iso3": "NIC"
+        },
+        "NIC_011": {
+            "name": "Masaya",
+            "adm0_iso3": "NIC"
+        },
+        "NIC_012": {
+            "name": "Matagalpa (Departemento)",
+            "adm0_iso3": "NIC"
+        },
+        "NIC_013": {
+            "name": "North Carribean Coast Autonomous Region",
+            "adm0_iso3": "NIC"
+        },
+        "NIC_014": {
+            "name": "Nueva Segovia",
+            "adm0_iso3": "NIC"
+        },
+        "NIC_015": {
+            "name": "Rio San Juan",
+            "adm0_iso3": "NIC"
+        },
+        "NIC_016": {
+            "name": "Rivas",
+            "adm0_iso3": "NIC"
+        },
+        "NIC_017": {
+            "name": "South Atlantic Autonomous Region",
+            "adm0_iso3": "NIC"
+        },
+        "PAN_001": {
+            "name": "Col\u00f3n Province",
+            "adm0_iso3": "PAN"
+        },
+        "PAN_002": {
+            "name": "Comarca Ember\u00e1-Wounaan",
+            "adm0_iso3": "PAN"
+        },
+        "PAN_003": {
+            "name": "Comarca Guna Yala",
+            "adm0_iso3": "PAN"
+        },
+        "PAN_004": {
+            "name": "Comarca Ng\u00e4be-Bugl\u00e9",
+            "adm0_iso3": "PAN"
+        },
+        "PAN_005": {
+            "name": "Provincia de Bocas del Toro",
+            "adm0_iso3": "PAN"
+        },
+        "PAN_006": {
+            "name": "Provincia de Chiriqu\u00ed",
+            "adm0_iso3": "PAN"
+        },
+        "PAN_007": {
+            "name": "Provincia de Cocl\u00e9",
+            "adm0_iso3": "PAN"
+        },
+        "PAN_008": {
+            "name": "Provincia de Dari\u00e9n",
+            "adm0_iso3": "PAN"
+        },
+        "PAN_009": {
+            "name": "Provincia de Herrera",
+            "adm0_iso3": "PAN"
+        },
+        "PAN_010": {
+            "name": "Provincia de Los Santos",
+            "adm0_iso3": "PAN"
+        },
+        "PAN_011": {
+            "name": "Provincia de Panam\u00e1",
+            "adm0_iso3": "PAN"
+        },
+        "PAN_012": {
+            "name": "Provincia de Panam\u00e1 Oeste",
+            "adm0_iso3": "PAN"
+        },
+        "PAN_013": {
+            "name": "Provincia de Veraguas",
+            "adm0_iso3": "PAN"
+        },
+        "PER_001": {
+            "name": "Amazonas",
+            "adm0_iso3": "PER"
+        },
+        "PER_002": {
+            "name": "Ancash",
+            "adm0_iso3": "PER"
+        },
+        "PER_003": {
+            "name": "Apur\u00edmac",
+            "adm0_iso3": "PER"
+        },
+        "PER_004": {
+            "name": "Arequipa",
+            "adm0_iso3": "PER"
+        },
+        "PER_005": {
+            "name": "Ayacucho",
+            "adm0_iso3": "PER"
+        },
+        "PER_006": {
+            "name": "Cajamarca",
+            "adm0_iso3": "PER"
+        },
+        "PER_007": {
+            "name": "Cusco",
+            "adm0_iso3": "PER"
+        },
+        "PER_009": {
+            "name": "Huancavelica",
+            "adm0_iso3": "PER"
+        },
+        "PER_010": {
+            "name": "Hu\u00e1nuco",
+            "adm0_iso3": "PER"
+        },
+        "PER_012": {
+            "name": "Jun\u00edn",
+            "adm0_iso3": "PER"
+        },
+        "PER_013": {
+            "name": "La Libertad",
+            "adm0_iso3": "PER"
+        },
+        "PER_014": {
+            "name": "Lambayeque",
+            "adm0_iso3": "PER"
+        },
+        "PER_015": {
+            "name": "Lima",
+            "adm0_iso3": "PER"
+        },
+        "PER_016": {
+            "name": "Loreto",
+            "adm0_iso3": "PER"
+        },
+        "PER_017": {
+            "name": "Madre de Dios",
+            "adm0_iso3": "PER"
+        },
+        "PER_018": {
+            "name": "Moquegua",
+            "adm0_iso3": "PER"
+        },
+        "PER_020": {
+            "name": "Pasco",
+            "adm0_iso3": "PER"
+        },
+        "PER_021": {
+            "name": "Piura",
+            "adm0_iso3": "PER"
+        },
+        "PER_022": {
+            "name": "Puno",
+            "adm0_iso3": "PER"
+        },
+        "PER_023": {
+            "name": "San Mart\u00edn",
+            "adm0_iso3": "PER"
+        },
+        "PER_024": {
+            "name": "Tacna",
+            "adm0_iso3": "PER"
+        },
+        "PER_025": {
+            "name": "Tumbes",
+            "adm0_iso3": "PER"
+        },
+        "PER_026": {
+            "name": "Ucayali",
+            "adm0_iso3": "PER"
+        },
+        "PRY_001": {
+            "name": "ALTO PARAGUAY",
+            "adm0_iso3": "PRY"
+        },
+        "PRY_002": {
+            "name": "ALTO PARANA",
+            "adm0_iso3": "PRY"
+        },
+        "PRY_003": {
+            "name": "AMAMBAY",
+            "adm0_iso3": "PRY"
+        },
+        "PRY_004": {
+            "name": "ASUNCION",
+            "adm0_iso3": "PRY"
+        },
+        "PRY_005": {
+            "name": "BOQUERON",
+            "adm0_iso3": "PRY"
+        },
+        "PRY_006": {
+            "name": "CAAGUAZU",
+            "adm0_iso3": "PRY"
+        },
+        "PRY_007": {
+            "name": "CAAZAPA",
+            "adm0_iso3": "PRY"
+        },
+        "PRY_008": {
+            "name": "CANINDEYU",
+            "adm0_iso3": "PRY"
+        },
+        "PRY_009": {
+            "name": "CENTRAL",
+            "adm0_iso3": "PRY"
+        },
+        "PRY_010": {
+            "name": "CONCEPCION",
+            "adm0_iso3": "PRY"
+        },
+        "PRY_011": {
+            "name": "CORDILLERA",
+            "adm0_iso3": "PRY"
+        },
+        "PRY_012": {
+            "name": "GUAIRA",
+            "adm0_iso3": "PRY"
+        },
+        "PRY_013": {
+            "name": "ITAPUA",
+            "adm0_iso3": "PRY"
+        },
+        "PRY_014": {
+            "name": "MISIONES",
+            "adm0_iso3": "PRY"
+        },
+        "PRY_015": {
+            "name": "PARAGUARI",
+            "adm0_iso3": "PRY"
+        },
+        "PRY_016": {
+            "name": "PRESIDENTE HAYES",
+            "adm0_iso3": "PRY"
+        },
+        "PRY_017": {
+            "name": "SAN PEDRO",
+            "adm0_iso3": "PRY"
+        },
+        "PRY_018": {
+            "name": "\u00d1EEMBUCU",
+            "adm0_iso3": "PRY"
+        },
+        "SLV_001": {
+            "name": "Departamento de Ahuachap\u00e1n",
+            "adm0_iso3": "SLV"
+        },
+        "SLV_002": {
+            "name": "Departamento de Caba\u00f1as",
+            "adm0_iso3": "SLV"
+        },
+        "SLV_003": {
+            "name": "Departamento de Chalatenango",
+            "adm0_iso3": "SLV"
+        },
+        "SLV_004": {
+            "name": "Departamento de Cuscatl\u00e1n",
+            "adm0_iso3": "SLV"
+        },
+        "SLV_005": {
+            "name": "Departamento de La Paz",
+            "adm0_iso3": "SLV"
+        },
+        "SLV_006": {
+            "name": "Departamento de La Uni\u00f3n",
+            "adm0_iso3": "SLV"
+        },
+        "SLV_007": {
+            "name": "Departamento de Moraz\u00e1n",
+            "adm0_iso3": "SLV"
+        },
+        "SLV_008": {
+            "name": "Departamento de San Miguel",
+            "adm0_iso3": "SLV"
+        },
+        "SLV_009": {
+            "name": "Departamento de San Salvador",
+            "adm0_iso3": "SLV"
+        },
+        "SLV_010": {
+            "name": "Departamento de Santa Ana",
+            "adm0_iso3": "SLV"
+        },
+        "SLV_011": {
+            "name": "Departamento de Sonsonate",
+            "adm0_iso3": "SLV"
+        },
+        "SLV_012": {
+            "name": "Departamento de Usulut\u00e1n",
+            "adm0_iso3": "SLV"
+        },
+        "SLV_013": {
+            "name": "La Libertad",
+            "adm0_iso3": "SLV"
+        },
+        "SLV_014": {
+            "name": "San Vicente",
+            "adm0_iso3": "SLV"
+        },
+        "SUR_001": {
+            "name": "Brokopondo",
+            "adm0_iso3": "SUR"
+        },
+        "SUR_002": {
+            "name": "Commewijne",
+            "adm0_iso3": "SUR"
+        },
+        "SUR_003": {
+            "name": "Coronie",
+            "adm0_iso3": "SUR"
+        },
+        "SUR_004": {
+            "name": "Marowijne",
+            "adm0_iso3": "SUR"
+        },
+        "SUR_005": {
+            "name": "Nickerie",
+            "adm0_iso3": "SUR"
+        },
+        "SUR_006": {
+            "name": "Para",
+            "adm0_iso3": "SUR"
+        },
+        "SUR_007": {
+            "name": "Paramaribo",
+            "adm0_iso3": "SUR"
+        },
+        "SUR_008": {
+            "name": "Saramacca",
+            "adm0_iso3": "SUR"
+        },
+        "SUR_009": {
+            "name": "Sipaliwini",
+            "adm0_iso3": "SUR"
+        },
+        "SUR_010": {
+            "name": "Wanica",
+            "adm0_iso3": "SUR"
+        },
+        "URY_001": {
+            "name": "Artigas",
+            "adm0_iso3": "URY"
+        },
+        "URY_002": {
+            "name": "Canelones",
+            "adm0_iso3": "URY"
+        },
+        "URY_003": {
+            "name": "Cerro Largo",
+            "adm0_iso3": "URY"
+        },
+        "URY_004": {
+            "name": "Colonia",
+            "adm0_iso3": "URY"
+        },
+        "URY_005": {
+            "name": "Durazno",
+            "adm0_iso3": "URY"
+        },
+        "URY_006": {
+            "name": "Flores",
+            "adm0_iso3": "URY"
+        },
+        "URY_007": {
+            "name": "Florida",
+            "adm0_iso3": "URY"
+        },
+        "URY_008": {
+            "name": "Lavalleja",
+            "adm0_iso3": "URY"
+        },
+        "URY_009": {
+            "name": "Maldonado",
+            "adm0_iso3": "URY"
+        },
+        "URY_010": {
+            "name": "Montevideo",
+            "adm0_iso3": "URY"
+        },
+        "URY_011": {
+            "name": "Paysand\u00fa",
+            "adm0_iso3": "URY"
+        },
+        "URY_012": {
+            "name": "Rivera",
+            "adm0_iso3": "URY"
+        },
+        "URY_013": {
+            "name": "Rocha",
+            "adm0_iso3": "URY"
+        },
+        "URY_014": {
+            "name": "R\u00edo Negro",
+            "adm0_iso3": "URY"
+        },
+        "URY_015": {
+            "name": "Salto",
+            "adm0_iso3": "URY"
+        },
+        "URY_016": {
+            "name": "San Jos\u00e9",
+            "adm0_iso3": "URY"
+        },
+        "URY_017": {
+            "name": "Soriano",
+            "adm0_iso3": "URY"
+        },
+        "URY_018": {
+            "name": "Tacuaremb\u00f3",
+            "adm0_iso3": "URY"
+        },
+        "URY_019": {
+            "name": "Treinta y Tres",
+            "adm0_iso3": "URY"
+        },
+        "USA_004": {
+            "name": "Arizona",
+            "adm0_iso3": "USA"
+        },
+        "USA_006": {
+            "name": "California",
+            "adm0_iso3": "USA"
+        },
+        "USA_035": {
+            "name": "New Mexico",
+            "adm0_iso3": "USA"
+        },
+        "USA_048": {
+            "name": "Texas",
+            "adm0_iso3": "USA"
+        },
+        "VEN_001": {
+            "name": "Amazonas",
+            "adm0_iso3": "VEN"
+        },
+        "VEN_002": {
+            "name": "Anzo\u00e1tegui",
+            "adm0_iso3": "VEN"
+        },
+        "VEN_003": {
+            "name": "Apure",
+            "adm0_iso3": "VEN"
+        },
+        "VEN_004": {
+            "name": "Aragua",
+            "adm0_iso3": "VEN"
+        },
+        "VEN_005": {
+            "name": "Barinas",
+            "adm0_iso3": "VEN"
+        },
+        "VEN_006": {
+            "name": "Bol\u00edvar",
+            "adm0_iso3": "VEN"
+        },
+        "VEN_007": {
+            "name": "Carabobo",
+            "adm0_iso3": "VEN"
+        },
+        "VEN_008": {
+            "name": "Cojedes",
+            "adm0_iso3": "VEN"
+        },
+        "VEN_009": {
+            "name": "Delta Amacuro",
+            "adm0_iso3": "VEN"
+        },
+        "VEN_011": {
+            "name": "Distrito Capital",
+            "adm0_iso3": "VEN"
+        },
+        "VEN_012": {
+            "name": "Falc\u00f3n",
+            "adm0_iso3": "VEN"
+        },
+        "VEN_013": {
+            "name": "Gu\u00e1rico",
+            "adm0_iso3": "VEN"
+        },
+        "VEN_014": {
+            "name": "La Guaira",
+            "adm0_iso3": "VEN"
+        },
+        "VEN_015": {
+            "name": "Lara",
+            "adm0_iso3": "VEN"
+        },
+        "VEN_016": {
+            "name": "Miranda",
+            "adm0_iso3": "VEN"
+        },
+        "VEN_017": {
+            "name": "Monagas",
+            "adm0_iso3": "VEN"
+        },
+        "VEN_018": {
+            "name": "M\u00e9rida",
+            "adm0_iso3": "VEN"
+        },
+        "VEN_020": {
+            "name": "Portuguesa",
+            "adm0_iso3": "VEN"
+        },
+        "VEN_021": {
+            "name": "Sucre",
+            "adm0_iso3": "VEN"
+        },
+        "VEN_022": {
+            "name": "Trujillo",
+            "adm0_iso3": "VEN"
+        },
+        "VEN_023": {
+            "name": "T\u00e1chira",
+            "adm0_iso3": "VEN"
+        },
+        "VEN_024": {
+            "name": "Yaracuy",
+            "adm0_iso3": "VEN"
+        },
+        "VEN_025": {
+            "name": "Zulia",
+            "adm0_iso3": "VEN"
         }
     }
 }

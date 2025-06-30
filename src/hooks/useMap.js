@@ -2,6 +2,7 @@ import maplibregl from 'maplibre-gl';
 import { useEffect, useRef, useState, useCallback } from 'react';
 
 import { useAppContext } from '../context/AppContext';
+import { useFilterState } from '../hooks/useFilterState';
 import useUpdateMapOnDatasetChange from '../hooks/useUpdateMapOnDatasetChange.js';
 //import useMapPanOnDatasetChange from '../hooks/useMapPanOnDatasetChange.js';
 //import useShowDatasetOnDatasetChange from '../hooks/useShowDatasetOnDatasetChange.js';
@@ -12,7 +13,13 @@ const useMap = (layers, containerRef, setLayers) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const layersRef = useRef({});
   const currentProjection = useRef('mercator');
-  const { data, datasetKey, adm0Key, adm1Key } = useAppContext();
+  const { data } = useAppContext(); 
+  const { getParam } = useFilterState(); // Add this
+
+  // Get all keys from URL parameters
+  const datasetKey = getParam('datasetKey');
+  const adm0Key = getParam('adm0Key');
+  const adm1Key = getParam('adm1Key');
 
   // Fetch style info for layers that only have URL
   const fetchLayerInfo = useCallback(async (layerKey, layerData) => {
@@ -50,6 +57,7 @@ const useMap = (layers, containerRef, setLayers) => {
       },
       center: [105.0, 13],
       zoom: 2.5,
+      maxZoom: 11,
       projection: 'globe'
     });
 
@@ -300,7 +308,7 @@ const useMap = (layers, containerRef, setLayers) => {
   }, [layers, map, isLoaded, fetchLayerInfo]);
 
   // Update the layers and pan the map, when the dataset is changed.
-  useUpdateMapOnDatasetChange(mapRef, data, datasetKey, setLayers); 
+  useUpdateMapOnDatasetChange(mapRef, data, setLayers); 
 
   //// Show the raster when the dataset is selected.
   //useShowDatasetOnDatasetChange(data, datasetKey, setLayers);

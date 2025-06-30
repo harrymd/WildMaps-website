@@ -5,10 +5,10 @@
     "wdpa": {
       "type": "vector",
       "tiles": [
-        "https://habitat-web-map.s3.eu-west-2.amazonaws.com/code_output/vector_tiles/protected_areas/WDPA/wdpa_06/{z}/{x}/{y}.pbf"
+        "https://wildcru-wildmaps.s3.eu-west-2.amazonaws.com/code_output/vector_tiles/protected_areas/WDPA/wdpa_10/{z}/{x}/{y}.pbf"
       ],
       "minzoom": 0,
-      "maxzoom": 6 
+      "maxzoom": 10
     }
   },
   "layers": [
@@ -30,25 +30,6 @@
       "paint": {
         "line-color": "#ff0000",
         "line-width": 2
-      }
-    },
-    {
-      "id": "wdpa-labels",
-      "type": "symbol",
-      "source": "wdpa",
-      "source-layer": "wdpa",
-      "layout": {
-        "text-field": ["get", "NAME"],
-        "text-size": 12,
-		"text-font": ["Noto Sans Regular"],
-        "text-anchor": "center",
-        "text-allow-overlap": false,
-        "text-ignore-placement": false
-      },
-      "paint": {
-        "text-color": "#ff0000",
-        "text-halo-color": "#ffffff",
-        "text-halo-width": 1
       }
     }
   ]

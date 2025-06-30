@@ -5,6 +5,13 @@ import Sidebar from './Sidebar';
 import SidebarToggleButton from './SidebarToggleButton';
 import MapContainer from './MapContainer';
 import { Routes, Route } from 'react-router-dom';
+//
+import SelectStartingFilter from '../pages/SelectStartingFilter';
+import SelectRegion from '../pages/SelectRegion';
+import SelectSubRegion from '../pages/SelectSubRegion';
+import SelectSuperSpecies from '../pages/SelectSuperSpecies';
+import SelectSpecies from '../pages/SelectSpecies';
+
 import SelectDataset from '../pages/SelectDataset';
 import SelectAdm0 from '../pages/SelectAdm0';
 import SelectAdm1 from '../pages/SelectAdm1';
@@ -44,13 +51,38 @@ export default function Layout() {
       {!showRight && (
         <SidebarToggleButton position="right" onClick={() => setShowRight(true)} title="Control basemap layers" />
       )}
-
+  
+      {/*
       <Sidebar title="Dataset browser" isOpen={showLeft} onClose={() => setShowLeft(false)} width={sidebarWidth}>
         <Routes>
           <Route path="/" element={<SelectDataset />} />
           <Route path="/:datasetKey" element={<SelectAdm0 />} />
           <Route path="/:datasetKey/:adm0Key" element={<SelectAdm1 />} />
           <Route path="/:datasetKey/:adm0Key/:adm1Key" element={<FinalScreen />} />
+        </Routes>
+      </Sidebar>
+        */}
+      <Sidebar title="Dataset browser" isOpen={showLeft} onClose={() => setShowLeft(false)} width={sidebarWidth}>
+        <Routes>
+          <Route path="/" element={<SelectStartingFilter />} />
+          <Route path="/region" element={<SelectRegion />} />
+          <Route path="/subregion" element={<SelectSubRegion />} />
+          <Route path="/superspecies" element={<SelectSuperSpecies />} />
+          <Route path="/species" element={<SelectSpecies />} />
+          <Route path="/dataset" element={<SelectDataset />} />
+          <Route path="/adm0" element={<SelectAdm0 />} />
+          <Route path="/adm1" element={<SelectAdm1 />} />
+          <Route path="/final" element={<FinalScreen />} />
+          {/*<Route path="/" element={<SelectStartingFilter />} />*/}
+          {/*<Route path="/region" element={<SelectRegion />} />
+          <Route path="/subregion" element={<SelectSubRegion />} />
+          <Route path="/genus" element={<SelectGenus />} />
+          <Route path="/species" element={<SelectSpecies />} />
+          */}
+          {/*<Route path="/dataset" element={<SelectDataset />} />
+          <Route path="/adm0" element={<SelectAdm0 />} />
+          <Route path="/adm1" element={<SelectAdm1 />} />
+          <Route path="/final" element={<FinalScreen />} />*/}
         </Routes>
       </Sidebar>
 
