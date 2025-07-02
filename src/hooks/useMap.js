@@ -42,7 +42,8 @@ const useMap = (layers, containerRef, setLayers) => {
             id: 'background',
             type: 'background',
             paint: {
-              'background-color': '#a4bcfa'
+              //'background-color': '#a4bcfa' // liberty sea blue
+              'background-color': '#C3C7C9' // positron sea grey
             }
           }
         ]

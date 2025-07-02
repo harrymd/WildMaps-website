@@ -21,7 +21,8 @@ export default function useShowDatasetOnDatasetChange(data, datasetKey, setLayer
 
     // Only add the layer if we have the required data
     if (datasetSubFolder && datasetMaxZoomStr) {
-      const urlTemplate = `https://wildcru-wildmaps.s3.eu-west-2.amazonaws.com/code_output/raster_tiles/SDM/${datasetSubFolder}/${datasetKey}_zoom_${datasetMaxZoomStr}/{z}/{x}/{y}.png`;
+      //const urlTemplate = `https://wildcru-wildmaps.s3.eu-west-2.amazonaws.com/code_output/raster_tiles/SDM/${datasetSubFolder}/${datasetKey}_zoom_${datasetMaxZoomStr}/{z}/{x}/{y}.png`;
+      const urlTemplate = `https://wildcru-wildmaps.s3.eu-west-2.amazonaws.com/data_outputs/raster_tiles/SDM/${datasetSubFolder}/${datasetKey}_zoom_${datasetMaxZoomStr}/{z}/{x}/{y}.png`;
       
       // Create the data layer configuration
       const dataLayerConfig = {

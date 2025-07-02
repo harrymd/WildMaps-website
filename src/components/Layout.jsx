@@ -23,13 +23,19 @@ export default function Layout() {
   const [showLeft, setShowLeft] = useState(true);
   const [showRight, setShowRight] = useState(false);
   const { datasetKey } = useAppContext();
+  const BUCKET_URL = 'https://wildcru-wildmaps.s3.eu-west-2.amazonaws.com';
+  const PATH_STYLES = `${BUCKET_URL}/data_inputs/styles`
   //  useState('style/liberty_underlay.json');
   const [layers, setLayers] = useState({
     underlay: {
-      url: 'style/liberty_underlay.json'
+      //url: 'style/liberty_underlay.json'
+      //url: 'style/positron_underlay.json'
+      url: `${PATH_STYLES}/positron_english_underlay.json`
     },
     overlay: {
-      url: 'style/liberty_overlay.json'
+      //url: 'style/liberty_overlay.json'
+      //url: 'style/positron_overlay.json'
+      url: `${PATH_STYLES}/positron_english_overlay.json`
     }
   });
   

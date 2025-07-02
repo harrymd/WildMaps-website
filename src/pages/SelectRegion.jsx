@@ -9,7 +9,6 @@ const SelectRegion = () => {
   const { regionData } = useAppContext();
   const { getParam } = useFilterState();
 
-
   const getRegionOptions = (allParams, data) => {
     let filteredData = data || {};
     
@@ -47,8 +46,7 @@ const SelectRegion = () => {
     }
     return null;
   };
-
-
+  
   const { handleLocationSelection } = useMapPanning('region', regionData, 'panToRegion');
 
   return (

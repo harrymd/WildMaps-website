@@ -3,31 +3,41 @@
 import React from 'react';
 import Sidebar from './Sidebar';
 
-// Define your basemap options once
+// Define basemap
+const BUCKET_URL = 'https://wildcru-wildmaps.s3.eu-west-2.amazonaws.com';
+const PATH_STYLES = `${BUCKET_URL}/data_inputs/styles`
 const UNDERLAYS = {
   STREET: {
     label: 'Street map',
-    value: 'style/liberty_underlay.json'
+    //value: 'style/liberty_underlay.json'
+    //value: 'style/positron_underlay.json'
+    //value: 'style/positron_english_underlay.json'
+    value: `${PATH_STYLES}/positron_english_underlay.json`
   },
   SATELLITE: {
     label: 'Satellite imagery',
-    value: 'style/esri_world_imagery.json'
+    //value: 'style/esri_world_imagery.json'
+    value: `${PATH_STYLES}/esri_world_imagery.json`
   },
   ALTITUDE: {
     label: 'Altitude',
-    value: 'style/mapzen_elevation_and_hillshade.json'
+    //value: 'style/mapzen_elevation_and_hillshade.json'
+    value: `${PATH_STYLES}/mapzen_elevation_and_hillshade.json`
   },
   POPULATION: {
     label: 'Population density',
-    value: 'style/worldpop.json'
+    //value: 'style/worldpop.json'
+    value: `${PATH_STYLES}/worldpop.json`
   },
   LAND_use: {
     label: 'Land use',
-    value: 'style/landcover.json'
+    //value: 'style/landcover.json'
+    value: `${PATH_STYLES}/landcover.json`
   },
   ECOREGIONS: {
     label: 'Ecoregions',
-    value: 'style/ecoregions.json'
+    //value: 'style/ecoregions.json'
+    value: `${PATH_STYLES}/ecoregions.json`
   }
 };
 
@@ -39,7 +49,7 @@ const OVERLAYS = {
   },
   PROTECTED_AREAS: {
     label: 'Protected areas',
-    value: 'style/wdpa.json'
+    value: `${PATH_STYLES}/wdpa.json`
   }
 };
 

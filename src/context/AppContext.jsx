@@ -19,18 +19,26 @@ export const AppProvider = ({ children }) => {
   const [regionData, setRegionData] = useState({});
   const [subregionData, setSubregionData] = useState({});
 
+  const BUCKET_URL = 'https://wildcru-wildmaps.s3.eu-west-2.amazonaws.com';
+  const PATH_DATA_OUTPUTS = `${BUCKET_URL}/data_outputs`;
+  const PATH_RESULTS = `${PATH_DATA_OUTPUTS}/raster_analysis`;
+  const PATH_DATA_INPUTS = `${BUCKET_URL}/data_inputs`;
+  const PATH_DICTS = `${PATH_DATA_INPUTS}/dictionaries`;
+
   // Load the data about the administrative boundaries
   useEffect(() => {
-    fetch('/adm_bdry_info.json')
+    //fetch('/adm_bdry_info.json')
+    fetch(`${PATH_DATA_OUTPUTS}/adm_bdry_info.json`)
       .then((res) => res.json())
       .then((dataset) => {
+        console.log(dataset);
         setAdmData(dataset);
       });
   }, []);
 
   // Load the species CSV data (step 1)
   useEffect(() => {
-    fetch('/species_dictionary.csv') 
+    fetch(`${PATH_DICTS}/species_dictionary.csv`) 
       .then((res) => res.text())
       .then((csvText) => {
         Papa.parse(csvText, {
@@ -62,7 +70,7 @@ export const AppProvider = ({ children }) => {
 
   // Load the superspecies CSV data (step 2)
   useEffect(() => {
-    fetch('/superspecies_dictionary.csv') 
+    fetch(`${PATH_DICTS}/superspecies_dictionary.csv`) 
       .then((res) => res.text())
       .then((csvText) => {
         Papa.parse(csvText, {
@@ -94,7 +102,7 @@ export const AppProvider = ({ children }) => {
 
   // Load the region bounding boxes CSV data (step 3)
   useEffect(() => {
-    fetch('/UN_geoscheme_bounding_boxes_tweaked.csv') 
+    fetch(`${PATH_DICTS}/region_dictionary.csv`) 
       .then((res) => res.text())
       .then((csvText) => {
         Papa.parse(csvText, {
@@ -125,7 +133,7 @@ export const AppProvider = ({ children }) => {
 
   // Load the subregion dictionary CSV data (step 4)
   useEffect(() => {
-    fetch('/subregion_dictionary.csv') 
+    fetch(`${PATH_DICTS}/subregion_dictionary.csv`) 
       .then((res) => res.text())
       .then((csvText) => {
         Papa.parse(csvText, {
@@ -165,7 +173,7 @@ export const AppProvider = ({ children }) => {
       return;
     }
 
-    fetch('/results.json')
+    fetch(`${PATH_RESULTS}/results_summary.json`)
       .then((res) => res.json())
       .then((dataset) => {
         console.log('Starting multi-step enrichment...');
