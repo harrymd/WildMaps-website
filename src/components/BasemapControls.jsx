@@ -2,6 +2,16 @@
 
 import React from 'react';
 import Sidebar from './Sidebar';
+import ElevationColorBar from './ElevationColorBar';
+import ColorBar from './ColorBar';
+import LandUseLegend from './LandUseLegend';
+import EcoregionLegend from './EcoregionLegend';
+
+// Import your legend components
+// import ElevationColorBar from './ElevationColorBar';
+// import PopulationLegend from './PopulationLegend';
+// import LandUseLegend from './LandUseLegend';
+// import EcoregionsLegend from './EcoregionsLegend';
 
 // Define basemap
 const BUCKET_URL = 'https://wildcru-wildmaps.s3.eu-west-2.amazonaws.com';
@@ -9,35 +19,33 @@ const PATH_STYLES = `${BUCKET_URL}/data_inputs/styles`
 const UNDERLAYS = {
   STREET: {
     label: 'Street map',
-    //value: 'style/liberty_underlay.json'
-    //value: 'style/positron_underlay.json'
-    //value: 'style/positron_english_underlay.json'
-    value: `${PATH_STYLES}/positron_english_underlay.json`
+    value: `${PATH_STYLES}/positron_english_underlay.json`,
+    legend: null // No legend for street map
   },
   SATELLITE: {
     label: 'Satellite imagery',
-    //value: 'style/esri_world_imagery.json'
-    value: `${PATH_STYLES}/esri_world_imagery.json`
+    value: `${PATH_STYLES}/esri_world_imagery.json`,
+    legend: null // No legend for satellite imagery
   },
   ALTITUDE: {
     label: 'Altitude',
-    //value: 'style/mapzen_elevation_and_hillshade.json'
-    value: `${PATH_STYLES}/mapzen_elevation_and_hillshade.json`
+    value: `${PATH_STYLES}/mapzen_elevation_and_hillshade.json`,
+    legend: ElevationColorBar
   },
   POPULATION: {
     label: 'Population density',
-    //value: 'style/worldpop.json'
-    value: `${PATH_STYLES}/worldpop.json`
+    value: `${PATH_STYLES}/worldpop.json`,
+    legend: ColorBar
   },
-  LAND_use: {
-    label: 'Land use',
-    //value: 'style/landcover.json'
-    value: `${PATH_STYLES}/landcover.json`
+  LAND_USE: {
+    label: 'Land cover',
+    value: `${PATH_STYLES}/landcover.json`,
+    legend: LandUseLegend
   },
   ECOREGIONS: {
     label: 'Ecoregions',
-    //value: 'style/ecoregions.json'
-    value: `${PATH_STYLES}/ecoregions.json`
+    value: `${PATH_STYLES}/ecoregions.json`,
+    legend: EcoregionLegend
   }
 };
 
@@ -92,25 +100,39 @@ export default function BasemapControls({
         <fieldset>
           <legend className="font-medium mb-2">Select a base map</legend>
           <div className="flex flex-col space-y-2">
-            {Object.values(UNDERLAYS).map(({ label, value }) => (
-              <label key={value} className="flex items-center space-x-2">
-                <input
-                  type="radio"
-                  name="underlay"
-                  value={value}
-                  checked={layers.underlay?.url === value}
-                  onChange={(e) =>
-                    setLayers((prev) => ({
-                      ...prev,
-                      underlay: {
-                        url: e.target.value
-                      },
-                    }))
-                  }
-                />
-                <span>{label}</span>
-              </label>
-            ))}
+            {Object.values(UNDERLAYS).map(({ label, value, legend }) => {
+              const isSelected = layers.underlay?.url === value;
+              const LegendComponent = legend;
+              
+              return (
+                <div key={value} className="space-y-0">
+                  <label className="flex items-center space-x-2">
+                    <input
+                      type="radio"
+                      name="underlay"
+                      value={value}
+                      checked={isSelected}
+                      onChange={(e) =>
+                        setLayers((prev) => ({
+                          ...prev,
+                          underlay: {
+                            url: e.target.value
+                          },
+                        }))
+                      }
+                    />
+                    <span>{label}</span>
+                  </label>
+                  
+                  {/* Render legend if this option is selected and has a legend */}
+                  {isSelected && LegendComponent && (
+                    <div className="ml-6">
+                      <LegendComponent />
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </fieldset>
 

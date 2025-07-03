@@ -18,6 +18,7 @@ export const AppProvider = ({ children }) => {
   const [speciesData, setSpeciesData] = useState({});
   const [regionData, setRegionData] = useState({});
   const [subregionData, setSubregionData] = useState({});
+  const [landUseColorSchemeData, setLandUseColorSchemeData] = useState({});
 
   const BUCKET_URL = 'https://wildcru-wildmaps.s3.eu-west-2.amazonaws.com';
   const PATH_DATA_OUTPUTS = `${BUCKET_URL}/data_outputs`;
@@ -215,6 +216,43 @@ export const AppProvider = ({ children }) => {
         console.error('Error loading main dataset:', error);
       });
   }, [speciesData, superSpeciesData, regionData, subregionData]);
+  //
+  // Load the data about the land use colour scheme
+  useEffect(() => {
+    //fetch('/adm_bdry_info.json')
+    fetch(`${PATH_DATA_INPUTS}/colour_ramps/un_lcc_color_scheme.csv`)
+      .then((res) => res.text())
+      .then((csvText) => {
+        Papa.parse(csvText, {
+          header: true,
+          dynamicTyping: true,
+          skipEmptyLines: true,
+          complete: (results) => {
+            const landUseColorSchemeMap = {};
+            results.data.forEach((row) => {
+              if (row.code) {
+                landUseColorSchemeMap[row.code] = {
+                  un_level : row.un_level || '',
+                  lc_class : row.lc_class || '',
+                  definition : row.definition || '',
+                  r : row.r || '',
+                  g : row.g || '',
+                  b : row.b || ''
+                };
+              }
+            });
+            console.log('Land use data loaded:', Object.keys(landUseColorSchemeMap).length, 'entries');
+            setLandUseColorSchemeData(landUseColorSchemeMap);
+          },
+          error: (error) => {
+            console.error('Error parsing land use colour scheme CSV:', error);
+          }
+        });
+      })
+      .catch((error) => {
+        console.error('Error loading land use colour scheme CSV:', error);
+      });
+  }, []);
 
   const value = {
     data,
@@ -229,6 +267,8 @@ export const AppProvider = ({ children }) => {
     setRegionData,
     subregionData,
     setSubregionData,
+    landUseColorSchemeData,
+    setLandUseColorSchemeData
   };
 
   return (
