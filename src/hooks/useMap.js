@@ -147,30 +147,38 @@ const useMap = (layers, containerRef, setLayers) => {
       for (const key of layerKeys) {
         const layerData = processedLayers[key];
         const existingLayer = layersRef.current[key];
-
+      
         // Check if layer needs to be updated
         const needsUpdate = !existingLayer || 
           JSON.stringify(existingLayer) !== JSON.stringify(layerData);
-
+      
         if (needsUpdate) {
           // Remove existing layer if it exists
           if (existingLayer && existingLayer.info && existingLayer.info.layers) {
             for (let i = existingLayer.info.layers.length - 1; i >= 0; i--) {
               const layerId = `${key}-${existingLayer.info.layers[i].id}`;
               if (map.getLayer(layerId)) {
-                map.removeLayer(layerId);
+                try {
+                  map.removeLayer(layerId);
+                } catch (error) {
+                  console.warn(`Failed to remove layer ${layerId}:`, error);
+                }
               }
             }
             if (existingLayer.info.sources) {
               Object.keys(existingLayer.info.sources).forEach(sourceId => {
                 const fullSourceId = `${key}-${sourceId}`;
                 if (map.getSource(fullSourceId)) {
-                  map.removeSource(fullSourceId);
+                  try {
+                    map.removeSource(fullSourceId);
+                  } catch (error) {
+                    console.warn(`Failed to remove source ${fullSourceId}:`, error);
+                  }
                 }
               });
             }
           }
-
+      
           // Add new layer
           if (layerData.info) {
             try {
@@ -193,6 +201,10 @@ const useMap = (layers, containerRef, setLayers) => {
                   ...styleUpdates
                 };
                 map.setStyle(updatedStyle);
+                
+                // IMPORTANT: Clear all layer references since setStyle removes everything
+                layersRef.current = {};
+                
                 // Wait for style to load before continuing
                 await new Promise(resolve => {
                   if (map.isStyleLoaded()) {
@@ -202,17 +214,21 @@ const useMap = (layers, containerRef, setLayers) => {
                   }
                 });
               }
-
+      
               // Add sources first
               if (layerData.info.sources) {
                 Object.entries(layerData.info.sources).forEach(([sourceId, sourceConfig]) => {
                   const fullSourceId = `${key}-${sourceId}`;
                   if (!map.getSource(fullSourceId)) {
-                    map.addSource(fullSourceId, sourceConfig);
+                    try {
+                      map.addSource(fullSourceId, sourceConfig);
+                    } catch (error) {
+                      console.error(`Failed to add source ${fullSourceId}:`, error);
+                    }
                   }
                 });
               }
-
+      
               // Add layers
               if (layerData.info.layers) {
                 layerData.info.layers.forEach((layer, index) => {
@@ -221,7 +237,7 @@ const useMap = (layers, containerRef, setLayers) => {
                     ...layer,
                     id: layerId
                   };
-
+      
                   // Handle source reference - only prefix if source exists in the style's sources
                   if (layer.source) {
                     if (layerData.info.sources && layerData.info.sources[layer.source]) {
@@ -231,17 +247,17 @@ const useMap = (layers, containerRef, setLayers) => {
                       layerConfig.source = layer.source;
                     }
                   }
-
+      
                   // Handle source-layer (for vector tiles)
                   if (layer['source-layer']) {
                     layerConfig['source-layer'] = layer['source-layer'];
                   }
-
+      
                   // Find the correct position to insert the layer
                   let beforeId = null;
                   const allLayers = map.getStyle().layers;
                   const currentKeyIndex = layerKeys.indexOf(key);
-
+      
                   // Special handling for layer positioning
                   if (key === 'baselayer') {
                     // For baselayer, position it below the permanent 'overlay' layer but above underlay
@@ -271,15 +287,20 @@ const useMap = (layers, containerRef, setLayers) => {
                       }
                     }
                   }
-
+      
                   try {
-                    map.addLayer(layerConfig, beforeId);
+                    // Check if layer already exists before adding
+                    if (!map.getLayer(layerId)) {
+                      map.addLayer(layerConfig, beforeId);
+                    } else {
+                      console.warn(`Layer ${layerId} already exists, skipping add...`);
+                    }
                   } catch (error) {
                     console.error(`Failed to add layer ${layerId}:`, error, layerConfig);
                   }
                 });
               }
-
+      
               layersRef.current[key] = layerData;
             } catch (error) {
               console.error(`Failed to add layer ${key}:`, error);
