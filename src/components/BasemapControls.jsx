@@ -88,6 +88,18 @@ export default function BasemapControls({
   // Get current baselayer value (null if no baselayer)
   const currentBaselayer = layers.baselayer?.url || null;
 
+  // Check if data layer is currently visible (exists in layers)
+  const isDataLayerVisible = !!layers.data;
+
+  // Store the data layer when it's hidden so we can restore it
+  const [hiddenDataLayer, setHiddenDataLayer] = React.useState(null);
+
+  // Check if overlay layer (positron_overlay) is currently visible
+  const isOverlayLayerVisible = !!layers.overlay;
+
+  // Store the overlay layer when it's hidden so we can restore it
+  const [hiddenOverlayLayer, setHiddenOverlayLayer] = React.useState(null);
+
   const handleOverlayChange = (overlayValue) => {
     setLayers((prev) => {
       const newLayers = { ...prev };
@@ -106,6 +118,47 @@ export default function BasemapControls({
     });
   };
 
+  const handleDataLayerToggle = () => {
+    if (isDataLayerVisible) {
+      // Store the current data layer before removing it
+      setHiddenDataLayer(layers.data);
+      setLayers((prev) => {
+        const newLayers = { ...prev };
+        delete newLayers.data;
+        return newLayers;
+      });
+    } else {
+      // Restore the hidden data layer
+      if (hiddenDataLayer) {
+        setLayers((prev) => ({
+          ...prev,
+          data: hiddenDataLayer
+        }));
+      }
+    }
+  };
+
+  const handleOverlayLayerToggle = () => {
+    if (isOverlayLayerVisible) {
+      // Store the current overlay layer before removing it
+      setHiddenOverlayLayer(layers.overlay);
+      setLayers((prev) => {
+        const newLayers = { ...prev };
+        delete newLayers.overlay;
+        return newLayers;
+      });
+    } else {
+      // Restore the hidden overlay layer or add default positron overlay
+      const overlayToRestore = hiddenOverlayLayer || {
+        url: `${PATH_STYLES}/positron_overlay.json`
+      };
+      setLayers((prev) => ({
+        ...prev,
+        overlay: overlayToRestore
+      }));
+    }
+  };
+
   return (
     <Sidebar
       title="Basemap controls"
@@ -117,8 +170,8 @@ export default function BasemapControls({
     >
       {/*<div className="p-4 space-y-6 overflow-y-auto">*/}
       {/*<div className="p-2 space-y-6 overflow-y-auto h-[calc(100vh-120px)]">*/}
-      <div className="p-2 space-y-6 overflow-y-auto h-[calc(100vh-100px)]">
-        <fieldset>
+      <div className="p-2 pr-4 space-y-6 overflow-y-auto h-[calc(100vh-100px)]">
+        <fieldset className="border-b border-gray-200 pb-4">
           <legend className="font-medium mb-2">Select a base map</legend>
           <div className="flex flex-col space-y-2">
             {Object.values(UNDERLAYS).map(({ label, value, legend }) => {
@@ -157,7 +210,7 @@ export default function BasemapControls({
           </div>
         </fieldset>
 
-        <fieldset>
+        <fieldset className="border-b border-gray-200 pb-4">
           <legend className="font-medium mb-2">Select an overlay layer</legend>
           <div className="flex flex-col space-y-2">
             {Object.values(OVERLAYS).map(({ label, value }) => (
@@ -177,15 +230,64 @@ export default function BasemapControls({
     
         {/* Conditionally render SDMLegend or placeholder message */}
         {datasetKey && maxVal !== null ? (
-          <SDMLegend maxVal={maxVal} />
+          <fieldset className="border-b border-gray-200 pb-4">
+            <legend className="font-medium mb-2">Data layer: Colour scale and toggle</legend>
+            
+            {/* iPhone-style toggle for data layer visibility */}
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-sm font-medium text-gray-700">Show data layer</span>
+              <button
+                onClick={handleDataLayerToggle}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                  isDataLayerVisible ? 'bg-blue-600' : 'bg-gray-200'
+                }`}
+                role="switch"
+                aria-checked={isDataLayerVisible}
+              >
+                <span className="sr-only">Toggle data layer visibility</span>
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    isDataLayerVisible ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </div>
+            
+            <SDMLegend maxVal={maxVal} />
+          </fieldset>
         ) : (
-          <fieldset>
+          <fieldset className="border-b border-gray-200 pb-4">
             <legend className="font-medium mb-2">Data layer: Controls and colour scale</legend>
             <div className="ml-0 text-gray-600 text-sm">
               Choose a dataset to view the dataset legend and controls
             </div>
           </fieldset>
         )}
+
+        {/* Toggle labels and roads */}
+        <fieldset>
+          <legend className="font-medium mb-2">Toggle labels and roads</legend>
+          
+          {/* iPhone-style toggle for overlay layer visibility */}
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-sm font-medium text-gray-700">Show labels and roads</span>
+            <button
+              onClick={handleOverlayLayerToggle}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                isOverlayLayerVisible ? 'bg-blue-600' : 'bg-gray-200'
+              }`}
+              role="switch"
+              aria-checked={isOverlayLayerVisible}
+            >
+              <span className="sr-only">Toggle labels and roads visibility</span>
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  isOverlayLayerVisible ? 'translate-x-6' : 'translate-x-1'
+                }`}
+              />
+            </button>
+          </div>
+        </fieldset>
 
       </div>
     </Sidebar>
