@@ -1,65 +1,68 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useDefaultMapPanning } from '../hooks/useDefaultMapPanning';
+import GeneralSelectComponent from '../components/GeneralSelectComponent';
 
 const SelectStartingFilter = () => {
-  const [selectedFilter, setSelectedFilter] = useState('');
   const navigate = useNavigate();
   
-  const handleNext = () => {
-    if (!selectedFilter) return;
-    
-    if (selectedFilter === 'region') {
+  // Pan to default view when component mounts
+  const defaultView = {
+    center: [105.0, 13],
+    zoom: 2.5
+  };
+  
+  useDefaultMapPanning(defaultView, {
+    eventName: 'panToDefault',
+    duration: 1500
+  });
+
+  const getFilterOptions = () => {
+    return [
+      {
+        value: 'region',
+        cells: ['🗺️ Start with geographical region']
+      },
+      {
+        value: 'superspecies',
+        cells: ['🐆 Start with animal type (taxon)']
+      }
+    ];
+  };
+
+  const getContextDisplay = () => {
+    return (
+      <div className="mb-4">
+        <p className="mb-4">Select how you'd like to begin filtering your data:</p>
+      </div>
+    );
+  };
+
+  const handleNext = (selectedValue) => {
+    if (selectedValue === 'region') {
       navigate(`/region?startingFilter=region`);
     } else {
       navigate(`/superspecies?startingFilter=superspecies`);
     }
   };
-  
+
+  // Custom back handler that does nothing (hides the back button)
+  const handleBack = () => {
+    // Do nothing - this is the first page
+  };
+
   return (
-    <div>
-      <h2 className="text-2xl mb-4">Choose starting theme</h2>
-      <p className="mb-4">Select how you'd like to begin filtering your data:</p>
-      
-      <div className="mb-4">
-        <div className="mb-2">
-          <label className="flex items-center cursor-pointer">
-            <input
-              type="radio"
-              name="startingFilter"
-              value="region"
-              checked={selectedFilter === 'region'}
-              onChange={(e) => setSelectedFilter(e.target.value)}
-              className="mr-2"
-            />
-            🗺️ Start with geographical region 
-          </label>
-        </div>
-        
-        <div className="mb-2">
-          <label className="flex items-center cursor-pointer">
-            <input
-              type="radio"
-              name="startingFilter"
-              value="superspecies"
-              checked={selectedFilter === 'superspecies'}
-              onChange={(e) => setSelectedFilter(e.target.value)}
-              className="mr-2"
-            />
-            🐆 Start with animal type (taxon)
-          </label>
-        </div>
-      </div>
-      
-      <div className="flex gap-2">
-        <button
-          onClick={handleNext}
-          disabled={!selectedFilter}
-          className="bg-blue-500 text-white px-4 py-2 rounded disabled:opacity-50"
-        >
-          Next
-        </button>
-      </div>
-    </div>
+    <GeneralSelectComponent
+      route="/starting-filter"
+      paramKey="startingFilter"
+      title="starting theme"
+      description=""
+      getOptions={getFilterOptions}
+      getContextDisplay={getContextDisplay}
+      tableHeaders={[]}
+      customNextHandler={handleNext}
+      customBackHandler={null} // This will hide the back button
+    />
   );
 };
 

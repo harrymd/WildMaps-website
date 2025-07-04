@@ -77,8 +77,8 @@ export default function Layout() {
           <Route path="/superspecies" element={<SelectSuperSpecies />} />
           <Route path="/species" element={<SelectSpecies />} />
           <Route path="/dataset" element={<SelectDataset />} />
-          <Route path="/adm0" element={<SelectAdm0 />} />
-          <Route path="/adm1" element={<SelectAdm1 />} />
+          {/*<Route path="/adm0" element={<SelectAdm0 />} />
+          <Route path="/adm1" element={<SelectAdm1 />} />*/}
           <Route path="/final" element={<FinalScreen />} />
           {/*<Route path="*" element={<Navigate to="/" replace />} />*/}
           {/*<Route path="/" element={<SelectStartingFilter />} />*/}

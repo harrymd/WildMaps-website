@@ -322,28 +322,45 @@ const useMap = (layers, containerRef, setLayers) => {
   }, [layers, map, isLoaded, fetchLayerInfo]);
 
   // Listen for custom panning events (region, subregion, etc.)
-  // In useMap.js, update the listener useEffect:
   useEffect(() => {
     const handlePanToLocation = (event) => {
-      if (map && event.detail.bounds) {
+      if (!map) return;
+  
+      console.log('Map received panning event:', event.type, event.detail);
+  
+      if (event.detail.bounds) {
+        // Handle bounding box events (from regions, countries, etc.)
+        console.log('Panning to bounds:', event.detail.bounds);
         map.fitBounds(event.detail.bounds, {
           padding: 40,
           duration: 2000
         });
+      } else if (event.detail.center && event.detail.zoom != null) {
+        // Handle center/zoom events (from default panning)
+        console.log('Panning to center/zoom:', event.detail.center, event.detail.zoom);
+        map.flyTo({
+          center: event.detail.center,
+          zoom: event.detail.zoom,
+          duration: 1500
+        });
+      } else {
+        console.warn('Unknown event format:', event.detail);
       }
     };
   
-    // Listen for location panning events
+    // Listen for all panning events
     window.addEventListener('panToRegion', handlePanToLocation);
     window.addEventListener('panToSubregion', handlePanToLocation);
     window.addEventListener('panToCountry', handlePanToLocation);
-    window.addEventListener('panToAdm1', handlePanToLocation);  // Add this line
-    
+    window.addEventListener('panToAdm1', handlePanToLocation);
+    window.addEventListener('panToDefault', handlePanToLocation); // Add this for your starting filter
+  
     return () => {
       window.removeEventListener('panToRegion', handlePanToLocation);
       window.removeEventListener('panToSubregion', handlePanToLocation);
       window.removeEventListener('panToCountry', handlePanToLocation);
-      window.removeEventListener('panToAdm1', handlePanToLocation);  // Add this line
+      window.removeEventListener('panToAdm1', handlePanToLocation);
+      window.removeEventListener('panToDefault', handlePanToLocation); // Add this cleanup
     };
   }, [map]);
 

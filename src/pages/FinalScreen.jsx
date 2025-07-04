@@ -3,17 +3,21 @@ import { useAppContext } from '../context/AppContext';
 import { useFilterState } from '../hooks/useFilterState';
 import { useState, useEffect } from 'react';
 import BarChart from '../Components/BarChart';
+import { panToBoundingBox, getBoundingBoxFromLocation } from '../utils/mapPanningUtils';
 
 const FinalScreen = () => {
   const navigate = useNavigate();
-  const { data, setData } = useAppContext();
-  const { getParam, getAllParams } = useFilterState();
+  const { data, admData, setData } = useAppContext();
+  const { getParam, getAllParams, setParam } = useFilterState();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   
   const datasetKey = getParam('datasetKey');
-  const adm0Key = getParam('adm0Key');
-  const adm1Key = getParam('adm1Key');
+  
+  // Initialize with default values if not present
+  const [adm0Key, setAdm0Key] = useState(getParam('adm0Key') || 'all_adm0');
+  const [adm1Key, setAdm1Key] = useState(getParam('adm1Key') || 'all_adm1');
+  
   const allParams = getAllParams();
   
   const dataset = data?.[datasetKey];
@@ -21,44 +25,154 @@ const FinalScreen = () => {
     ? dataset?.adm1_list || []
     : dataset?.adm1_list?.filter(a => a.slice(0, 3) === adm0Key.slice(0, 3)) || [];
 
+  // Set default values in URL if not present
+  useEffect(() => {
+    const currentAdm0 = getParam('adm0Key');
+    const currentAdm1 = getParam('adm1Key');
+    
+    if (!currentAdm0) {
+      setParam('adm0Key', 'all_adm0');
+    }
+    if (!currentAdm1) {
+      setParam('adm1Key', 'all_adm1');
+    }
+  }, [getParam, setParam]);
+
   const handleReset = () => {
     navigate('/');
   };
 
   const handlePrevious = () => {
-    const dataset = data?.[datasetKey];
-    
-    // Check if SelectAdm1 would auto-redirect
-    let skipAdm1 = false;
-    if (dataset && adm0Key) {
-      let adm1Options;
-      if (adm0Key === 'all_adm0') {
-        adm1Options = ['all_adm1'];
-      } else {
-        const filtered = dataset?.adm1_list?.filter(a => a.slice(0, 3) === adm0Key.slice(0, 3)) || [];
-        adm1Options = ['all_adm1', ...filtered];
-      }
-      skipAdm1 = adm1Options.length <= 2;
-    }
-    
-    // Check if SelectAdm0 would auto-redirect
-    let skipAdm0 = false;
-    if (dataset && dataset.adm0_list) {
-      const adm0Options = ['all_adm0', ...dataset.adm0_list];
-      skipAdm0 = adm0Options.length <= 2;
-    }
-    
     const currentParams = new URLSearchParams(window.location.search);
+    currentParams.delete('adm0Key');
+    currentParams.delete('adm1Key');
+    navigate(`/dataset?${currentParams.toString()}`);
+  };
+
+  // Get ADM0 options using the same logic as SelectAdm0
+  const getAdm0Options = () => {
+    if (!dataset) return [];
     
-    if (skipAdm1 && skipAdm0) {
-      currentParams.delete('adm0Key');
-      currentParams.delete('adm1Key');
-      navigate(`/dataset?${currentParams.toString()}`);
-    } else if (skipAdm1) {
-      currentParams.delete('adm1Key');
-      navigate(`/adm0?${currentParams.toString()}`);
+    const options = ['all_adm0', ...(dataset?.adm0_list || [])];
+    return options.map(key => ({
+      value: key,
+      label: key === 'all_adm0'
+        ? 'All countries (entire extent of dataset)'
+        : admData.adm0?.[key]?.name || key
+    }));
+  };
+
+  // Get ADM1 options using the same logic as SelectAdm1
+  const getAdm1Options = () => {
+    if (!dataset || !adm0Key) return [];
+
+    if (adm0Key === 'all_adm0') {
+      return [{
+        value: 'all_adm1',
+        label: 'All regions (entire extent of dataset)'
+      }];
+    }
+
+    const filtered = dataset?.adm1_list?.filter(a => a.slice(0, 3) === adm0Key.slice(0, 3)) || [];
+    const options = ['all_adm1', ...filtered];
+    
+    return options.map(key => ({
+      value: key,
+      label: key === 'all_adm1'
+        ? 'All regions (entire extent of country)'
+        : admData.adm1?.[key]?.name || key
+    }));
+  };
+
+  const handleAdm0Change = (e) => {
+    const newAdm0Key = e.target.value;
+    setAdm0Key(newAdm0Key);
+    setParam('adm0Key', newAdm0Key);
+    
+    // Add map panning for countries
+    if (newAdm0Key !== 'all_adm0' && admData.adm0?.[newAdm0Key]?.bbox) {
+      const bbox = getBoundingBoxFromLocation(
+        { [newAdm0Key]: { bbox: admData.adm0[newAdm0Key].bbox } }, 
+        newAdm0Key
+      );
+      if (bbox) {
+        panToBoundingBox(null, bbox, {
+          method: 'event',
+          eventName: 'panToCountry',
+          duration: 2000,
+          padding: 40
+        });
+      }
+    } else if (newAdm0Key === 'all_adm0' && dataset?.raster_summary?.bounds) {
+      // Pan to dataset bounds when "all_adm0" is selected
+      panToBoundingBox(null, dataset.raster_summary.bounds, {
+        method: 'event',
+        eventName: 'panToCountry',
+        duration: 2000,
+        padding: 40
+      });
+    }
+    
+    // Reset adm1 when adm0 changes
+    if (newAdm0Key === 'all_adm0') {
+      setAdm1Key('all_adm1');
+      setParam('adm1Key', 'all_adm1');
     } else {
-      navigate(`/adm1?${currentParams.toString()}`);
+      // Check if current adm1 is still valid for new adm0
+      const newAdm1Options = dataset?.adm1_list?.filter(a => a.slice(0, 3) === newAdm0Key.slice(0, 3)) || [];
+      const allAdm1Options = ['all_adm1', ...newAdm1Options];
+      
+      if (!allAdm1Options.includes(adm1Key)) {
+        setAdm1Key('all_adm1');
+        setParam('adm1Key', 'all_adm1');
+      }
+    }
+  };
+
+  const handleAdm1Change = (e) => {
+    const newAdm1Key = e.target.value;
+    setAdm1Key(newAdm1Key);
+    setParam('adm1Key', newAdm1Key);
+    
+    // Add map panning for regions
+    if (newAdm1Key !== 'all_adm1' && admData.adm1?.[newAdm1Key]?.bbox) {
+      const bbox = getBoundingBoxFromLocation(
+        { [newAdm1Key]: { bbox: admData.adm1[newAdm1Key].bbox } }, 
+        newAdm1Key
+      );
+      if (bbox) {
+        panToBoundingBox(null, bbox, {
+          method: 'event',
+          eventName: 'panToAdm1',
+          duration: 2000,
+          padding: 40
+        });
+      }
+    } else if (newAdm1Key === 'all_adm1') {
+      // Pan back to country or dataset level when "all_adm1" is selected
+      if (adm0Key !== 'all_adm0' && admData.adm0?.[adm0Key]?.bbox) {
+        // Pan to country bounds
+        const bbox = getBoundingBoxFromLocation(
+          { [adm0Key]: { bbox: admData.adm0[adm0Key].bbox } }, 
+          adm0Key
+        );
+        if (bbox) {
+          panToBoundingBox(null, bbox, {
+            method: 'event',
+            eventName: 'panToCountry',
+            duration: 2000,
+            padding: 40
+          });
+        }
+      } else if (dataset?.raster_summary?.bounds) {
+        // Pan to dataset bounds
+        panToBoundingBox(null, dataset.raster_summary.bounds, {
+          method: 'event',
+          eventName: 'panToCountry',
+          duration: 2000,
+          padding: 40
+        });
+      }
     }
   };
 
@@ -115,17 +229,6 @@ const FinalScreen = () => {
   } else {
     sub_data = dataset?.['adm1-zone']?.[adm1Key];
   }
-  
-  //// Calculate fraction of protected areas in each bin
-  //let chartData_PA_frac = [];
-  //if (sub_data?.area_km2_by_bin_in_PA) {
-  //  const area_PA = sub_data.area_km2_by_bin_in_PA;
-  //  const total = area_PA.reduce((sum, val) => sum + val, 0);
-  //  chartData_PA_frac = area_PA.map((val, idx) => ({
-  //    label: labels[idx],
-  //    value: total > 0 ? val / total : 0
-  //  }));
-  //}
 
   // Extract PA and not_PA arrays
   const area_PA = sub_data?.area_km2_by_bin_in_PA || [];
@@ -287,6 +390,9 @@ const FinalScreen = () => {
     );
   }
 
+  const adm0Options = getAdm0Options();
+  const adm1Options = getAdm1Options();
+
   return (
     <div>
       <h2 className="text-2xl mb-4">Summary</h2>
@@ -294,9 +400,6 @@ const FinalScreen = () => {
       <div className="mb-6 p-4 bg-gray-50 rounded">
         <h3 className="text-lg font-semibold mb-2">Your Selection Path:</h3>
         <ul className="space-y-1">
-          {/*allParams.startingFilter && (
-            <li><strong>Starting Filter:</strong> {allParams.startingFilter === 'region' ? 'Region First' : 'SuperSpecies First'}</li>
-          )*/}
           {allParams.superspecies && (
             <li><strong>Taxon:</strong> {allParams.superspecies}</li>
           )}
@@ -306,19 +409,58 @@ const FinalScreen = () => {
           {allParams.subregion && (
             <li><strong>Sub-region:</strong> {allParams.subregion}</li>
           )}
-          {/*datasetKey && (
-            <li><strong>Dataset:</strong> {getDisplayValue(datasetKey, 'dataset')}</li>
-          )*/}
           {datasetKey && (
             <li><strong>Dataset:</strong> {(dataset?.source_text || 'Unknown') + ' - ' + (dataset?.common_name || 'Unknown species')}</li>
           )}
-          {adm0Key && (
-            <li><strong>Country:</strong> {getDisplayValue(adm0Key, 'adm0')} (out of {dataset?.adm0_list?.length ?? 0} options)</li>
-          )}
-          {adm1Key && (
-            <li><strong>Region:</strong> {getDisplayValue(adm1Key, 'adm1')} (out of {adm1_list_filtered?.length ?? 0} options)</li>
-          )}
         </ul>
+      </div>
+
+      {/* Location Selection Dropdowns */}
+      <div className="mb-6 p-4 bg-blue-50 rounded">
+        <h3 className="text-lg font-semibold mb-3">Location Selection</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label htmlFor="adm0-select" className="block text-sm font-medium mb-1">
+              Country:
+            </label>
+            <select
+              id="adm0-select"
+              value={adm0Key}
+              onChange={handleAdm0Change}
+              className="w-full p-2 border rounded-md"
+            >
+              {adm0Options.map(option => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          
+          <div>
+            <label htmlFor="adm1-select" className="block text-sm font-medium mb-1">
+              Region:
+            </label>
+            <select
+              id="adm1-select"
+              value={adm1Key}
+              onChange={handleAdm1Change}
+              disabled={adm0Key === 'all_adm0'}
+              className="w-full p-2 border rounded-md disabled:bg-gray-100 disabled:cursor-not-allowed"
+            >
+              {adm1Options.map(option => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            {adm0Key === 'all_adm0' && (
+              <p className="text-sm text-gray-500 mt-1">
+                Select a specific country to choose regions
+              </p>
+            )}
+          </div>
+        </div>
       </div>
       
       <BarChart 

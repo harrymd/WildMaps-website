@@ -13,7 +13,8 @@ const GeneralSelectComponent = ({
   getContextDisplay,
   tableHeaders = [title],
   onSelect,
-  customBackHandler
+  customBackHandler,
+  customNextHandler
 }) => {
   const { data } = useAppContext();
   const { getParam, getAllParams, setParamAndNavigate } = useFilterState();
@@ -38,8 +39,13 @@ const GeneralSelectComponent = ({
   
   const handleNext = () => {
     if (!selectedValue) return;
-    const nextRoute = getNextRoute(route, startingFilter);
-    setParamAndNavigate(paramKey, selectedValue, nextRoute);
+    
+    if (customNextHandler) {
+      customNextHandler(selectedValue);
+    } else {
+      const nextRoute = getNextRoute(route, startingFilter);
+      setParamAndNavigate(paramKey, selectedValue, nextRoute);
+    }
   };
   
   const handleBack = () => {
@@ -57,11 +63,14 @@ const GeneralSelectComponent = ({
   const options = getOptions(allParams, data);
   const contextDisplay = getContextDisplay ? getContextDisplay(allParams) : null;
   
+  // Determine if back button should be shown
+  const showBackButton = customBackHandler !== null;
+  
   return (
     <div>
       <h2 className="text-2xl mb-4">Select {title}</h2>
       {contextDisplay && <div className="mb-4">{contextDisplay}</div>}
-      <p className="mb-4">Click on a row to select a {title.toLowerCase()}:</p>
+      {description && <p className="mb-4">{description}</p>}
       
       <table className="w-full mb-4 border">
         {tableHeaders.length > 0 && (
@@ -81,13 +90,13 @@ const GeneralSelectComponent = ({
               <tr 
                 key={optionValue} 
                 onClick={() => handleSelect(optionValue)} 
-                className={`cursor-pointer ${optionValue === selectedValue ? 'bg-blue-100' : ''}`}
+                className={`cursor-pointer hover:bg-gray-50 ${optionValue === selectedValue ? 'bg-blue-100' : ''}`}
               >
                 {typeof option === 'string' ? (
-                  <td className="border px-2">{option}</td>
+                  <td className="border px-2 py-1">{option}</td>
                 ) : (
                   option.cells.map((cell, index) => (
-                    <td key={index} className="border px-2">{cell}</td>
+                    <td key={index} className="border px-2 py-1">{cell}</td>
                   ))
                 )}
               </tr>
@@ -97,16 +106,18 @@ const GeneralSelectComponent = ({
       </table>
       
       <div className="flex gap-2">
-        <button
-          onClick={handleBack}
-          className="bg-gray-500 text-white px-4 py-2 rounded"
-        >
-          Back
-        </button>
+        {showBackButton && (
+          <button
+            onClick={handleBack}
+            className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+          >
+            Back
+          </button>
+        )}
         <button
           onClick={handleNext}
           disabled={!selectedValue}
-          className="bg-blue-500 text-white px-4 py-2 rounded disabled:opacity-50"
+          className="bg-blue-500 text-white px-4 py-2 rounded disabled:opacity-50 hover:bg-blue-600 disabled:hover:bg-blue-500"
         >
           Next
         </button>

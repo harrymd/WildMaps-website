@@ -1,6 +1,7 @@
 export const getNextRoute = (currentRoute, startingFilter) => {
-  const regionFirstOrder = ['/region', '/subregion', '/superspecies', '/dataset', '/adm0', '/adm1', '/final'];
-  const superspeciesFirstOrder = ['/superspecies', '/region', '/subregion', '/dataset', '/adm0', '/adm1', '/final'];
+  // Updated to skip adm0 and adm1 - go directly from dataset to final
+  const regionFirstOrder = ['/region', '/subregion', '/superspecies', '/dataset', '/final'];
+  const superspeciesFirstOrder = ['/superspecies', '/region', '/subregion', '/dataset', '/final'];
   
   const order = startingFilter === 'region' ? regionFirstOrder : superspeciesFirstOrder;
   const currentIndex = order.indexOf(currentRoute);
@@ -9,8 +10,9 @@ export const getNextRoute = (currentRoute, startingFilter) => {
 };
 
 export const getPreviousRoute = (currentRoute, startingFilter) => {
-  const regionFirstOrder = ['/region', '/subregion', '/superspecies', '/dataset', '/adm0', '/adm1', '/final'];
-  const superspeciesFirstOrder = ['/superspecies', '/region', '/subregion', '/dataset', '/adm0', '/adm1', '/final'];
+  // Updated to skip adm0 and adm1 - go directly from final back to dataset
+  const regionFirstOrder = ['/region', '/subregion', '/superspecies', '/dataset', '/final'];
+  const superspeciesFirstOrder = ['/superspecies', '/region', '/subregion', '/dataset', '/final'];
   
   const order = startingFilter === 'region' ? regionFirstOrder : superspeciesFirstOrder;
   const currentIndex = order.indexOf(currentRoute);
