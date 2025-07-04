@@ -367,129 +367,177 @@ const FinalScreen = () => {
     }
   };
 
+  const adm0Options = getAdm0Options();
+  const adm1Options = getAdm1Options();
+
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="text-lg">Loading detailed data...</div>
+      <div className="relative" style={{ height: 'calc(100% - 40px)' }}>
+        <div className="overflow-y-auto" style={{ height: 'calc(100% - 60px)' }}>
+          <div className="flex justify-center items-center h-64">
+            <div className="text-lg">Loading detailed data...</div>
+          </div>
+        </div>
+        <div className="absolute bottom-0 left-0 right-0 border-t pt-4 bg-white h-15">
+          <div className="flex justify-between gap-2">
+            <button
+              onClick={handlePrevious}
+              className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+            >
+              Back
+            </button>
+            <button
+              onClick={handleReset}
+              disabled
+              className="bg-red-500 text-white px-4 py-2 rounded opacity-50"
+            >
+              Reset Parameters
+            </button>
+          </div>
+        </div>
       </div>
     );
   }
   
   if (error) {
     return (
-      <div className="text-red-600 p-4 bg-red-50 rounded">
-        <h3 className="font-semibold">Error loading data</h3>
-        <p>{error}</p>
-        <button 
-          onClick={() => window.location.reload()} 
-          className="mt-2 bg-red-500 text-white px-4 py-2 rounded"
-        >
-          Retry
-        </button>
+      <div className="relative" style={{ height: 'calc(100% - 40px)' }}>
+        <div className="overflow-y-auto" style={{ height: 'calc(100% - 60px)' }}>
+          <div className="text-red-600 p-4 bg-red-50 rounded">
+            <h3 className="font-semibold">Error loading data</h3>
+            <p>{error}</p>
+            <button 
+              onClick={() => window.location.reload()} 
+              className="mt-2 bg-red-500 text-white px-4 py-2 rounded"
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+        <div className="absolute bottom-0 left-0 right-0 border-t pt-4 bg-white h-15">
+          <div className="flex justify-between gap-2">
+            <button
+              onClick={handlePrevious}
+              className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+            >
+              Back
+            </button>
+            <button
+              onClick={handleReset}
+              className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+            >
+              Reset Parameters
+            </button>
+          </div>
+        </div>
       </div>
     );
   }
 
-  const adm0Options = getAdm0Options();
-  const adm1Options = getAdm1Options();
-
   return (
-    <div>
-      <h2 className="text-2xl mb-4">Summary</h2>
-      
-      <div className="mb-6 p-4 bg-gray-50 rounded">
-        <h3 className="text-lg font-semibold mb-2">Your Selection Path:</h3>
-        <ul className="space-y-1">
-          {allParams.superspecies && (
-            <li><strong>Taxon:</strong> {allParams.superspecies}</li>
-          )}
-          {allParams.region && (
-            <li><strong>Region:</strong> {allParams.region}</li>
-          )}
-          {allParams.subregion && (
-            <li><strong>Sub-region:</strong> {allParams.subregion}</li>
-          )}
-          {datasetKey && (
-            <li><strong>Dataset:</strong> {(dataset?.source_text || 'Unknown') + ' - ' + (dataset?.common_name || 'Unknown species')}</li>
-          )}
-        </ul>
-      </div>
-
-      {/* Location Selection Dropdowns */}
-      <div className="mb-6 p-4 bg-blue-50 rounded">
-        <h3 className="text-lg font-semibold mb-3">Location Selection</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="adm0-select" className="block text-sm font-medium mb-1">
-              Country:
-            </label>
-            <select
-              id="adm0-select"
-              value={adm0Key}
-              onChange={handleAdm0Change}
-              className="w-full p-2 border rounded-md"
-            >
-              {adm0Options.map(option => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </div>
-          
-          <div>
-            <label htmlFor="adm1-select" className="block text-sm font-medium mb-1">
-              Region:
-            </label>
-            <select
-              id="adm1-select"
-              value={adm1Key}
-              onChange={handleAdm1Change}
-              disabled={adm0Key === 'all_adm0'}
-              className="w-full p-2 border rounded-md disabled:bg-gray-100 disabled:cursor-not-allowed"
-            >
-              {adm1Options.map(option => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-            {adm0Key === 'all_adm0' && (
-              <p className="text-sm text-gray-500 mt-1">
-                Select a specific country to choose regions
-              </p>
+    <div className="relative" style={{ height: 'calc(100% - 40px)' }}>
+      {/* Content area with scrolling */}
+      <div className="overflow-y-auto" style={{ height: 'calc(100% - 60px)' }}>
+        <h2 className="text-2xl mb-4">Summary</h2>
+        
+        <div className="mb-6 p-4 bg-gray-50 rounded">
+          <h3 className="text-lg font-semibold mb-2">Your Selection Path:</h3>
+          <ul className="space-y-1">
+            {allParams.superspecies && (
+              <li><strong>Taxon:</strong> {allParams.superspecies}</li>
             )}
+            {allParams.region && (
+              <li><strong>Region:</strong> {allParams.region}</li>
+            )}
+            {allParams.subregion && (
+              <li><strong>Sub-region:</strong> {allParams.subregion}</li>
+            )}
+            {datasetKey && (
+              <li><strong>Dataset:</strong> {(dataset?.source_text || 'Unknown') + ' - ' + (dataset?.common_name || 'Unknown species')}</li>
+            )}
+          </ul>
+        </div>
+
+        {/* Location Selection Dropdowns */}
+        <div className="mb-6 p-4 bg-blue-50 rounded">
+          <h3 className="text-lg font-semibold mb-3">Location Selection</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="adm0-select" className="block text-sm font-medium mb-1">
+                Country:
+              </label>
+              <select
+                id="adm0-select"
+                value={adm0Key}
+                onChange={handleAdm0Change}
+                className="w-full p-2 border rounded-md"
+              >
+                {adm0Options.map(option => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            
+            <div>
+              <label htmlFor="adm1-select" className="block text-sm font-medium mb-1">
+                Region:
+              </label>
+              <select
+                id="adm1-select"
+                value={adm1Key}
+                onChange={handleAdm1Change}
+                disabled={adm0Key === 'all_adm0'}
+                className="w-full p-2 border rounded-md disabled:bg-gray-100 disabled:cursor-not-allowed"
+              >
+                {adm1Options.map(option => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+              {adm0Key === 'all_adm0' && (
+                <p className="text-sm text-gray-500 mt-1">
+                  Select a specific country to choose regions
+                </p>
+              )}
+            </div>
           </div>
         </div>
+        
+        <BarChart 
+          data={chartData_areas_transposed}
+          title='Level of protection by suitability category'
+          xLabel='Land type'
+          yLabel='Proportion this land category (%)'
+          colors={customColors}
+        />
+        <BarChart 
+          data={chartData_landuse}
+          title='Area by land class and suitability category'
+          xLabel='Land class'
+          yLabel='Area (km²)'
+          colors={customColors}
+        />
       </div>
       
-      <BarChart 
-        data={chartData_areas_transposed}
-        title='Level of protection by suitability category'
-        xLabel='Land type'
-        yLabel='Proportion this land category (%)'
-        colors={customColors}
-      />
-      <BarChart 
-        data={chartData_landuse}
-        title='Area by land class and suitability category'
-        xLabel='Land class'
-        yLabel='Area (km²)'
-        colors={customColors}
-      />
-      <div className="flex gap-2">
-        <button 
-          onClick={handlePrevious}
-          className="bg-gray-500 text-white px-4 py-2 rounded"
-        >
-          Previous
-        </button>
-        <button 
-          onClick={handleReset} 
-          className="bg-red-500 text-white px-4 py-2 rounded"
-        >
-          Reset Parameters
-        </button>
+      {/* Fixed navigation buttons at bottom */}
+      <div className="absolute bottom-0 left-0 right-0 border-t pt-4 bg-white h-15">
+        <div className="flex justify-between gap-2">
+          <button
+            onClick={handlePrevious}
+            className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+          >
+            Back
+          </button>
+          <button
+            onClick={handleReset}
+            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+          >
+            Reset Parameters
+          </button>
+        </div>
       </div>
     </div>
   );
