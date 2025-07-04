@@ -95,8 +95,10 @@ export default function BasemapControls({
       onClose={onClose}
       side="right"
       width="300px"
+      //scrollOnOverflow={true}
     >
-      <div className="p-4 space-y-6">
+      {/*<div className="p-4 space-y-6 overflow-y-auto">*/}
+      <div className="p-4 space-y-6 overflow-y-auto h-[calc(100vh-120px)]">
         <fieldset>
           <legend className="font-medium mb-2">Select a base map</legend>
           <div className="flex flex-col space-y-2">
@@ -126,7 +128,7 @@ export default function BasemapControls({
                   
                   {/* Render legend if this option is selected and has a legend */}
                   {isSelected && LegendComponent && (
-                    <div className="ml-6">
+                    <div className="ml-0">
                       <LegendComponent />
                     </div>
                   )}

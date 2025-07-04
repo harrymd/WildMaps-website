@@ -67,60 +67,68 @@ const GeneralSelectComponent = ({
   const showBackButton = customBackHandler !== null;
   
   return (
-    <div>
-      <h2 className="text-2xl mb-4">Select {title}</h2>
-      {contextDisplay && <div className="mb-4">{contextDisplay}</div>}
-      {description && <p className="mb-4">{description}</p>}
-      
-      <table className="w-full mb-4 border">
-        {tableHeaders.length > 0 && (
-          <thead>
-            <tr>
-              {tableHeaders.map((header, index) => (
-                <th key={index} className="border px-2 text-left">{header}</th>
-              ))}
-            </tr>
-          </thead>
-        )}
-        <tbody>
-          {options.map((option) => {
-            const optionValue = typeof option === 'string' ? option : option.value;
-            
-            return (
-              <tr 
-                key={optionValue} 
-                onClick={() => handleSelect(optionValue)} 
-                className={`cursor-pointer hover:bg-gray-50 ${optionValue === selectedValue ? 'bg-blue-100' : ''}`}
-              >
-                {typeof option === 'string' ? (
-                  <td className="border px-2 py-1">{option}</td>
-                ) : (
-                  option.cells.map((cell, index) => (
-                    <td key={index} className="border px-2 py-1">{cell}</td>
-                  ))
-                )}
+    <div className="relative" style={{ height: 'calc(100% - 40px)' }}>
+      {/* Content area with scrolling */}
+      <div className="overflow-y-auto" style={{ height: 'calc(100% - 60px)' }}>
+        <h2 className="text-2xl mb-4">Select {title}</h2>
+        {contextDisplay && <div className="mb-4">{contextDisplay}</div>}
+        {description && <p className="mb-4">{description}</p>}
+        
+        <table className="w-full mb-4 border">
+          {tableHeaders.length > 0 && (
+            <thead>
+              <tr>
+                {tableHeaders.map((header, index) => (
+                  <th key={index} className="border px-2 text-left">{header}</th>
+                ))}
               </tr>
-            );
-          })}
-        </tbody>
-      </table>
+            </thead>
+          )}
+          <tbody>
+            {options.map((option) => {
+              const optionValue = typeof option === 'string' ? option : option.value;
+              
+              return (
+                <tr 
+                  key={optionValue} 
+                  onClick={() => handleSelect(optionValue)} 
+                  className={`cursor-pointer hover:bg-gray-50 ${optionValue === selectedValue ? 'bg-blue-100' : ''}`}
+                >
+                  {typeof option === 'string' ? (
+                    <td className="border px-2 py-1">{option}</td>
+                  ) : (
+                    option.cells.map((cell, index) => (
+                      <td key={index} className="border px-2 py-1">{cell}</td>
+                    ))
+                  )}
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
       
-      <div className="flex gap-2">
-        {showBackButton && (
+      {/* Fixed navigation buttons at bottom */}
+      <div className="absolute bottom-0 left-0 right-0 border-t pt-4 bg-white h-15">
+        <div className="flex justify-between gap-2">
+          {showBackButton ? (
+            <button
+              onClick={handleBack}
+              className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+            >
+              Back
+            </button>
+          ) : (
+            <div></div>
+          )}
           <button
-            onClick={handleBack}
-            className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+            onClick={handleNext}
+            disabled={!selectedValue}
+            className="bg-blue-500 text-white px-4 py-2 rounded disabled:opacity-50 hover:bg-blue-600 disabled:hover:bg-blue-500"
           >
-            Back
+            Next
           </button>
-        )}
-        <button
-          onClick={handleNext}
-          disabled={!selectedValue}
-          className="bg-blue-500 text-white px-4 py-2 rounded disabled:opacity-50 hover:bg-blue-600 disabled:hover:bg-blue-500"
-        >
-          Next
-        </button>
+        </div>
       </div>
     </div>
   );

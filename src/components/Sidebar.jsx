@@ -1,6 +1,6 @@
 import { X } from 'lucide-react';
 
-export default function Sidebar({ title, isOpen, onClose, children, side = 'left', width }) {
+export default function Sidebar({ title, isOpen, onClose, children, side = 'left', width, scrollOnOverflow = false }) {
   return (
     <div
       style={{ width: isOpen ? width : '0' }}
@@ -9,13 +9,15 @@ export default function Sidebar({ title, isOpen, onClose, children, side = 'left
       }`}
     >
       <div
-        className={`transition-opacity duration-300 h-full overflow-y-auto ${
-          isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
-        }`}
+        //className={`transition-opacity duration-300 h-full overflow-y-auto ${
+        className={`transition-opacity duration-300 h-full
+        ${ scrollOnOverflow ? 'overflow-y-auto' : ''}
+        ${ isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}
+        `}
       >
         <div className="flex items-center justify-between mb-4">
-          {/*<h2 className="text-lg font-semibold">{title}</h2>*/}
-          <h2 className="text-lg font-semibold"></h2>
+          <h2 className="text-lg font-semibold">{title}</h2>
+          {/*<h2 className="text-lg font-semibold"></h2>*/}
           <button onClick={onClose} className="hover:text-gray-600">
             <X className="w-6 h-6" />
           </button>
