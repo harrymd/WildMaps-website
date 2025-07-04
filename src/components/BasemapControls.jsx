@@ -1,11 +1,14 @@
 // BasemapControls.js
 
 import React from 'react';
+import { useAppContext } from '../context/AppContext';
+import { useSearchParams } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import ElevationColorBar from './ElevationColorBar';
 import ColorBar from './ColorBar';
 import LandUseLegend from './LandUseLegend';
 import EcoregionLegend from './EcoregionLegend';
+import SDMLegend from './SDMLegend';
 
 // Import your legend components
 // import ElevationColorBar from './ElevationColorBar';
@@ -28,7 +31,7 @@ const UNDERLAYS = {
     legend: null // No legend for satellite imagery
   },
   ALTITUDE: {
-    label: 'Altitude',
+    label: 'Elevation',
     value: `${PATH_STYLES}/mapzen_elevation_and_hillshade.json`,
     legend: ElevationColorBar
   },
@@ -67,6 +70,21 @@ export default function BasemapControls({
   layers,
   setLayers
 }) {
+  const [searchParams] = useSearchParams();
+  const datasetKey = searchParams.get('datasetKey');
+  const { data } = useAppContext();
+  
+  // Extract maxVal from the dataset
+  const maxVal = datasetKey && data[datasetKey] ? (() => {
+    const dataset = data[datasetKey];
+    const scaleFactor = dataset['scale_factor'];
+    console.log('Scale factor:', scaleFactor);
+
+    return scaleFactor ?
+      (dataset['raster_summary']['99pc'] / scaleFactor) :
+      dataset['raster_summary']['99pc'];
+  })() : null;
+  
   // Get current baselayer value (null if no baselayer)
   const currentBaselayer = layers.baselayer?.url || null;
 
@@ -98,7 +116,8 @@ export default function BasemapControls({
       //scrollOnOverflow={true}
     >
       {/*<div className="p-4 space-y-6 overflow-y-auto">*/}
-      <div className="p-4 space-y-6 overflow-y-auto h-[calc(100vh-120px)]">
+      {/*<div className="p-2 space-y-6 overflow-y-auto h-[calc(100vh-120px)]">*/}
+      <div className="p-2 space-y-6 overflow-y-auto h-[calc(100vh-100px)]">
         <fieldset>
           <legend className="font-medium mb-2">Select a base map</legend>
           <div className="flex flex-col space-y-2">
@@ -155,6 +174,19 @@ export default function BasemapControls({
             ))}
           </div>
         </fieldset>
+    
+        {/* Conditionally render SDMLegend or placeholder message */}
+        {datasetKey && maxVal !== null ? (
+          <SDMLegend maxVal={maxVal} />
+        ) : (
+          <fieldset>
+            <legend className="font-medium mb-2">Data layer: Controls and colour scale</legend>
+            <div className="ml-0 text-gray-600 text-sm">
+              Choose a dataset to view the dataset legend and controls
+            </div>
+          </fieldset>
+        )}
+
       </div>
     </Sidebar>
   );

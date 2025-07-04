@@ -1,9 +1,11 @@
 import GeneralSelectComponent from '../components/GeneralSelectComponent';
 import { useFilterState } from '../hooks/useFilterState';
 import { useNavigate } from 'react-router-dom';
+import { useAppContext } from '../context/AppContext';
 
 const SelectDataset = () => {
   const { setParamAndNavigate } = useFilterState();
+  const { speciesData } = useAppContext();
   const navigate = useNavigate();
 
   const getDatasetOptions = (allParams, data) => {
@@ -36,11 +38,28 @@ const SelectDataset = () => {
       );
     }
   
-    // Return filtered datasets as table rows
-    return Object.entries(filteredData).map(([key, entry]) => ({
-      value: key,
-      cells: [entry.common_name || 'Unknown species', entry.source_text || 'No source']
-    }));
+    // Return filtered datasets as table rows with formatted species names
+    return Object.entries(filteredData).map(([key, entry]) => {
+      const commonName = entry.common_name || 'Unknown species';
+      const scientificName = entry.scientific_name || speciesData[commonName]?.scientific_name;
+      
+      // Capitalize the common name
+      const capitalizedCommonName = commonName.charAt(0).toUpperCase() + commonName.slice(1);
+      
+      // Format species display with scientific name in italics if available
+      const speciesDisplay = scientificName 
+        ? (
+            <span>
+              {capitalizedCommonName} <em>({scientificName})</em>
+            </span>
+          )
+        : capitalizedCommonName;
+
+      return {
+        value: key,
+        cells: [speciesDisplay, entry.source_text || 'No source']
+      };
+    });
   };
 
   // Custom handler for dataset selection that goes directly to final screen

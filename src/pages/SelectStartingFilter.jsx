@@ -21,11 +21,11 @@ const SelectStartingFilter = () => {
     return [
       {
         value: 'region',
-        cells: ['🗺️ Start with geographical region']
+        cells: ['... geographical region']
       },
       {
         value: 'superspecies',
-        cells: ['🐆 Start with animal type (taxon)']
+        cells: ['... animal type (taxon)']
       }
     ];
   };
@@ -33,7 +33,7 @@ const SelectStartingFilter = () => {
   const getContextDisplay = () => {
     return (
       <div className="mb-4">
-        <p className="mb-4">Select how you'd like to begin filtering your data:</p>
+        <p className="mb-4">Choose a dataset, filtering first by...</p>
       </div>
     );
   };

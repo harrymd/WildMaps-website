@@ -34,26 +34,32 @@ const SelectSuperSpecies = () => {
     )];
     
     // Create options with separate columns for scientific and common names
-    return uniqueSuperSpecies
-      .map(superspecies => {
-        const info = superSpeciesData[superspecies];
-        const emoji = info?.emoji || '';
-        console.log(info);
-        const scientific_name = info?.scientific_name || '-';
-        const common_name = info?.common_name || '-';
-        return {
-          superspecies,
-          scientific_name,
-          common_name
-        };
-      })
-      .sort((a, b) => a.scientific_name.localeCompare(b.scientific_name))
-      .map(item => ({
-        value: item.superspecies,
-        cells: [item.scientific_name, item.common_name]
-      }));
+    return uniqueSuperSpecies                                                   
+      .map(superspecies => {                                                    
+        const info = superSpeciesData[superspecies];                            
+        const emoji = info?.emoji || '';                                        
+        console.log(info);                                                      
+        const scientific_name = info?.scientific_name || '-';                   
+        const common_name = info?.common_name || '-';                           
+        
+        // Capitalize the first letter of both names
+        const capitalizedScientificName = scientific_name !== '-' ? 
+          scientific_name.charAt(0).toUpperCase() + scientific_name.slice(1) : '-';
+        const capitalizedCommonName = common_name !== '-' ? 
+          common_name.charAt(0).toUpperCase() + common_name.slice(1) : '-';
+        
+        return {                                                                
+          superspecies,                                                         
+          scientific_name: capitalizedScientificName,                           
+          common_name: capitalizedCommonName                                     
+        };                                                                      
+      })                                                                        
+      .sort((a, b) => a.scientific_name.localeCompare(b.scientific_name))       
+      .map(item => ({                                                           
+        value: item.superspecies,                                               
+        cells: [item.scientific_name, item.common_name]                         
+      }));                                                                      
   };
-
   return (
     <GeneralSelectComponent
       route="/superspecies"
@@ -61,7 +67,7 @@ const SelectSuperSpecies = () => {
       title="taxon"
       description="Click on a row to select a taxon:"
       getOptions={getSuperSpeciesOptions}
-      tableHeaders={['Scientific Name', 'Common Name']}
+      tableHeaders={['Scientific name', 'Common name']}
     />
   );
 };

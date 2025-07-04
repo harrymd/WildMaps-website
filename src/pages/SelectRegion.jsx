@@ -36,17 +36,6 @@ const SelectRegion = () => {
       }));
   };
 
-  const getContextDisplay = (allParams) => {
-    if (allParams.superspecies) {
-      return (
-        <div className="mb-4">
-          <p className="mb-1">SuperSpecies: <strong>{allParams.superspecies}</strong></p>
-        </div>
-      );
-    }
-    return null;
-  };
-  
   const { handleLocationSelection } = useMapPanning('region', regionData, 'panToRegion');
 
   return (
@@ -56,7 +45,7 @@ const SelectRegion = () => {
       title="region"
       description="Click on a row to select a region:"
       getOptions={getRegionOptions}
-      getContextDisplay={getContextDisplay}
+      //getContextDisplay={getContextDisplay}
       tableHeaders={[]}
       onSelect={handleLocationSelection}
     />

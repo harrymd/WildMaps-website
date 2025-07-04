@@ -5,7 +5,7 @@ export default function Sidebar({ title, isOpen, onClose, children, side = 'left
     <div
       style={{ width: isOpen ? width : '0' }}
       className={`fixed top-0 ${side}-0 h-full bg-white shadow-lg z-20 transition-all duration-300 ease-in-out overflow-hidden ${
-        isOpen ? 'p-6' : 'p-0'
+        isOpen ? 'p-4' : 'p-0'
       }`}
     >
       <div

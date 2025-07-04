@@ -27,15 +27,19 @@ const ParameterSummary = ({ className = "" }) => {
         if (superspeciesInfo) {
           const scientificName = superspeciesInfo.scientific_name;
           const commonName = superspeciesInfo.common_name;
-          
-          if (scientificName && commonName) {
+
+          // Capitalize the first letter of scientific name
+          const capitalizedScientificName = scientificName ?
+            scientificName.charAt(0).toUpperCase() + scientificName.slice(1) : '';
+
+          if (capitalizedScientificName && commonName) {
             return (
               <span>
-              {commonName} (<em>{scientificName}</em>)
+              {capitalizedScientificName} ({commonName})
               </span>
             );
-          } else if (scientificName) {
-            return <em>{scientificName}</em>;
+          } else if (capitalizedScientificName) {
+            return capitalizedScientificName;
           } else if (commonName) {
             return commonName;
           }
