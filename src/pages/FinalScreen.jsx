@@ -5,7 +5,10 @@ import BarChart from '../Components/BarChart';
 import { useDetailedData } from '../hooks/useDetailedData';
 import { useLocationSelection } from '../hooks/useLocationSelection';
 import { processChartData } from '../utils/chartDataUtils';
-import SelectionPath from '../components/SelectionPath';
+//import SelectionPath from '../components/SelectionPath';
+//import ParameterSummary from '../components/ParameterSummary';
+import FinalSummary from '../components/FinalSummary';
+import FinalDatasetInfo from '../components/FinalDatasetInfo';
 import LocationSelector from '../components/LocationSelector';
 import NavigationButtons from '../components/NavigationButtons';
 
@@ -91,7 +94,8 @@ const FinalScreen = () => {
       <div className="overflow-y-auto" style={{ height: 'calc(100% - 60px)' }}>
         <h2 className="text-2xl mb-4">Summary</h2>
         
-        <SelectionPath allParams={allParams} dataset={dataset} />
+        {/*<SelectionPath allParams={allParams} dataset={dataset} />*/}
+        <FinalSummary />
         
         <LocationSelector
           adm0Key={adm0Key}
@@ -117,6 +121,7 @@ const FinalScreen = () => {
           yLabel='Area (km²)'
           colors={customColors}
         />
+        <FinalDatasetInfo />
       </div>
       
       <NavigationButtons onPrevious={handlePrevious} onReset={handleReset} />

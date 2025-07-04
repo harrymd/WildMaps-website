@@ -51,31 +51,6 @@ const SelectSubRegion = () => {
       }));
   };
 
-  const getContextDisplay = (allParams) => {
-    const context = [];
-    if (allParams.superspecies) {
-      context.push(`SuperSpecies: **${allParams.superspecies}**`);
-    }
-    if (allParams.region) {
-      context.push(`Region: **${allParams.region}**`);
-    }
-    
-    if (context.length > 0) {
-      return (
-        <div className="mb-4">
-          {context.map((item, index) => (
-            <p key={index} className="mb-1">
-              {item.split('**').map((part, i) => 
-                i % 2 === 1 ? <strong key={i}>{part}</strong> : part
-              )}
-            </p>
-          ))}
-        </div>
-      );
-    }
-    return null;
-  };
-
   return (
     <GeneralSelectComponent
       route="/subregion"
@@ -83,7 +58,7 @@ const SelectSubRegion = () => {
       title="sub-region"
       description="Click on a row to select a sub-region:"
       getOptions={getSubRegionOptions}
-      getContextDisplay={getContextDisplay}
+      //getContextDisplay={getContextDisplay}
       tableHeaders={[]} // No headers
       onSelect={handleLocationSelection}
     />

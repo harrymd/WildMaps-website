@@ -38,44 +38,24 @@ const SelectSuperSpecies = () => {
       .map(superspecies => {
         const info = superSpeciesData[superspecies];
         const emoji = info?.emoji || '';
-        const description = info?.description || 'No description available';
+        console.log(info);
+        //const description = info?.description || 'No description available';
+        const scientific_name = info?.scientific_name || '-';
+        const common_name = info?.common_name || '-';
         return {
           superspecies,
-          emoji,
-          description,
-          displayText: `${emoji} ${description}`.trim()
+          //emoji,
+          //description,
+          scientific_name,
+          displayText: `${scientific_name} (${common_name})`.trim()
         };
       })
-      .sort((a, b) => a.description.localeCompare(b.description))
+      //.sort((a, b) => a.description.localeCompare(b.description))
+      .sort((a, b) => a.scientific_name.localeCompare(b.scientific_name))
       .map(item => ({
         value: item.superspecies,
         cells: [item.displayText]
       }));
-  };
-
-  const getContextDisplay = (allParams) => {
-    const context = [];
-    if (allParams.region) {
-      context.push(`Region: **${allParams.region}**`);
-    }
-    if (allParams.subregion) {
-      context.push(`Sub-region: **${allParams.subregion}**`);
-    }
-    
-    if (context.length > 0) {
-      return (
-        <div className="mb-4">
-          {context.map((item, index) => (
-            <p key={index} className="mb-1">
-              {item.split('**').map((part, i) => 
-                i % 2 === 1 ? <strong key={i}>{part}</strong> : part
-              )}
-            </p>
-          ))}
-        </div>
-      );
-    }
-    return null;
   };
 
   return (
@@ -85,7 +65,7 @@ const SelectSuperSpecies = () => {
       title="taxon"
       description="Click on a row to select a taxon:"
       getOptions={getSuperSpeciesOptions}
-      getContextDisplay={getContextDisplay}
+      //getContextDisplay={getContextDisplay}
       tableHeaders={[]} // Empty array = no headers
     />
   );

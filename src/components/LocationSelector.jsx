@@ -7,7 +7,7 @@ const LocationSelector = ({
   onAdm1Change 
 }) => (
   <div className="mb-6 p-4 bg-blue-50 rounded">
-    <h3 className="text-lg font-semibold mb-3">Location Selection</h3>
+    <h3 className="text-lg font-semibold mb-3">Location selection</h3>
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div>
         <label htmlFor="adm0-select" className="block text-sm font-medium mb-1">

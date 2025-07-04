@@ -83,7 +83,9 @@ export const AppProvider = ({ children }) => {
             results.data.forEach((row) => {
               if (row.superspecies) {
                 superSpeciesMap[row.superspecies] = {
-                  description: row.description || '',
+                  //description: row.description || '',
+                  scientific_name: row.scientific_name || '',
+                  common_name: row.common_name || '',
                   emoji: row.emoji || ''
                 };
               }
