@@ -1,12 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { UNDERLAYS } from './config';
+import SourceAttribution from '../SourceAttribution';
 
 export default function UnderlaySection({ layers, setLayers }) {
+  const [expandedAttribution, setExpandedAttribution] = useState(null);
+
   return (
     <fieldset className="border-b border-gray-200 pb-4">
       <legend className="font-medium mb-2">Select a base map</legend>
       <div className="flex flex-col space-y-2">
-        {Object.values(UNDERLAYS).map(({ label, value, legend }) => {
+        {Object.values(UNDERLAYS).map(({ label, value, legend, source }) => {
           const isSelected = layers.underlay?.url === value;
           const LegendComponent = legend;
           
@@ -27,6 +30,11 @@ export default function UnderlaySection({ layers, setLayers }) {
                 />
                 <span>{label}</span>
               </label>
+
+              <SourceAttribution
+                isVisible={isSelected}
+                source={source}
+              />
               
               {isSelected && LegendComponent && (
                 <div className="ml-0">
