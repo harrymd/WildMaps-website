@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 
+// Enhanced BarChart that can optionally display color swatches
 const BarChart = ({ 
   data, 
   width = 500, 
@@ -8,13 +9,16 @@ const BarChart = ({
   title = 'Bar Chart', 
   xLabel = '', 
   yLabel = '',
-  colors = null, // Array of colors for stack levels (bottom to top)
-  yMax = null,   // New prop: specify exact y-axis maximum (overrides auto-scaling)
-  xTickFontSize = 14,  // New prop: font size for x-axis tick labels
-  yTickFontSize = 14,  // New prop: font size for y-axis tick labels
-  xLabelFontSize = 20, // New prop: font size for x-axis label
-  yLabelFontSize = 20, // New prop: font size for y-axis label
-  yLabelOffset = 45    // New prop: distance of y-axis label from y-axis (in pixels)
+  colors = null,
+  yMax = null,
+  xTickFontSize = 14,
+  yTickFontSize = 14,
+  xLabelFontSize = 20,
+  yLabelFontSize = 20,
+  yLabelOffset = 45,
+  // New props for color swatch functionality
+  useColorSwatches = false,
+  landUseColorSchemeData = null
 }) => {
   const svgRef = useRef();
 
@@ -27,8 +31,8 @@ const BarChart = ({
     const margin = { 
       top: 20, 
       right: 20, 
-      bottom: 60, 
-      left: Math.max(60, yLabelOffset + 20) // Dynamically adjust left margin based on yLabelOffset
+      bottom: useColorSwatches ? 80 : 60, // Adjust bottom margin for swatches
+      left: Math.max(60, yLabelOffset + 20)
     };
     const innerWidth = width - margin.left - margin.right;
     const innerHeight = height - margin.top - margin.bottom;
@@ -47,25 +51,36 @@ const BarChart = ({
     const g = svg.append('g')
       .attr('transform', `translate(${margin.left},${margin.top})`);
 
+    // Create tooltip only if using color swatches
+    let tooltip;
+    if (useColorSwatches) {
+      tooltip = d3.select('body').append('div')
+        .attr('class', 'bar-chart-tooltip')
+        .style('position', 'absolute')
+        .style('visibility', 'hidden')
+        .style('background', 'rgba(0, 0, 0, 0.8)')
+        .style('color', 'white')
+        .style('padding', '8px')
+        .style('border-radius', '4px')
+        .style('font-size', '12px')
+        .style('max-width', '200px')
+        .style('z-index', '1000')
+        .style('pointer-events', 'none');
+    }
+
     if (isStacked) {
       const stack = d3.stack().keys(keys);
       const stackedData = stack(data);
 
-      // Use custom yMax if provided, otherwise auto-calculate
       if (yMax !== null) {
         y.domain([0, yMax]);
       } else {
         y.domain([0, d3.max(stackedData[stackedData.length - 1], d => d[1])]).nice();
       }
 
-      // Color scale - use custom colors if provided, otherwise default
       const color = colors && colors.length === keys.length
-        ? d3.scaleOrdinal()
-            .domain(keys)
-            .range(colors)
-        : d3.scaleOrdinal()
-            .domain(keys)
-            .range(d3.schemeCategory10);
+        ? d3.scaleOrdinal().domain(keys).range(colors)
+        : d3.scaleOrdinal().domain(keys).range(d3.schemeCategory10);
 
       g.selectAll('.serie')
         .data(stackedData)
@@ -79,7 +94,6 @@ const BarChart = ({
         .attr('height', d => y(d[0]) - y(d[1]))
         .attr('width', x.bandwidth());
     } else {
-      // Use custom yMax if provided, otherwise auto-calculate
       if (yMax !== null) {
         y.domain([0, yMax]);
       } else {
@@ -97,23 +111,7 @@ const BarChart = ({
         .attr('fill', colors && colors.length > 0 ? colors[0] : '#4A90E2');
     }
 
-    // Axes
-    g.append('g')
-      .attr('transform', `translate(0,${innerHeight})`)
-      .call(d3.axisBottom(x))
-      .selectAll('text')
-      .style('font-size', `${xTickFontSize}px`);
-
-    if (xLabel) {
-      g.append('text')
-        .attr('x', innerWidth / 2)
-        .attr('y', innerHeight + 40)
-        .attr('text-anchor', 'middle')
-        .attr('fill', 'black')
-        .style('font-size', `${xLabelFontSize}px`)
-        .text(xLabel);
-    }
-
+    // Y-axis
     g.append('g')
       .call(d3.axisLeft(y))
       .selectAll('text')
@@ -130,13 +128,103 @@ const BarChart = ({
         .text(yLabel);
     }
 
-  }, [data, width, height, xLabel, yLabel, colors, yMax, xTickFontSize, yTickFontSize, xLabelFontSize, yLabelFontSize, yLabelOffset]);
+    // X-axis - conditionally show text labels
+    g.append('g')
+      .attr('class', 'x-axis')
+      .attr('transform', `translate(0,${innerHeight})`)
+      .call(d3.axisBottom(x).tickFormat(useColorSwatches ? '' : null))
+      .selectAll('text')
+      .style('font-size', `${xTickFontSize}px`);
+
+    // Add color swatches if enabled
+    if (useColorSwatches && landUseColorSchemeData) {
+      const swatchSize = Math.min(x.bandwidth() * 0.8, 20);
+      const swatchY = innerHeight + 15;
+
+      g.selectAll('.color-swatch')
+        .data(data)
+        .enter().append('rect')
+        .attr('class', 'color-swatch')
+        .attr('x', d => x(d.label) + (x.bandwidth() - swatchSize) / 2)
+        .attr('y', swatchY)
+        .attr('width', swatchSize)
+        .attr('height', swatchSize)
+        .attr('fill', d => {
+          if (landUseColorSchemeData[d.label]) {
+            const colorData = landUseColorSchemeData[d.label];
+            return `rgb(${colorData.r}, ${colorData.g}, ${colorData.b})`;
+          }
+          return '#ccc';
+        })
+        .attr('stroke', '#000')
+        .attr('stroke-width', 1)
+        .style('cursor', 'pointer')
+        .on('mouseover', function(event, d) {
+          if (landUseColorSchemeData[d.label]) {
+            const colorData = landUseColorSchemeData[d.label];
+            const tooltipContent = `
+              <strong>Code:</strong> ${d.label}<br/>
+              <strong>Class:</strong> ${colorData.lc_class}<br/>
+              <strong>Definition:</strong> ${colorData.definition}
+            `;
+            tooltip
+              .style('visibility', 'visible')
+              .html(tooltipContent);
+          } else {
+            // Handle case where landUseColorSchemeData doesn't have this label
+            const tooltipContent = `
+              Other land cover types.
+            `;
+            tooltip
+              .style('visibility', 'visible')
+              .html(tooltipContent);
+          }
+        })
+        .on('mousemove', function(event) {
+          tooltip
+            .style('top', (event.pageY - 10) + 'px')
+            .style('left', (event.pageX + 10) + 'px');
+        })
+        .on('mouseout', function() {
+          tooltip.style('visibility', 'hidden');
+        });
+    }
+
+    // X-axis label
+    if (xLabel) {
+      g.append('text')
+        .attr('x', innerWidth / 2)
+        .attr('y', innerHeight + (useColorSwatches ? 60 : 40))
+        .attr('text-anchor', 'middle')
+        .attr('fill', 'black')
+        .style('font-size', `${xLabelFontSize}px`)
+        .text(xLabel);
+    }
+
+    // Cleanup function
+    return () => {
+      if (tooltip) {
+        tooltip.remove();
+      }
+    };
+
+  }, [data, width, height, xLabel, yLabel, colors, yMax, xTickFontSize, yTickFontSize, xLabelFontSize, yLabelFontSize, yLabelOffset, useColorSwatches, landUseColorSchemeData]);
 
   return (
     <div className="mt-6">
       <h3 className="text-lg font-semibold mb-2">{title}</h3>
       <svg ref={svgRef} width={width} height={height}></svg>
     </div>
+  );
+};
+
+// Higher-order component that creates a ColorSwatchBarChart
+export const ColorSwatchBarChart = (props) => {
+  return (
+    <BarChart 
+      {...props} 
+      useColorSwatches={true}
+    />
   );
 };
 

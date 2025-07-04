@@ -227,16 +227,17 @@ export const AppProvider = ({ children }) => {
             results.data.forEach((row) => {
               if (row.code) {
                 landUseColorSchemeMap[row.code] = {
-                  un_level : row.un_level || '',
-                  lc_class : row.lc_class || '',
-                  definition : row.definition || '',
-                  r : row.r || '',
-                  g : row.g || '',
-                  b : row.b || ''
+                  un_level : row.un_level ?? '',
+                  lc_class : row.lc_class ?? '',
+                  definition : row.definition ?? '',
+                  r : row.r ?? '',
+                  g : row.g ?? '',
+                  b : row.b ?? ''
                 };
               }
             });
             setLandUseColorSchemeData(landUseColorSchemeMap);
+            console.log('Data being set in context:', landUseColorSchemeMap);
           },
           error: (error) => {
             console.error('Error parsing land use colour scheme CSV:', error);

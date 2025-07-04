@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 import { useFilterState } from '../hooks/useFilterState';
-import BarChart from '../Components/BarChart';
+import BarChart, { ColorSwatchBarChart } from '../Components/BarChart';
 import { useDetailedData } from '../hooks/useDetailedData';
 import { useLocationSelection } from '../hooks/useLocationSelection';
 import { processChartData } from '../utils/chartDataUtils';
@@ -15,7 +15,10 @@ import DataRangeInfo from '../components/DataRangeInfo';
 
 const FinalScreen = () => {
   const navigate = useNavigate();
-  const { data, admData, setData } = useAppContext();
+  const { data, admData, setData} = useAppContext();
+  const { landUseColorSchemeData } = useAppContext();
+  //const { data, admData, setData } = useAppContext();
+  console.log('Data received from context:', landUseColorSchemeData);
   const { getParam, getAllParams } = useFilterState();
   
   const datasetKey = getParam('datasetKey');
@@ -55,6 +58,9 @@ const FinalScreen = () => {
   }
 
   const { chartData_areas_transposed, chartData_landuse } = processChartData(sub_data);
+
+  //console.log('landUseColorSchemeData:', landUseColorSchemeData);
+  //console.log('chartData_areas_transposed:', chartData_areas_transposed);
   const customColors = ['#472d7b', '#2c728e', '#28ae80', '#addc30'];
 
   if (loading) {
@@ -116,17 +122,28 @@ const FinalScreen = () => {
           yMax={100}
           xTickFontSize={18}
         />
+
         
-        <BarChart 
+        <ColorSwatchBarChart 
           data={chartData_landuse}
           title='Area by land class and suitability category'
-          xLabel='Land class'
+          xLabel='Land class (hover for description)'
           yLabel='Area (1,000 km²)'
           colors={customColors}
+          landUseColorSchemeData={landUseColorSchemeData}
           yLabelOffset={60}
         />
+
         <DataRangeInfo />
+        <div className="mb-4 text-sm">
+          <p>
+            Protected areas come from the WDPA database. The database is incomplete, so calculations of protected areas might be inaccurate; they are most likely to be underestimates. Land use categories come from Copernicus Global Dynamic Land Cover dataset.
+          </p>
+        </div>
+
         <FinalDatasetInfo />
+
+
       </div>
       
       <NavigationButtons onPrevious={handlePrevious} onReset={handleReset} />
