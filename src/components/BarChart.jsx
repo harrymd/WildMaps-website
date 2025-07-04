@@ -8,7 +8,13 @@ const BarChart = ({
   title = 'Bar Chart', 
   xLabel = '', 
   yLabel = '',
-  colors = null // New prop: array of colors for stack levels (bottom to top)
+  colors = null, // Array of colors for stack levels (bottom to top)
+  yMax = null,   // New prop: specify exact y-axis maximum (overrides auto-scaling)
+  xTickFontSize = 14,  // New prop: font size for x-axis tick labels
+  yTickFontSize = 14,  // New prop: font size for y-axis tick labels
+  xLabelFontSize = 20, // New prop: font size for x-axis label
+  yLabelFontSize = 20, // New prop: font size for y-axis label
+  yLabelOffset = 45    // New prop: distance of y-axis label from y-axis (in pixels)
 }) => {
   const svgRef = useRef();
 
@@ -18,7 +24,12 @@ const BarChart = ({
     const svg = d3.select(svgRef.current);
     svg.selectAll('*').remove();
 
-    const margin = { top: 20, right: 20, bottom: 60, left: 60 };
+    const margin = { 
+      top: 20, 
+      right: 20, 
+      bottom: 60, 
+      left: Math.max(60, yLabelOffset + 20) // Dynamically adjust left margin based on yLabelOffset
+    };
     const innerWidth = width - margin.left - margin.right;
     const innerHeight = height - margin.top - margin.bottom;
 
@@ -40,7 +51,12 @@ const BarChart = ({
       const stack = d3.stack().keys(keys);
       const stackedData = stack(data);
 
-      y.domain([0, d3.max(stackedData[stackedData.length - 1], d => d[1])]).nice();
+      // Use custom yMax if provided, otherwise auto-calculate
+      if (yMax !== null) {
+        y.domain([0, yMax]);
+      } else {
+        y.domain([0, d3.max(stackedData[stackedData.length - 1], d => d[1])]).nice();
+      }
 
       // Color scale - use custom colors if provided, otherwise default
       const color = colors && colors.length === keys.length
@@ -63,7 +79,12 @@ const BarChart = ({
         .attr('height', d => y(d[0]) - y(d[1]))
         .attr('width', x.bandwidth());
     } else {
-      y.domain([0, d3.max(data, d => d.value)]).nice();
+      // Use custom yMax if provided, otherwise auto-calculate
+      if (yMax !== null) {
+        y.domain([0, yMax]);
+      } else {
+        y.domain([0, d3.max(data, d => d.value)]).nice();
+      }
 
       g.selectAll('.bar')
         .data(data)
@@ -79,7 +100,9 @@ const BarChart = ({
     // Axes
     g.append('g')
       .attr('transform', `translate(0,${innerHeight})`)
-      .call(d3.axisBottom(x));
+      .call(d3.axisBottom(x))
+      .selectAll('text')
+      .style('font-size', `${xTickFontSize}px`);
 
     if (xLabel) {
       g.append('text')
@@ -87,23 +110,27 @@ const BarChart = ({
         .attr('y', innerHeight + 40)
         .attr('text-anchor', 'middle')
         .attr('fill', 'black')
+        .style('font-size', `${xLabelFontSize}px`)
         .text(xLabel);
     }
 
     g.append('g')
-      .call(d3.axisLeft(y));
+      .call(d3.axisLeft(y))
+      .selectAll('text')
+      .style('font-size', `${yTickFontSize}px`);
 
     if (yLabel) {
       g.append('text')
         .attr('transform', 'rotate(-90)')
         .attr('x', -innerHeight / 2)
-        .attr('y', -45)
+        .attr('y', -yLabelOffset)
         .attr('text-anchor', 'middle')
         .attr('fill', 'black')
+        .style('font-size', `${yLabelFontSize}px`)
         .text(yLabel);
     }
 
-  }, [data, width, height, xLabel, yLabel, colors]);
+  }, [data, width, height, xLabel, yLabel, colors, yMax, xTickFontSize, yTickFontSize, xLabelFontSize, yLabelFontSize, yLabelOffset]);
 
   return (
     <div className="mt-6">

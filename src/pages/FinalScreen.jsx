@@ -11,6 +11,7 @@ import FinalSummary from '../components/FinalSummary';
 import FinalDatasetInfo from '../components/FinalDatasetInfo';
 import LocationSelector from '../components/LocationSelector';
 import NavigationButtons from '../components/NavigationButtons';
+import DataRangeInfo from '../components/DataRangeInfo';
 
 const FinalScreen = () => {
   const navigate = useNavigate();
@@ -108,19 +109,23 @@ const FinalScreen = () => {
         
         <BarChart 
           data={chartData_areas_transposed}
-          title='Level of protection by suitability category'
+          title='Suitability levels in protected and unprotected land'
           xLabel='Land type'
-          yLabel='Proportion this land category (%)'
+          yLabel='Proportion of land (%)'
           colors={customColors}
+          yMax={100}
+          xTickFontSize={18}
         />
         
         <BarChart 
           data={chartData_landuse}
           title='Area by land class and suitability category'
           xLabel='Land class'
-          yLabel='Area (km²)'
+          yLabel='Area (1,000 km²)'
           colors={customColors}
+          yLabelOffset={60}
         />
+        <DataRangeInfo />
         <FinalDatasetInfo />
       </div>
       

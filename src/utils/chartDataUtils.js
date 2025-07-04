@@ -65,10 +65,10 @@ export const processChartData = (sub_data) => {
       
       chartData_landuse.push({
         label: category,
-        Low: values[0],
-        'Low-med': values[1], 
-        'High-med': values[2],
-        High: values[3]
+        Low: values[0] / 1000,
+        'Low-med': values[1] / 1000, 
+        'High-med': values[2] / 1000,
+        High: values[3] / 1000
       });
     });
     
@@ -86,10 +86,10 @@ export const processChartData = (sub_data) => {
       
       chartData_landuse.push({
         label: 'Other',
-        Low: other_values[0],
-        'Low-med': other_values[1],
-        'High-med': other_values[2], 
-        High: other_values[3]
+        Low: other_values[0] / 1000,
+        'Low-med': other_values[1] / 1000,
+        'High-med': other_values[2] / 1000, 
+        High: other_values[3] / 1000
       });
     }
   }
