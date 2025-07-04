@@ -33,28 +33,24 @@ const SelectSuperSpecies = () => {
         .filter(superspecies => superspecies && superspecies !== 'Unknown taxon')
     )];
     
-    // Create options with emoji and description, then sort by description
+    // Create options with separate columns for scientific and common names
     return uniqueSuperSpecies
       .map(superspecies => {
         const info = superSpeciesData[superspecies];
         const emoji = info?.emoji || '';
         console.log(info);
-        //const description = info?.description || 'No description available';
         const scientific_name = info?.scientific_name || '-';
         const common_name = info?.common_name || '-';
         return {
           superspecies,
-          //emoji,
-          //description,
           scientific_name,
-          displayText: `${scientific_name} (${common_name})`.trim()
+          common_name
         };
       })
-      //.sort((a, b) => a.description.localeCompare(b.description))
       .sort((a, b) => a.scientific_name.localeCompare(b.scientific_name))
       .map(item => ({
         value: item.superspecies,
-        cells: [item.displayText]
+        cells: [item.scientific_name, item.common_name]
       }));
   };
 
@@ -65,8 +61,7 @@ const SelectSuperSpecies = () => {
       title="taxon"
       description="Click on a row to select a taxon:"
       getOptions={getSuperSpeciesOptions}
-      //getContextDisplay={getContextDisplay}
-      tableHeaders={[]} // Empty array = no headers
+      tableHeaders={['Scientific Name', 'Common Name']}
     />
   );
 };
