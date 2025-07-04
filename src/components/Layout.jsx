@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAppContext } from '../context/AppContext';
-import BasemapControls from './BasemapControls';
+import BasemapControls from './BasemapControls/BasemapControls';
 import Sidebar from './Sidebar';
 import SidebarToggleButton from './SidebarToggleButton';
 import MapContainer from './MapContainer';

@@ -38,7 +38,6 @@ const SelectSuperSpecies = () => {
       .map(superspecies => {                                                    
         const info = superSpeciesData[superspecies];                            
         const emoji = info?.emoji || '';                                        
-        console.log(info);                                                      
         const scientific_name = info?.scientific_name || '-';                   
         const common_name = info?.common_name || '-';                           
         

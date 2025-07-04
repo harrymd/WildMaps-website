@@ -34,7 +34,6 @@ const ElevationColorBar = () => {
         <div className="relative h-80 flex flex-col justify-between">
           {labels.filter(label => label !== -1).map((label, index) => {
             const label_str = label.toLocaleString('en-US');
-            console.log(label_str);
             // Calculate position based on gradient sections
             let position;
             if (label >= 0) {

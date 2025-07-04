@@ -13,7 +13,6 @@ const FinalSummary = ({ className = "" }) => {
   };
 
   const currentEntry = getCurrentDatasetEntry();
-  console.log(currentEntry);
 
   const formatRegionsArray = (regions) => {
     if (!regions || regions.length === 0) return 'Unknown region';

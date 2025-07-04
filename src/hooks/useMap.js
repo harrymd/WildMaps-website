@@ -326,18 +326,14 @@ const useMap = (layers, containerRef, setLayers) => {
     const handlePanToLocation = (event) => {
       if (!map) return;
   
-      console.log('Map received panning event:', event.type, event.detail);
-  
       if (event.detail.bounds) {
         // Handle bounding box events (from regions, countries, etc.)
-        console.log('Panning to bounds:', event.detail.bounds);
         map.fitBounds(event.detail.bounds, {
           padding: 40,
           duration: 2000
         });
       } else if (event.detail.center && event.detail.zoom != null) {
         // Handle center/zoom events (from default panning)
-        console.log('Panning to center/zoom:', event.detail.center, event.detail.zoom);
         map.flyTo({
           center: event.detail.center,
           zoom: event.detail.zoom,

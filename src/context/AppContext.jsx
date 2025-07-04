@@ -32,7 +32,6 @@ export const AppProvider = ({ children }) => {
     fetch(`${PATH_DATA_OUTPUTS}/adm_bdry_info.json`)
       .then((res) => res.json())
       .then((dataset) => {
-        console.log(dataset);
         setAdmData(dataset);
       });
   }, []);
@@ -56,7 +55,6 @@ export const AppProvider = ({ children }) => {
                 };
               }
             });
-            console.log('Species data loaded:', Object.keys(speciesMap).length, 'entries');
             setSpeciesData(speciesMap);
           },
           error: (error) => {
@@ -90,7 +88,6 @@ export const AppProvider = ({ children }) => {
                 };
               }
             });
-            console.log('SuperSpecies data loaded:', Object.keys(superSpeciesMap).length, 'entries');
             setSuperSpeciesData(superSpeciesMap);
           },
           error: (error) => {
@@ -121,7 +118,6 @@ export const AppProvider = ({ children }) => {
                 };
               }
             });
-            console.log('Region data loaded:', Object.keys(regionMap).length, 'entries');
             setRegionData(regionMap);
           },
           error: (error) => {
@@ -154,7 +150,6 @@ export const AppProvider = ({ children }) => {
                 };
               }
             });
-            console.log('Subregion data loaded:', Object.keys(subregionMap).length, 'entries');
             setSubregionData(subregionMap);
           },
           error: (error) => {
@@ -179,7 +174,6 @@ export const AppProvider = ({ children }) => {
     fetch(`${PATH_RESULTS}/results_summary.json`)
       .then((res) => res.json())
       .then((dataset) => {
-        console.log('Starting multi-step enrichment...');
         
         // Step 1: Enrich with species data
         const stepOneEnriched = {};
@@ -211,7 +205,6 @@ export const AppProvider = ({ children }) => {
           };
         });
 
-        console.log('Enrichment complete. Sample entry:', Object.values(finalEnriched)[0]);
         setData(finalEnriched);
       })
       .catch((error) => {
@@ -243,7 +236,6 @@ export const AppProvider = ({ children }) => {
                 };
               }
             });
-            console.log('Land use data loaded:', Object.keys(landUseColorSchemeMap).length, 'entries');
             setLandUseColorSchemeData(landUseColorSchemeMap);
           },
           error: (error) => {
