@@ -5,6 +5,7 @@ import Sidebar from './Sidebar';
 import SidebarToggleButton from './SidebarToggleButton';
 import MapContainer from './MapContainer';
 import { Routes, Route } from 'react-router-dom';
+import { BarChart3 } from 'lucide-react';
 //import { Routes, Route, Navigate } from 'react-router-dom';
 //
 import SelectStartingFilter from '../pages/SelectStartingFilter';
@@ -53,7 +54,12 @@ export default function Layout() {
   return (
     <div className="relative w-screen h-screen font-sans overflow-hidden bg-blue-950">
       {!showLeft && (
-        <SidebarToggleButton position="left" onClick={() => setShowLeft(true)} title="Choose a dataset to inspect" />
+        <SidebarToggleButton
+          position="left"
+          onClick={() => setShowLeft(true)}
+          title="Choose a dataset to inspect"
+          Icon={BarChart3}
+        />
       )}
       {!showRight && (
         <SidebarToggleButton position="right" onClick={() => setShowRight(true)} title="Control basemap layers" />

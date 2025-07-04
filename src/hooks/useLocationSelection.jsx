@@ -20,14 +20,23 @@ export const useLocationSelection = (getParam, setParam, dataset, admData) => {
 
   const getAdm0Options = () => {
     if (!dataset) return [];
-    
+  
     const options = ['all_adm0', ...(dataset?.adm0_list || [])];
-    return options.map(key => ({
-      value: key,
-      label: key === 'all_adm0'
-        ? 'All countries (entire extent of dataset)'
-        : admData.adm0?.[key]?.name || key
-    }));
+    console.log(admData.adm0);
+    return options
+      .filter(key => {
+        // Always include 'all_adm0' option
+        if (key === 'all_adm0') return true;
+        
+        // Filter out disputed territories
+        return admData.adm0?.[key]?.is_disputed !== 'yes';
+      })
+      .map(key => ({
+        value: key,
+        label: key === 'all_adm0'
+          ? 'All countries (entire extent of dataset)'
+          : admData.adm0?.[key]?.name || key
+      }));
   };
 
   const getAdm1Options = () => {
