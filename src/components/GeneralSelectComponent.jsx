@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useFilterState } from '../hooks/useFilterState';
 import { getNextRoute, getPreviousRoute } from '../utils/navigationUtils';
 import { useAppContext } from '../context/AppContext';
+import ParameterSummary from '../components/ParameterSummary';
 
 const GeneralSelectComponent = ({ 
   route,
@@ -106,6 +107,7 @@ const GeneralSelectComponent = ({
             })}
           </tbody>
         </table>
+        <ParameterSummary />
       </div>
       
       {/* Fixed navigation buttons at bottom */}
