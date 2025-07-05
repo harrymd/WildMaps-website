@@ -32,6 +32,8 @@ export const AppProvider = ({ children }) => {
     fetch(`${PATH_DATA_OUTPUTS}/adm_bdry_info.json`)
       .then((res) => res.json())
       .then((dataset) => {
+        console.log(dataset);
+        console.log(`${PATH_DATA_OUTPUTS}/adm_bdry_info.json`);
         setAdmData(dataset);
       });
   }, []);

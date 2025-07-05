@@ -7,17 +7,15 @@ export default function useUpdateMapOnDatasetChange(mapRef, data, setLayers) {
   const datasetKey = getParam('datasetKey');
   
   useEffect(() => {
-    const map = mapRef.current;
-    
     // First, update the layers
     updateDatasetLayer(data, datasetKey, setLayers);
     
-    // Then, pan the map after a short delay to ensure layers are processed
-    if (map && datasetKey) {
+    // Then, pan the map using the same event system as other panning operations
+    if (datasetKey) {
       // Small delay to ensure layer updates are processed
       const timeoutId = setTimeout(() => {
-        zoomToDataset(map, data, datasetKey);
-      }, 100);
+        panToDataset(data, datasetKey);
+      }, 250); // Slightly longer delay to ensure layers are ready
       
       return () => clearTimeout(timeoutId);
     }
@@ -37,14 +35,12 @@ function updateDatasetLayer(data, datasetKey, setLayers) {
   // Load the dataset configuration
   const datasetSubFolder = data?.[datasetKey]?.folder;
   const datasetMaxZoom = data?.[datasetKey]?.max_zoom;
-  //const datasetMaxZoomStr = datasetMaxZoom.toString().padStart(2, '0');
   const datasetMaxZoomStr = 'auto';
   const datasetBounds = data?.[datasetKey]?.raster_summary?.bounds ?? [];
   const [datasetMinLng, datasetMinLat, datasetMaxLng, datasetMaxLat] = datasetBounds;
 
   // Only add the layer if we have the required data
   if (datasetSubFolder && datasetMaxZoomStr) {
-    //const urlTemplate = `https://wildcru-wildmaps.s3.eu-west-2.amazonaws.com/code_output/raster_tiles/SDM/${datasetSubFolder}/${datasetKey}_zoom_${datasetMaxZoomStr}/{z}/{x}/{y}.png`;
     const urlTemplate = `https://wildcru-wildmaps.s3.eu-west-2.amazonaws.com/data_outputs/raster_tiles/SDM/${datasetSubFolder}/${datasetKey}_zoom_${datasetMaxZoomStr}/{z}/{x}/{y}.png`;
     
     // Create the data layer configuration
@@ -88,7 +84,7 @@ function updateDatasetLayer(data, datasetKey, setLayers) {
   }
 }
 
-function zoomToDataset(map, data, datasetKey) {
+function panToDataset(data, datasetKey) {
   // Load the dataset bounds from the data.
   const dataset = data?.[datasetKey];
   if (!dataset) return;
@@ -97,15 +93,15 @@ function zoomToDataset(map, data, datasetKey) {
   const [minLng, minLat, maxLng, maxLat] = bounds;
   if ([minLng, minLat, maxLng, maxLat].some((v) => v == null)) return;
 
-  // Change the map view to match the dataset bounds.
-  map.fitBounds(
-    [
-      [minLng, minLat],
-      [maxLng, maxLat],
-    ],
-    {
-      padding: 40,      // pixels of padding on all sides
-      duration: 2000,   // animation duration in ms
+  // Use the same event system as other panning operations
+  const event = new CustomEvent('panToDataset', {
+    detail: {
+      bounds: [
+        [minLng, minLat],
+        [maxLng, maxLat],
+      ]
     }
-  );
+  });
+  
+  window.dispatchEvent(event);
 }

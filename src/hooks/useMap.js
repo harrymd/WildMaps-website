@@ -5,6 +5,18 @@ import { useAppContext } from '../context/AppContext';
 import { useFilterState } from '../hooks/useFilterState';
 import useUpdateMapOnDatasetChange from '../hooks/useUpdateMapOnDatasetChange.js';
 
+const debounce = (func, wait) => {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+};
+
 const useMap = (layers, containerRef, setLayers) => {
   const mapRef = useRef(null);
   const [map, setMap] = useState(null);
@@ -321,42 +333,127 @@ const useMap = (layers, containerRef, setLayers) => {
     updateLayers();
   }, [layers, map, isLoaded, fetchLayerInfo]);
 
-  // Listen for custom panning events (region, subregion, etc.)
   useEffect(() => {
-    const handlePanToLocation = (event) => {
+    const handlePanToLocation = async (event) => {
       if (!map) return;
   
-      if (event.detail.bounds) {
-        // Handle bounding box events (from regions, countries, etc.)
-        map.fitBounds(event.detail.bounds, {
-          padding: 40,
-          duration: 2000
-        });
-      } else if (event.detail.center && event.detail.zoom != null) {
-        // Handle center/zoom events (from default panning)
-        map.flyTo({
-          center: event.detail.center,
-          zoom: event.detail.zoom,
-          duration: 1500
-        });
-      } else {
-        console.warn('Unknown event format:', event.detail);
+      try {
+        if (event.detail.bounds) {
+          await new Promise((resolve) => {
+            let completed = false;
+            const timeout = setTimeout(() => {
+              if (!completed) {
+                completed = true;
+                resolve();
+              }
+            }, 5000); // 5 second timeout
+  
+            map.fitBounds(event.detail.bounds, {
+              padding: 40,
+              duration: 2000
+            });
+  
+            const onMoveEnd = () => {
+              if (!completed) {
+                completed = true;
+                clearTimeout(timeout);
+                map.off('moveend', onMoveEnd);
+                resolve();
+              }
+            };
+  
+            map.on('moveend', onMoveEnd);
+  
+            const onError = (error) => {
+              console.warn('Map move error (non-fatal):', error);
+            };
+  
+            map.on('error', onError);
+            setTimeout(() => map.off('error', onError), 3000);
+          });
+  
+        } else if (event.detail.center && event.detail.zoom != null) {
+          await new Promise((resolve) => {
+            let completed = false;
+            const timeout = setTimeout(() => {
+              if (!completed) {
+                completed = true;
+                resolve();
+              }
+            }, 3000);
+  
+            map.flyTo({
+              center: event.detail.center,
+              zoom: event.detail.zoom,
+              duration: 1500
+            });
+  
+            const onMoveEnd = () => {
+              if (!completed) {
+                completed = true;
+                clearTimeout(timeout);
+                map.off('moveend', onMoveEnd);
+                resolve();
+              }
+            };
+  
+            map.on('moveend', onMoveEnd);
+  
+            const onError = (error) => {
+              console.warn('Map flyTo error (non-fatal):', error);
+            };
+  
+            map.on('error', onError);
+            setTimeout(() => map.off('error', onError), 2000);
+          });
+  
+        } else {
+          console.warn('Unknown event format:', event.detail);
+        }
+  
+      } catch (error) {
+        console.error('Panning operation failed:', error);
       }
     };
   
+    // Debounced version to prevent rapid-fire events
+    const debouncedPanHandler = debounce(handlePanToLocation, 100);
+    
     // Listen for all panning events
-    window.addEventListener('panToRegion', handlePanToLocation);
-    window.addEventListener('panToSubregion', handlePanToLocation);
-    window.addEventListener('panToCountry', handlePanToLocation);
-    window.addEventListener('panToAdm1', handlePanToLocation);
-    window.addEventListener('panToDefault', handlePanToLocation); // Add this for your starting filter
+    window.addEventListener('panToRegion', debouncedPanHandler);
+    window.addEventListener('panToSubregion', debouncedPanHandler);
+    window.addEventListener('panToCountry', debouncedPanHandler);
+    window.addEventListener('panToAdm1', debouncedPanHandler);
+    window.addEventListener('panToDefault', debouncedPanHandler);
+    window.addEventListener('panToDataset', debouncedPanHandler);  // ADD THIS
+    
+    return () => {
+      window.removeEventListener('panToRegion', debouncedPanHandler);
+      window.removeEventListener('panToSubregion', debouncedPanHandler);
+      window.removeEventListener('panToCountry', debouncedPanHandler);
+      window.removeEventListener('panToAdm1', debouncedPanHandler);
+      window.removeEventListener('panToDefault', debouncedPanHandler);
+      window.removeEventListener('panToDataset', debouncedPanHandler);  // ADD THIS
+    }; 
+  }, [map]);
+
+  useEffect(() => {
+    if (!map) return;
+  
+    const handleMapError = (error) => {
+      console.warn('Map error (continuing operation):', error);
+    };
+  
+    const handleSourceError = (error) => {
+      console.warn('Source error (continuing operation):', error);
+    };
+  
+    map.on('error', handleMapError);
+    map.on('sourceerror', handleSourceError);
   
     return () => {
-      window.removeEventListener('panToRegion', handlePanToLocation);
-      window.removeEventListener('panToSubregion', handlePanToLocation);
-      window.removeEventListener('panToCountry', handlePanToLocation);
-      window.removeEventListener('panToAdm1', handlePanToLocation);
-      window.removeEventListener('panToDefault', handlePanToLocation); // Add this cleanup
+      map.off('error', handleMapError);
+      map.off('sourceerror', handleSourceError);
     };
   }, [map]);
 
