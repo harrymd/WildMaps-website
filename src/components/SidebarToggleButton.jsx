@@ -4,7 +4,8 @@ export default function SidebarToggleButton({
   position, 
   onClick, 
   title, 
-  Icon = Layers // Default to Layers icon
+  Icon = Layers, // Default to Layers icon
+  ClassName = ''
 }) {
   return (
     <button

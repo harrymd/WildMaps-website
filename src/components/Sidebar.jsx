@@ -1,6 +1,6 @@
 import { X } from 'lucide-react';                                               
                                                                                 
-export default function Sidebar({ title, isOpen, onClose, children, side = 'left', width, scrollOnOverflow = false }) {
+export default function Sidebar({ title, isOpen, onClose, children, side = 'left', width, scrollOnOverflow = false, className = '' }) {
   return (                                                                      
     <div                                                                        
       style={{ width: isOpen ? width : '0' }}                                   

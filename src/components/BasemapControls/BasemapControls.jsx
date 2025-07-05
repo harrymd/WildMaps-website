@@ -12,7 +12,8 @@ export default function BasemapControls({
   onClose,
   layers,
   setLayers,
-  width
+  width,
+  className = ''
 }) {
   const { datasetKey, maxVal } = useDatasetInfo();
   const {

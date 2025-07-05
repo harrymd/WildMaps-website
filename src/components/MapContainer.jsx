@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import useMap from '../hooks/useMap';
 
-export default function MapContainer({ transformStyle, layers, setLayers, showLeft, showRight }) {
+export default function MapContainer({ transformStyle, layers, setLayers, showLeft, showRight, className = '' }) {
   const mapContainerRef = useRef(null);
   
   const { map, isLoaded } = useMap(layers, mapContainerRef, setLayers, showLeft, showRight);
