@@ -11,7 +11,8 @@ export default function BasemapControls({
   isOpen,
   onClose,
   layers,
-  setLayers
+  setLayers,
+  width
 }) {
   const { datasetKey, maxVal } = useDatasetInfo();
   const {
@@ -29,7 +30,7 @@ export default function BasemapControls({
       isOpen={isOpen}
       onClose={onClose}
       side="right"
-      width="300px"
+      width={width}
     >
       <div className="p-2 pr-4 space-y-6 overflow-y-auto h-[calc(100vh-100px)]">
         <UnderlaySection 

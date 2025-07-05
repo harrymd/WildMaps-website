@@ -22,7 +22,6 @@ export const useLocationSelection = (getParam, setParam, dataset, admData) => {
     if (!dataset) return [];
   
     const options = ['all_adm0', ...(dataset?.adm0_list || [])];
-    console.log(admData.adm0);
     return options
       .filter(key => {
         // Always include 'all_adm0' option

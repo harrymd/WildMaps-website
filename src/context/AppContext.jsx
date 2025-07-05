@@ -237,7 +237,6 @@ export const AppProvider = ({ children }) => {
               }
             });
             setLandUseColorSchemeData(landUseColorSchemeMap);
-            console.log('Data being set in context:', landUseColorSchemeMap);
           },
           error: (error) => {
             console.error('Error parsing land use colour scheme CSV:', error);

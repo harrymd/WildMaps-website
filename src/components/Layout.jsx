@@ -19,7 +19,7 @@ import SelectAdm0 from '../pages/SelectAdm0';
 import SelectAdm1 from '../pages/SelectAdm1';
 import FinalScreen from '../pages/FinalScreen';
 
-const sidebarWidth = 'min(50vw, 35rem)';
+
 
 export default function Layout() {
   const [showLeft, setShowLeft] = useState(true);
@@ -40,18 +40,22 @@ export default function Layout() {
       url: `${PATH_STYLES}/positron_english_overlay.json`
     }
   });
-  
-  //const transformStyle = `translateX(${
-  //  showLeft && showRight
-  //    ? '0'
-  //    : showLeft
-  //    ? `calc(${sidebarWidth} / 2)`
-  //    : showRight
-  //    ? `calc(-1 * ${sidebarWidth} / 2)`
-  //    : '0'
-  //})`;
+ 
 
-  const transformStyle = null;
+  //const sidebarWidth = 'min(50vw, 35rem)';
+  const leftSidebarWidth = 'min(50vw, 35rem)';
+  const rightSidebarWidth = 'min(30vw, 21rem)';
+  const transformStyle = `translateX(${
+    showLeft && showRight
+      ? '0'
+      : showLeft
+      ? `calc(${leftSidebarWidth} / 2)`
+      : showRight
+      ? `calc(-1 * ${rightSidebarWidth} / 2)`
+      : '0'
+  })`;
+
+  //const transformStyle = null;
 
   return (
     <div className="relative w-screen h-screen font-sans overflow-hidden bg-blue-950">
@@ -77,7 +81,7 @@ export default function Layout() {
         </Routes>
       </Sidebar>
         */}
-      <Sidebar title="Dataset browser" isOpen={showLeft} onClose={() => setShowLeft(false)} width={sidebarWidth}>
+      <Sidebar title="Dataset browser" isOpen={showLeft} onClose={() => setShowLeft(false)} width={leftSidebarWidth}>
         <Routes>
           <Route path="/" element={<SelectStartingFilter />} />
           <Route path="/region" element={<SelectRegion />} />
@@ -107,6 +111,7 @@ export default function Layout() {
         onClose={() => setShowRight(false)}
         layers={layers}
         setLayers={setLayers}
+        width={rightSidebarWidth}
       />
 
       <MapContainer

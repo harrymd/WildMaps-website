@@ -18,7 +18,6 @@ const FinalScreen = () => {
   const { data, admData, setData} = useAppContext();
   const { landUseColorSchemeData } = useAppContext();
   //const { data, admData, setData } = useAppContext();
-  console.log('Data received from context:', landUseColorSchemeData);
   const { getParam, getAllParams } = useFilterState();
   
   const datasetKey = getParam('datasetKey');
@@ -59,8 +58,6 @@ const FinalScreen = () => {
 
   const { chartData_areas_transposed, chartData_landuse } = processChartData(sub_data);
 
-  //console.log('landUseColorSchemeData:', landUseColorSchemeData);
-  //console.log('chartData_areas_transposed:', chartData_areas_transposed);
   const customColors = ['#472d7b', '#2c728e', '#28ae80', '#addc30'];
 
   if (loading) {
@@ -137,7 +134,7 @@ const FinalScreen = () => {
         <DataRangeInfo />
         <div className="mb-4 text-sm">
           <p>
-            Protected areas come from the <a href="http://protectedplanet.net/" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 underline hover:no-underline transition-colors">World Database on Protected Areas</a> (WDPA). The database is incomplete, so calculations of protected areas might be inaccurate; they are most likely to be underestimates. Land use categories come from the <a href="https://doi.org/10.2909/c6377c6e-76cc-4d03-8330-628a03693042" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 underline hover:no-underline transition-colors">Copernicus Global Dynamic Land Cover</a> dataset.
+            Protected areas come from the <a href="http://protectedplanet.net/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline hover:no-underline transition-colors">World Database on Protected Areas</a> (WDPA). The database is incomplete, so calculations of protected areas might be inaccurate; they are most likely to be underestimates. Land use categories come from the <a href="https://doi.org/10.2909/c6377c6e-76cc-4d03-8330-628a03693042" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline hover:no-underline transition-colors">Copernicus Global Dynamic Land Cover</a> dataset.
           </p>
         </div>
 
