@@ -117,57 +117,68 @@ const useMap = (layers, containerRef, setLayers, showLeft = true, showRight = fa
     };
   }, [containerRef]);
 
-  // Handle map controls positioning based on sidebar state
+  // Handle map controls and custom elements positioning based on sidebar state
   useEffect(() => {
     if (!map || !isLoaded) return;
 
-    const adjustMapControls = () => {
+    const adjustMapElements = () => {
       const mapContainer = containerRef.current;
       if (!mapContainer) return;
-
-      const controls = mapContainer.querySelector('.maplibregl-ctrl-bottom-right');
-      if (!controls) return;
 
       const sidebarWidths = computeSidebarWidths();
       console.log('Computed sidebar widths (px):', sidebarWidths);
 
       let translate = 'translateX(0)';
       //let backgroundColor = 'transparent';
-      let backgroundColor = 'rgba(255, 255, 255, 0.8)';
+      //let backgroundColor = 'rgba(255, 255, 255, 0.8)';
 
       if (showLeft && showRight) {
-        //translate = 'translateX(0)';
-        //translate = `translateX(-${(sidebarWidths.right + sidebarWidths.left)/ 2}px)`;
-        //translate = `translateX(-${(sidebarWidths.right + sidebarWidths.left)}px)`;
         translate = `translateX(-${(sidebarWidths.right)}px)`;
       } else if (showLeft && !showRight) {
-        //translate = `translateX(${sidebarWidths.left / 2}px)`;
-        //translate = `translateX(0)`;
         translate = `translateX(-${sidebarWidths.left / 2}px)`;
-        //backgroundColor = 'rgba(0, 0, 255, 0.2)';
       } else if (!showLeft && showRight) {
         translate = `translateX(-${sidebarWidths.right / 2}px)`;
-        //backgroundColor = 'rgba(255, 0, 0, 0.2)';
       }
 
-      [...controls.children].forEach((child) => {
-        child.style.transition = 'transform 0.3s ease-in-out, background-color 0.3s ease-in-out';
-        child.style.transform = translate;
-        child.style.backgroundColor = backgroundColor;
-      });
+      let translateLeft = 'translateX(0)';
+
+      if (showLeft && showRight) {
+        translateLeft = `translateX(${(sidebarWidths.left)}px)`;
+      } else if (showLeft && !showRight) {
+        translateLeft = `translateX(${sidebarWidths.left / 2}px)`;
+      } else if (!showLeft && showRight) {
+        translateLeft = `translateX(${sidebarWidths.right / 2}px)`;
+      }
+
+      // Adjust MapLibre controls
+      const controls = mapContainer.querySelector('.maplibregl-ctrl-bottom-right');
+      if (controls) {
+        [...controls.children].forEach((child) => {
+          child.style.transition = 'transform 0.3s ease-in-out, background-color 0.3s ease-in-out';
+          child.style.transform = translate;
+          //child.style.backgroundColor = backgroundColor;
+        });
+      }
+
+      // Adjust custom bottom-right image
+      const customImage = mapContainer.querySelector('.map-bottom-right-image');
+      if (customImage) {
+        customImage.style.transition = 'transform 0.3s ease-in-out';
+        customImage.style.transform = translateLeft;
+      }
     };
 
     // Debounce the adjustment to prevent excessive calls
-    const debouncedAdjustControls = debounce(adjustMapControls, 100);
+    const debouncedAdjustElements = debounce(adjustMapElements, 100);
     
-    // Adjust controls immediately
-    adjustMapControls();
+    // Adjust elements immediately
+    adjustMapElements();
 
     // Listen for window resize to recalculate
-    window.addEventListener('resize', debouncedAdjustControls);
+    window.addEventListener('resize', debouncedAdjustElements);
 
     return () => {
-      window.removeEventListener('resize', debouncedAdjustControls);
+      window.removeEventListener('resize', debouncedAdjustElements);
     };
   }, [map, isLoaded, showLeft, showRight, containerRef]);
 
