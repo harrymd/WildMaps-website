@@ -19,16 +19,22 @@ export default function MapContainer({ transformStyle, layers, setLayers, showLe
         className="w-full h-full relative"
       >
         {/* Custom image in bottom right corner */}
-        <img 
-          src={PATH_LOGO}
-          alt="Map logo"
-          className="map-bottom-right-image absolute bottom-4 left-4 aspect-[1522/342] h-12 z-10 pointer-events-none"
-
-          style={{
-            // You can add additional styling here
-            filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))',
-          }}
-        />
+        <a 
+          href="https://www.wildcru.org/" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="map-bottom-right-image absolute bottom-4 left-4 z-10"
+        >
+          <img                                                                    
+            src={PATH_LOGO}                                                       
+            alt="The WildMaps project logo."                                      
+            className="aspect-[1522/342] h-12 pointer-events-auto hover:opacity-80 transition-opacity"
+            //style={{                                                            
+            //  // You can add additional styling here                            
+            //  filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))',                 
+            //}}                                                                  
+          /> 
+        </a>
       </div>
     </div>
   );
