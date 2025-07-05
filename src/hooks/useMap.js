@@ -17,7 +17,18 @@ const debounce = (func, wait) => {
   };
 };
 
-const useMap = (layers, containerRef, setLayers) => {
+// Helper function to compute sidebar widths in pixels
+const computeSidebarWidths = () => {
+  const vw = window.innerWidth;
+  const rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
+  
+  return {
+    left: Math.min(0.5 * vw, 35 * rem), // min(50vw, 35rem)
+    right: Math.min(0.3 * vw, 21 * rem) // min(30vw, 21rem)
+  };
+};
+
+const useMap = (layers, containerRef, setLayers, showLeft = true, showRight = false) => {
   const mapRef = useRef(null);
   const [map, setMap] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -105,6 +116,60 @@ const useMap = (layers, containerRef, setLayers) => {
       setIsLoaded(false);
     };
   }, [containerRef]);
+
+  // Handle map controls positioning based on sidebar state
+  useEffect(() => {
+    if (!map || !isLoaded) return;
+
+    const adjustMapControls = () => {
+      const mapContainer = containerRef.current;
+      if (!mapContainer) return;
+
+      const controls = mapContainer.querySelector('.maplibregl-ctrl-bottom-right');
+      if (!controls) return;
+
+      const sidebarWidths = computeSidebarWidths();
+      console.log('Computed sidebar widths (px):', sidebarWidths);
+
+      let translate = 'translateX(0)';
+      //let backgroundColor = 'transparent';
+      let backgroundColor = 'rgba(255, 255, 255, 0.8)';
+
+      if (showLeft && showRight) {
+        //translate = 'translateX(0)';
+        //translate = `translateX(-${(sidebarWidths.right + sidebarWidths.left)/ 2}px)`;
+        //translate = `translateX(-${(sidebarWidths.right + sidebarWidths.left)}px)`;
+        translate = `translateX(-${(sidebarWidths.right)}px)`;
+      } else if (showLeft && !showRight) {
+        //translate = `translateX(${sidebarWidths.left / 2}px)`;
+        //translate = `translateX(0)`;
+        translate = `translateX(-${sidebarWidths.left / 2}px)`;
+        //backgroundColor = 'rgba(0, 0, 255, 0.2)';
+      } else if (!showLeft && showRight) {
+        translate = `translateX(-${sidebarWidths.right / 2}px)`;
+        //backgroundColor = 'rgba(255, 0, 0, 0.2)';
+      }
+
+      [...controls.children].forEach((child) => {
+        child.style.transition = 'transform 0.3s ease-in-out, background-color 0.3s ease-in-out';
+        child.style.transform = translate;
+        child.style.backgroundColor = backgroundColor;
+      });
+    };
+
+    // Debounce the adjustment to prevent excessive calls
+    const debouncedAdjustControls = debounce(adjustMapControls, 100);
+    
+    // Adjust controls immediately
+    adjustMapControls();
+
+    // Listen for window resize to recalculate
+    window.addEventListener('resize', debouncedAdjustControls);
+
+    return () => {
+      window.removeEventListener('resize', debouncedAdjustControls);
+    };
+  }, [map, isLoaded, showLeft, showRight, containerRef]);
 
   // Update layers when layers prop changes.
   useEffect(() => {
