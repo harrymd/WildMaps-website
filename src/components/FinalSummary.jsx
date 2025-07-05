@@ -49,7 +49,7 @@ const FinalSummary = ({ className = "" }) => {
 
   return (
     <div className={`mb-4 ${className}`}>
-      <div className="text-sm text-gray-800 leading-relaxed">
+      <div className="leading-relaxed">
         <p>
           You've selected a species distribution model for the {displayValues.common_name} (<em>{displayValues.scientific_name}</em>) by{' '}
           {displayValues.source_link && displayValues.source_link !== '#' ? (

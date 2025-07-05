@@ -41,15 +41,17 @@ export default function Layout() {
     }
   });
   
-  const transformStyle = `translateX(${
-    showLeft && showRight
-      ? '0'
-      : showLeft
-      ? `calc(${sidebarWidth} / 2)`
-      : showRight
-      ? `calc(-1 * ${sidebarWidth} / 2)`
-      : '0'
-  })`;
+  //const transformStyle = `translateX(${
+  //  showLeft && showRight
+  //    ? '0'
+  //    : showLeft
+  //    ? `calc(${sidebarWidth} / 2)`
+  //    : showRight
+  //    ? `calc(-1 * ${sidebarWidth} / 2)`
+  //    : '0'
+  //})`;
+
+  const transformStyle = null;
 
   return (
     <div className="relative w-screen h-screen font-sans overflow-hidden bg-blue-950">
