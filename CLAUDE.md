@@ -13,15 +13,17 @@ All data (raster tiles, map styles, metadata dictionaries, chart data) is served
 | Tool | Version |
 |------|---------|
 | React | 19.1 |
+| TypeScript | 5.x (strict mode) |
 | MapLibre GL JS | 5.6 |
 | React Router DOM | 7.6 |
 | D3 | 7.9 |
 | PapaParse | 5.5 |
 | Vite | 6.3 |
 | Tailwind CSS | 3.4 |
+| Vitest | 4.x |
 | Lucide React | icons |
 
-**No TypeScript** — the project is plain JSX throughout.
+The project is **TypeScript throughout** — all source files use `.ts` / `.tsx`. Shared interfaces and types live in `src/types/index.ts`.
 
 ---
 
@@ -29,50 +31,58 @@ All data (raster tiles, map styles, metadata dictionaries, chart data) is served
 
 ```
 src/
-  App.jsx              # Root: loading screen, tutorial overlay, provider/router setup
-  main.jsx             # ReactDOM.createRoot entry point
+  App.tsx              # Root: loading screen, tutorial overlay, provider/router setup
+  main.tsx             # ReactDOM.createRoot entry point
   index.css            # Tailwind directives only (@tailwind base/components/utilities)
 
+  types/
+    index.ts           # All shared TypeScript interfaces and types
+
   context/
-    AppContext.jsx      # Global state: all S3 data loaded here on startup
+    AppContext.tsx      # Global state: all S3 data loaded here on startup
 
   constants/
-    mapConfig.js        # BUCKET_URL and PATH_STYLES — single source of truth for S3 paths
+    mapConfig.ts        # BUCKET_URL and PATH_STYLES — single source of truth for S3 paths
 
   hooks/
-    useMap.js           # Core MapLibre hook: init, layer management, projection switching
-    useLayerState.js    # Visibility state for data/overlay/baselayer
-    useFilterState.js   # URL search-param state (replaces useState for selections)
-    useDatasetInfo.js   # Derives current dataset key + scale from URL params
-    useDetailedData.jsx # Lazy-loads per-dataset JSON from S3 on final screen
-    useLocationSelection.jsx  # ADM0/ADM1 option lists + map panning
-    useUpdateMapOnDatasetChange.js  # Adds raster tile layer when dataset changes
-    useMapPanning.js    # Dispatches pan events from pages
-    useDefaultMapPanning.js   # Pan-on-mount to default view
+    useMap.ts                      # Core MapLibre hook: init, layer management, projection switching
+    useLayerState.ts               # Visibility state for data/overlay/baselayer
+    useFilterState.ts              # URL search-param state (replaces useState for selections)
+    useDatasetInfo.ts              # Derives current dataset key + scale from URL params
+    useDetailedData.ts             # Lazy-loads per-dataset JSON from S3 on final screen
+    useLocationSelection.ts        # ADM0/ADM1 option lists
+    useUpdateMapOnDatasetChange.ts # Adds raster tile layer when dataset changes
+    useMapPanning.ts               # Dispatches pan events from pages
+    useDefaultMapPanning.ts        # Pan-on-mount to default view
 
   pages/               # One component per step in the selection workflow
-    SelectStartingFilter.jsx  → / (choose Region-first or Species-first)
-    SelectRegion.jsx          → /region
-    SelectSubRegion.jsx       → /subregion
-    SelectSuperSpecies.jsx    → /superspecies
-    SelectSpecies.jsx         → /species
-    SelectDataset.jsx         → /dataset
-    FinalScreen.jsx           → /final
-    SelectAdm0.jsx, SelectAdm1.jsx  (exist but currently skipped in workflow)
+    SelectStartingFilter.tsx  → / (choose Region-first or Species-first)
+    SelectRegion.tsx          → /region
+    SelectSubRegion.tsx       → /subregion
+    SelectSuperSpecies.tsx    → /superspecies
+    SelectSpecies.tsx         → /species
+    SelectDataset.tsx         → /dataset
+    FinalScreen.tsx           → /final
+    SelectAdm0.tsx, SelectAdm1.tsx  (exist but currently skipped in workflow)
 
   components/
-    Layout.jsx          # Shell: two sidebars + centre map + router outlet
-    MapContainer.jsx    # Wraps useMap; renders map canvas, logo
-    Sidebar.jsx         # Reusable animated sidebar (left or right)
-    BasemapControls/    # Right-sidebar UI + config.js for basemap/overlay options
-    GeneralSelectComponent.jsx  # Reusable card-list selector used by most pages
-    BarChart.jsx        # D3 stacked bar charts
-    *Legend.jsx / *ColorBar.jsx  # Map legend components
+    Layout.tsx          # Shell: two sidebars + centre map + router outlet
+    MapContainer.tsx    # Wraps useMap; renders map canvas, logo
+    Sidebar.tsx         # Reusable animated sidebar (left or right)
+    BasemapControls/    # Right-sidebar UI + config.ts for basemap/overlay options
+    GeneralSelectComponent.tsx  # Reusable card-list selector used by most pages
+    BarChart.tsx        # D3 stacked bar charts
+    *Legend.tsx / *ColorBar.tsx  # Map legend components
 
   utils/
-    mapPanningUtils.js  # pan helpers: fitBounds, flyTo, or event-based
-    navigationUtils.jsx # getNextRoute / getPreviousRoute for both workflow orderings
-    chartDataUtils.js   # Transforms raw dataset JSON into D3-ready chart data
+    mapPanningUtils.ts  # Pan helpers: fitBounds, flyTo, or event-based
+    navigationUtils.ts  # getNextRoute / getPreviousRoute for both workflow orderings
+    chartDataUtils.ts   # Transforms raw dataset JSON into D3-ready chart data
+    navigationUtils.test.ts  # Unit tests for route logic
+    chartDataUtils.test.ts   # Unit tests for chart data transforms
+
+  test/
+    setup.ts            # @testing-library/jest-dom setup for Vitest
 ```
 
 ---
@@ -88,7 +98,7 @@ src/
 
 ## Map layers
 
-`useMap.js` manages four named layer slots, rendered in this order (bottom → top):
+`useMap.ts` manages four named layer slots, rendered in this order (bottom → top):
 
 1. **underlay** — base style (Positron street map, satellite, elevation, etc.)
 2. **data** — raster tiles for the selected species distribution model
@@ -123,21 +133,23 @@ data_outputs/raster_analysis/
 ## Development
 
 ```bash
-npm run dev      # Vite dev server
-npm run build    # Production build → dist/
-npm run lint     # ESLint
-npm run preview  # Preview production build
+npm run dev        # Vite dev server
+npm run build      # Production build → dist/
+npm run preview    # Preview production build
+npm run lint       # ESLint
+npm run type-check # TypeScript type-check (tsc --noEmit)
+npm test           # Vitest unit tests (run once)
+npm run test:watch # Vitest in watch mode
 ```
-
-No test suite currently.
 
 ---
 
 ## Things worth knowing
 
-- **Two selection orderings** are supported: Region-first and Superspecies-first. `navigationUtils.jsx` encodes both route sequences.
+- **Two selection orderings** are supported: Region-first and Superspecies-first. `navigationUtils.ts` encodes both route sequences.
 - **`SelectAdm0` and `SelectAdm1`** exist as pages but are not wired into the navigation workflow — ADM selection happens inside `FinalScreen` instead.
 - **`src/old/`** is gitignored — legacy files kept locally, not tracked.
-- The app currently has no test suite.
-- `BarChart.jsx` uses imperative D3 DOM manipulation inside a `useEffect` — take care when re-rendering.
+- **`AdmData` typing**: `AppContext` initialises `admData` as `{}` before the S3 fetch completes. Hooks that use it should cast with `admData as AdmData` after checking for key presence, since the context types it as `AdmData | Record<string, never>`.
+- **`useMap.ts`** uses imperative MapLibre DOM manipulation — avoid adding fast-changing props that would trigger frequent re-initialisations. The `projection` option is passed as `any` because MapLibre 5.6 supports it at runtime but the TS definitions don't yet include it.
+- **`BarChart.tsx`** uses imperative D3 DOM manipulation inside a `useEffect` — take care when re-rendering.
 - All S3 assets are public; there is no auth layer.
