@@ -278,14 +278,12 @@ const useMap = (
               continue;
             }
 
-            const layerConfig: StyleLayer = {
-              ...layer,
-              id: layerId,
-              // Prefix source references so they don't collide with other groups
-              source: layer.source && layerData.info.sources?.[layer.source]
+            const layerConfig: StyleLayer = { ...layer, id: layerId };
+            if (layer.source) {
+              layerConfig.source = layerData.info.sources?.[layer.source]
                 ? `${key}-${layer.source}`
-                : layer.source,
-            };
+                : layer.source;
+            }
 
             const beforeId = findInsertionPoint(map, key, layerKeys, layersRef.current);
             try { map.addLayer(layerConfig as maplibregl.AddLayerObject, beforeId ?? undefined); }
