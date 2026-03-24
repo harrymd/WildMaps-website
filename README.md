@@ -99,6 +99,37 @@ src/
 
 ---
 
+## AWS S3 data sources
+
+All data is served from a public S3 bucket:
+
+```
+BUCKET_URL = https://wildcru-wildmaps.s3.eu-west-2.amazonaws.com
+```
+
+### Inputs (`data_inputs/`)
+
+| Path | Format | Purpose |
+|------|--------|---------|
+| `data_inputs/dictionaries/species_dictionary.csv` | CSV | Maps common name → scientific name + superspecies |
+| `data_inputs/dictionaries/superspecies_dictionary.csv` | CSV | Superspecies metadata (scientific name, emoji) |
+| `data_inputs/dictionaries/region_dictionary.csv` | CSV | Region names and bounding boxes |
+| `data_inputs/dictionaries/subregion_dictionary.csv` | CSV | Subregion names, parent region, and bounding boxes |
+| `data_inputs/styles/*.json` | MapLibre GL style JSON | Basemap and overlay styles (Positron, satellite, WDPA, etc.) |
+| `data_inputs/colour_ramps/un_lcc_color_scheme.csv` | CSV | Land-use class colours (UN LCC scheme) for bar chart swatches |
+| `data_inputs/website_assets/` | MP4, PNG | Splash screen video and logo |
+
+### Outputs (`data_outputs/`)
+
+| Path | Format | Purpose |
+|------|--------|---------|
+| `data_outputs/adm_bdry_info.json` | JSON | Country/ADM1 boundary metadata (bounding boxes, display names) |
+| `data_outputs/raster_analysis/results_summary.json` | JSON | Metadata for all datasets — loaded at startup |
+| `data_outputs/raster_analysis/results_{datasetKey}.json` | JSON | Per-dataset chart data — lazy-loaded on the final screen |
+| `data_outputs/raster_analysis/raster_tiles/SDM/{folder}/{key}_zoom_auto/{z}/{x}/{y}.png` | PNG tiles | Raster tiles for species distribution models |
+
+---
+
 ## Architecture notes
 
 - **Selection state** is stored in URL search params via `useFilterState` — selections survive page refreshes and are shareable.
