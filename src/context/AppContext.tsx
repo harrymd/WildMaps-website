@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import Papa from 'papaparse';
+import { BUCKET_URL } from '../constants/mapConfig';
 import type {
   AppContextValue,
   DatasetMap,
@@ -20,7 +21,6 @@ export const useAppContext = (): AppContextValue => {
   return ctx;
 };
 
-const BUCKET_URL = 'https://wildcru-wildmaps.s3.eu-west-2.amazonaws.com';
 const PATH_DATA_OUTPUTS = `${BUCKET_URL}/data_outputs`;
 const PATH_RESULTS = `${PATH_DATA_OUTPUTS}/raster_analysis`;
 const PATH_DATA_INPUTS = `${BUCKET_URL}/data_inputs`;

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { Dataset, DatasetMap } from '../types';
+import { BUCKET_URL } from '../constants/mapConfig';
 
-const BUCKET_URL = 'https://wildcru-wildmaps.s3.eu-west-2.amazonaws.com';
 const PATH_RESULTS = `${BUCKET_URL}/data_outputs/raster_analysis`;
 
 export interface DetailedDataState {

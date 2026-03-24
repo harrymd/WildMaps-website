@@ -1,8 +1,9 @@
 import { useEffect } from 'react';
 import { useFilterState } from './useFilterState';
 import type { DatasetMap, LayersMap } from '../types';
+import { TILE_BUCKET_URL } from '../constants/mapConfig';
 
-const TILE_BASE_URL = 'https://wildcru-wildmaps.s3.eu-west-2.amazonaws.com/data_outputs/raster_tiles/SDM';
+const TILE_BASE_URL = `${TILE_BUCKET_URL}/data_outputs/raster_tiles/SDM`;
 
 /**
  * Keeps the raster data layer in sync with the selected dataset key.

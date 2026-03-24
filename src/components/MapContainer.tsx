@@ -1,9 +1,9 @@
 import { useRef } from 'react';
 import useMap from '../hooks/useMap';
 import type { LayersMap } from '../types';
+import { BUCKET_URL } from '../constants/mapConfig';
 
-const PATH_LOGO =
-  'https://wildcru-wildmaps.s3.eu-west-2.amazonaws.com/data_inputs/website_assets/wildmaps_logo.png';
+const PATH_LOGO = `${BUCKET_URL}/data_inputs/website_assets/wildmaps_logo.png`;
 
 interface MapContainerProps {
   transformStyle: string;

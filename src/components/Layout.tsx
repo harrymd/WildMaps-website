@@ -13,9 +13,7 @@ import SelectSpecies from '../pages/SelectSpecies';
 import SelectDataset from '../pages/SelectDataset';
 import FinalScreen from '../pages/FinalScreen';
 import type { LayersMap } from '../types';
-
-const BUCKET_URL = 'https://wildcru-wildmaps.s3.eu-west-2.amazonaws.com';
-const PATH_STYLES = `${BUCKET_URL}/data_inputs/styles`;
+import { PATH_STYLES } from '../constants/mapConfig';
 
 // Tutorial highlight states per component
 type TutorialComponent = 'sidebar' | 'basemapButton' | 'map';
