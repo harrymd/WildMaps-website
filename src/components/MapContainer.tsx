@@ -34,19 +34,27 @@ export default function MapContainer({
       style={{ transform: transformStyle }}
     >
       <div ref={mapContainerRef} className="w-full h-full relative">
-        {/* WildMaps logo — positioned bottom-left, shifts right when left sidebar opens */}
+        {/* WildMaps logo — queried by useMap as .map-bottom-right-image for sidebar-aware translation */}
         <a
           href="https://www.wildcru.org/"
           target="_blank"
           rel="noopener noreferrer"
-          className="map-bottom-right-image absolute bottom-4 left-4 z-10"
+          className="map-bottom-right-image absolute bottom-4 left-4 z-10 pointer-events-auto"
         >
           <img
             src={PATH_LOGO}
             alt="The WildMaps project logo."
-            className="aspect-[1522/342] h-12 pointer-events-auto hover:opacity-80 transition-opacity"
+            className="aspect-[1522/342] h-12 hover:opacity-80 transition-opacity"
           />
         </a>
+
+        {/* Submission button — queried by useMap as .map-survey-button for sidebar-aware translation */}
+        <button
+          onClick={() => window.open('/survey', '_blank', 'noopener,noreferrer')}
+          className="map-survey-button absolute bottom-11 right-2 z-[999] bg-green-800 hover:bg-green-700 active:bg-green-900 text-white text-xs font-medium px-3 py-1.5 rounded shadow-md transition-colors pointer-events-auto"
+        >
+          Add your data to this catalog
+        </button>
       </div>
     </div>
   );

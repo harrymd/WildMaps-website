@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
-import { BrowserRouter as Router } from 'react-router-dom';
+import { BrowserRouter as Router, useLocation } from 'react-router-dom';
 import { AppProvider } from './context/AppContext';
 import Layout from './components/Layout';
+import SurveyPage from './pages/SurveyPage';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { BUCKET_URL } from './constants/mapConfig';
 
@@ -201,9 +202,9 @@ function TutorialOverlay({ step, onNext, onComplete }: TutorialOverlayProps) {
   );
 }
 
-// ─── App root ─────────────────────────────────────────────────────────────────
+// ─── Main app (with loading screen + tutorial) ────────────────────────────────
 
-export default function App() {
+function MainApp() {
   const [isLoading,    setIsLoading]    = useState(true);
   const [showTutorial, setShowTutorial] = useState(false);
   const [tutorialStep, setTutorialStep] = useState(0);
@@ -215,22 +216,37 @@ export default function App() {
 
   return (
     <AppProvider>
-      <Router>
-        {isLoading ? (
-          <LoadingScreen onVideoEnd={handleVideoEnd} backgroundColor="#f5eeee" />
-        ) : (
-          <>
-            <Layout tutorialActive={showTutorial} tutorialStep={tutorialStep} />
-            {showTutorial && (
-              <TutorialOverlay
-                step={tutorialStep}
-                onNext={() => setTutorialStep((s) => s + 1)}
-                onComplete={() => { setShowTutorial(false); setTutorialStep(0); }}
-              />
-            )}
-          </>
-        )}
-      </Router>
+      {isLoading ? (
+        <LoadingScreen onVideoEnd={handleVideoEnd} backgroundColor="#f5eeee" />
+      ) : (
+        <>
+          <Layout tutorialActive={showTutorial} tutorialStep={tutorialStep} />
+          {showTutorial && (
+            <TutorialOverlay
+              step={tutorialStep}
+              onNext={() => setTutorialStep((s) => s + 1)}
+              onComplete={() => { setShowTutorial(false); setTutorialStep(0); }}
+            />
+          )}
+        </>
+      )}
     </AppProvider>
+  );
+}
+
+// ─── App root ─────────────────────────────────────────────────────────────────
+
+/** Routes /survey directly to the standalone form; all other paths go through the main app. */
+function AppContent() {
+  const location = useLocation();
+  if (location.pathname === '/survey') return <SurveyPage />;
+  return <MainApp />;
+}
+
+export default function App() {
+  return (
+    <Router>
+      <AppContent />
+    </Router>
   );
 }

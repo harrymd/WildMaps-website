@@ -194,11 +194,17 @@ export interface AppContextValue {
 
 // ─── Study metadata types ──────────────────────────────────────────────────────
 
-/** One row from study_metadata_dictionary.csv (tab-separated). */
+/** One row from study_metadata_dictionary.csv. */
 export interface StudyMetadataDictionaryEntry {
   metadata_key: string;
   section_name: string;
   metadata_name: string;
+  /** Input type for the submission form. */
+  form_type: 'string' | 'integer' | 'choices' | 'ratio';
+  /** Raw comma-separated option list; only populated when form_type === 'choices'. */
+  choices: string;
+  /** Optional prompt shown below the question heading; empty string if absent. */
+  form_prompt: string;
 }
 
 /**

@@ -234,7 +234,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
     fetch(`${PATH_DICTS}/study_metadata_dictionary.csv`)
       .then((res) => res.text())
       .then((csvText) => {
-        Papa.parse<{ metadata_key: string; section_name: string; metadata_name: string }>(csvText, {
+        Papa.parse<{ metadata_key: string; section_name: string; metadata_name: string; form_type: string; choices: string; form_prompt: string }>(csvText, {
           header: true,
           skipEmptyLines: true,
           complete: (results) => {
@@ -245,6 +245,9 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
                   metadata_key: row.metadata_key,
                   section_name: row.section_name ?? '',
                   metadata_name: row.metadata_name ?? '',
+                  form_type: (row.form_type || 'string') as StudyMetadataDictionaryEntry['form_type'],
+                  choices: row.choices ?? '',
+                  form_prompt: row.form_prompt ?? '',
                 }))
             );
           },

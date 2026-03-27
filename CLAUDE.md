@@ -63,11 +63,12 @@ src/
     SelectSpecies.tsx         → /species
     SelectDataset.tsx         → /dataset
     FinalScreen.tsx           → /final
+    SurveyPage.tsx            → /survey (standalone data submission form — no loading screen, no AppProvider)
     SelectAdm0.tsx, SelectAdm1.tsx  (exist but currently skipped in workflow)
 
   components/
     Layout.tsx          # Shell: two sidebars + centre map + router outlet
-    MapContainer.tsx    # Wraps useMap; renders map canvas, logo
+    MapContainer.tsx    # Wraps useMap; renders map canvas, logo, and survey button
     Sidebar.tsx         # Reusable animated sidebar (left or right)
     BasemapControls/    # Right-sidebar UI + config.ts for basemap/overlay options
     GeneralSelectComponent.tsx  # Reusable card-list selector used by most pages
@@ -148,6 +149,9 @@ npm run test:watch # Vitest in watch mode
 
 ## Things worth knowing
 
+- **`/survey` route** is handled by `AppContent` in `App.tsx` before `AppProvider` or the loading screen are mounted. `SurveyPage` fetches `study_metadata_dictionary.csv` directly from S3 (does not use `AppContext`). The API endpoint is set via `VITE_SURVEY_API_URL` in `.env.local`; form submissions are saved to a private S3 bucket and trigger a team notification email via SES (eu-west-2).
+- **Map overlay elements** (logo, survey button) live inside `mapContainerRef` alongside MapLibre's canvas. `useMap.ts::adjustMapElements` translates them by querying CSS classes (`.map-bottom-right-image`, `.map-survey-button`) so they stay clear of sidebars. Any new overlay elements added to the map must follow this pattern.
+- **`study_metadata_dictionary.csv`** has three additional columns beyond the original three: `form_type` (`string|integer|choices|ratio`), `choices` (comma-separated option list), and `form_prompt` (optional question sub-text). `StudyMetadataDictionaryEntry` in `types/index.ts` reflects this.
 - **Two selection orderings** are supported: Region-first and Superspecies-first. `navigationUtils.ts` encodes both route sequences.
 - **`SelectAdm0` and `SelectAdm1`** exist as pages but are not wired into the navigation workflow — ADM selection happens inside `FinalScreen` instead.
 - **`src/old/`** is gitignored — legacy files kept locally, not tracked.
