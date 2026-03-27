@@ -72,6 +72,7 @@ src/
     BasemapControls/    # Right-sidebar UI + config.ts for basemap/overlay options
     GeneralSelectComponent.tsx  # Reusable card-list selector used by most pages
     BarChart.tsx        # D3 stacked bar charts
+    StudyDesignSection.tsx  # Collapsible study design section on FinalScreen
     *Legend.tsx / *ColorBar.tsx  # Map legend components
 
   utils/
@@ -116,7 +117,8 @@ The map switches between **globe** projection (zoom < 4) and **Mercator** (zoom 
 ```
 BUCKET_URL = https://wildcru-wildmaps.s3.eu-west-2.amazonaws.com
 
-data_inputs/dictionaries/   — CSV lookups (species, superspecies, regions, subregions)
+data_inputs/dictionaries/   — CSV lookups (species, superspecies, regions, subregions, study metadata fields)
+data_inputs/catalogs/       — CSV catalogs (study_metadata_catalog.csv keyed by dataset_id)
 data_inputs/styles/         — MapLibre style JSON files
 data_inputs/colour_ramps/   — Land use colour scheme CSV
 data_inputs/website_assets/ — Splash video, logo
@@ -152,4 +154,6 @@ npm run test:watch # Vitest in watch mode
 - **`AdmData` typing**: `AppContext` initialises `admData` as `{}` before the S3 fetch completes. Hooks that use it should cast with `admData as AdmData` after checking for key presence, since the context types it as `AdmData | Record<string, never>`.
 - **`useMap.ts`** uses imperative MapLibre DOM manipulation — avoid adding fast-changing props that would trigger frequent re-initialisations. The `projection` option is passed as `any` because MapLibre 5.6 supports it at runtime but the TS definitions don't yet include it.
 - **`BarChart.tsx`** uses imperative D3 DOM manipulation inside a `useEffect` — take care when re-rendering.
+- **`study_metadata_dictionary.csv`** is tab-separated (other dictionaries are comma-separated) — PapaParse is called with `delimiter: '\t'`. The file must be saved as UTF-8; it was originally Mac Roman which corrupted special characters (e.g. en-dash).
+- **`study_metadata_catalog.csv`** is keyed by `dataset_id` (string). `AppContext` converts it to `StudyMetadataCatalog`: a nested record `{ [dataset_id]: { [metadata_key]: string } }`. `StudyDesignSection` looks up the current `datasetKey` in this catalog.
 - All S3 assets are public; there is no auth layer.

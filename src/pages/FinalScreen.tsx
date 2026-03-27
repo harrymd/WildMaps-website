@@ -8,6 +8,7 @@ import { useLocationSelection } from '../hooks/useLocationSelection';
 import { processChartData } from '../utils/chartDataUtils';
 import FinalSummary from '../components/FinalSummary';
 import FinalDatasetInfo from '../components/FinalDatasetInfo';
+import StudyDesignSection from '../components/StudyDesignSection';
 import LocationSelector from '../components/LocationSelector';
 import NavigationButtons from '../components/NavigationButtons';
 import DataRangeInfo from '../components/DataRangeInfo';
@@ -160,6 +161,8 @@ const FinalScreen = () => {
         </div>
 
         <FinalDatasetInfo />
+
+        <StudyDesignSection />
       </div>
 
       <NavigationButtons onPrevious={handlePrevious} onReset={handleReset} />

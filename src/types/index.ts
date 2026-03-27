@@ -22,6 +22,7 @@ export interface DataSubset {
  */
 export interface Dataset {
   // ── From S3 ──
+  string_id: string;
   common_name: string;
   source_text?: string;
   source_link?: string;
@@ -38,6 +39,7 @@ export interface Dataset {
   adm0_list?: string[];
   adm1_list?: string[];
   // ── Enriched by AppContext ──
+  dataset_id: string;
   superspecies: string;
   scientific_name: string;
   /** Parsed from the `region` string. */
@@ -184,7 +186,26 @@ export interface AppContextValue {
   setSubregionData: React.Dispatch<React.SetStateAction<Record<string, SubregionInfo>>>;
   landUseColorSchemeData: Record<string, LandUseColorEntry>;
   setLandUseColorSchemeData: React.Dispatch<React.SetStateAction<Record<string, LandUseColorEntry>>>;
+  studyMetadataDictionary: StudyMetadataDictionaryEntry[];
+  setStudyMetadataDictionary: React.Dispatch<React.SetStateAction<StudyMetadataDictionaryEntry[]>>;
+  studyMetadataCatalog: StudyMetadataCatalog;
+  setStudyMetadataCatalog: React.Dispatch<React.SetStateAction<StudyMetadataCatalog>>;
 }
+
+// ─── Study metadata types ──────────────────────────────────────────────────────
+
+/** One row from study_metadata_dictionary.csv (tab-separated). */
+export interface StudyMetadataDictionaryEntry {
+  metadata_key: string;
+  section_name: string;
+  metadata_name: string;
+}
+
+/**
+ * Parsed study_metadata_catalog.csv.
+ * Outer key: dataset_id (string). Inner key: metadata_key. Value: raw string from CSV.
+ */
+export type StudyMetadataCatalog = Record<string, Record<string, string>>;
 
 // ─── Navigation types ──────────────────────────────────────────────────────────
 

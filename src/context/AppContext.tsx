@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import Papa from 'papaparse';
-import { BUCKET_URL } from '../constants/mapConfig';
+import { DATA_ROOT } from '../constants/mapConfig';
 import type {
   AppContextValue,
   DatasetMap,
@@ -10,6 +10,8 @@ import type {
   SubregionInfo,
   LandUseColorEntry,
   AdmData,
+  StudyMetadataDictionaryEntry,
+  StudyMetadataCatalog,
 } from '../types';
 
 const AppContext = createContext<AppContextValue | null>(null);
@@ -21,10 +23,11 @@ export const useAppContext = (): AppContextValue => {
   return ctx;
 };
 
-const PATH_DATA_OUTPUTS = `${BUCKET_URL}/data_outputs`;
+const PATH_DATA_OUTPUTS = `${DATA_ROOT}/data_outputs`;
 const PATH_RESULTS = `${PATH_DATA_OUTPUTS}/raster_analysis`;
-const PATH_DATA_INPUTS = `${BUCKET_URL}/data_inputs`;
+const PATH_DATA_INPUTS = `${DATA_ROOT}/data_inputs`;
 const PATH_DICTS = `${PATH_DATA_INPUTS}/dictionaries`;
+const PATH_CATALOGS = `${PATH_DATA_INPUTS}/catalogs`;
 
 export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const [data, setData] = useState<DatasetMap>({});
@@ -34,6 +37,8 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const [regionData, setRegionData] = useState<Record<string, RegionInfo>>({});
   const [subregionData, setSubregionData] = useState<Record<string, SubregionInfo>>({});
   const [landUseColorSchemeData, setLandUseColorSchemeData] = useState<Record<string, LandUseColorEntry>>({});
+  const [studyMetadataDictionary, setStudyMetadataDictionary] = useState<StudyMetadataDictionaryEntry[]>([]);
+  const [studyMetadataCatalog, setStudyMetadataCatalog] = useState<StudyMetadataCatalog>({});
 
   // ── Administrative boundary data ─────────────────────────────────────────
 
@@ -175,6 +180,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
           const speciesInfo = entry.common_name ? speciesData[entry.common_name] : undefined;
           enriched[key] = {
             ...entry,
+            dataset_id: key,
             superspecies: speciesInfo?.superspecies ?? 'Unknown superspecies',
             scientific_name: speciesInfo?.scientific_name ?? 'Unknown scientific name',
             // Parse semicolon-separated strings into arrays
@@ -222,6 +228,62 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
       .catch((err) => console.error('Error loading land use colour scheme CSV:', err));
   }, []);
 
+  // ── Study metadata dictionary ─────────────────────────────────────────────
+
+  useEffect(() => {
+    fetch(`${PATH_DICTS}/study_metadata_dictionary.csv`)
+      .then((res) => res.text())
+      .then((csvText) => {
+        Papa.parse<{ metadata_key: string; section_name: string; metadata_name: string }>(csvText, {
+          header: true,
+          delimiter: '\t',
+          skipEmptyLines: true,
+          complete: (results) => {
+            setStudyMetadataDictionary(
+              results.data
+                .filter((row) => row.metadata_key)
+                .map((row) => ({
+                  metadata_key: row.metadata_key,
+                  section_name: row.section_name ?? '',
+                  metadata_name: row.metadata_name ?? '',
+                }))
+            );
+          },
+          error: (err: unknown) => console.error('Error parsing study metadata dictionary CSV:', err),
+        });
+      })
+      .catch((err) => console.error('Error loading study metadata dictionary CSV:', err));
+  }, []);
+
+  // ── Study metadata catalog ────────────────────────────────────────────────
+
+  useEffect(() => {
+    fetch(`${PATH_CATALOGS}/study_metadata_catalog.csv`)
+      .then((res) => res.text())
+      .then((csvText) => {
+        Papa.parse<Record<string, string>>(csvText, {
+          header: true,
+          skipEmptyLines: true,
+          complete: (results) => {
+            const catalog: StudyMetadataCatalog = {};
+            for (const row of results.data) {
+              const id = String(row['dataset_id'] ?? '').trim();
+              if (id) {
+                const entry: Record<string, string> = {};
+                for (const [k, v] of Object.entries(row)) {
+                  if (k !== 'dataset_id') entry[k] = String(v ?? '');
+                }
+                catalog[id] = entry;
+              }
+            }
+            setStudyMetadataCatalog(catalog);
+          },
+          error: (err: unknown) => console.error('Error parsing study metadata catalog CSV:', err),
+        });
+      })
+      .catch((err) => console.error('Error loading study metadata catalog CSV:', err));
+  }, []);
+
   const value: AppContextValue = {
     data, setData,
     admData, setAdmData,
@@ -230,6 +292,8 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
     regionData, setRegionData,
     subregionData, setSubregionData,
     landUseColorSchemeData, setLandUseColorSchemeData,
+    studyMetadataDictionary, setStudyMetadataDictionary,
+    studyMetadataCatalog, setStudyMetadataCatalog,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
