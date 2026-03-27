@@ -154,6 +154,5 @@ npm run test:watch # Vitest in watch mode
 - **`AdmData` typing**: `AppContext` initialises `admData` as `{}` before the S3 fetch completes. Hooks that use it should cast with `admData as AdmData` after checking for key presence, since the context types it as `AdmData | Record<string, never>`.
 - **`useMap.ts`** uses imperative MapLibre DOM manipulation — avoid adding fast-changing props that would trigger frequent re-initialisations. The `projection` option is passed as `any` because MapLibre 5.6 supports it at runtime but the TS definitions don't yet include it.
 - **`BarChart.tsx`** uses imperative D3 DOM manipulation inside a `useEffect` — take care when re-rendering.
-- **`study_metadata_dictionary.csv`** is tab-separated (other dictionaries are comma-separated) — PapaParse is called with `delimiter: '\t'`. The file must be saved as UTF-8; it was originally Mac Roman which corrupted special characters (e.g. en-dash).
 - **`study_metadata_catalog.csv`** is keyed by `dataset_id` (string). `AppContext` converts it to `StudyMetadataCatalog`: a nested record `{ [dataset_id]: { [metadata_key]: string } }`. `StudyDesignSection` looks up the current `datasetKey` in this catalog.
 - All S3 assets are public; there is no auth layer.

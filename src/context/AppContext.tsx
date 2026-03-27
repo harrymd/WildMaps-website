@@ -236,7 +236,6 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
       .then((csvText) => {
         Papa.parse<{ metadata_key: string; section_name: string; metadata_name: string }>(csvText, {
           header: true,
-          delimiter: '\t',
           skipEmptyLines: true,
           complete: (results) => {
             setStudyMetadataDictionary(
