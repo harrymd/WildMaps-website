@@ -11,7 +11,7 @@
     "type-check": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "deploy": "npm run build && rsync -auv --delete --exclude='.htaccess' dist/ bluehost:~/public_html/demo/"
+    "deploy": "npm run build && rsync -auv --delete --no-perms --chmod=D755,F644 --exclude='.htaccess' dist/ bluehost:~/public_html/demo/"
   },
   "dependencies": {
     "d3": "^7.9.0",
