@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
 import { useFilterState } from './useFilterState';
 import type { DatasetMap, LayersMap } from '../types';
-import { TILE_BUCKET_URL } from '../constants/mapConfig';
+import { TILE_DATA_ROOT } from '../constants/mapConfig';
 
-const TILE_BASE_URL = `${TILE_BUCKET_URL}/data_outputs/raster_tiles/SDM`;
+const TILE_BASE_URL = `${TILE_DATA_ROOT}/data_outputs/raster_tiles/SDM`;
 
 /**
  * Keeps the raster data layer in sync with the selected dataset key.
@@ -50,11 +50,13 @@ function updateDatasetLayer(
 
   const dataset = data?.[datasetKey];
   const subFolder = dataset?.folder;
+  const datasetId = dataset?.dataset_id;
+  const stringId = dataset?.string_id;
   const maxZoom = dataset?.max_zoom;
   const bounds = dataset?.raster_summary?.bounds ?? ([] as unknown as [number, number, number, number]);
   const [minLng, minLat, maxLng, maxLat] = bounds;
 
-  if (!subFolder) {
+  if (!subFolder || !datasetId || !stringId) {
     // Config incomplete — remove stale layer
     setLayers((prev) => {
       const { data: _removed, ...rest } = prev;
@@ -63,7 +65,8 @@ function updateDatasetLayer(
     return;
   }
 
-  const urlTemplate = `${TILE_BASE_URL}/${subFolder}/${datasetKey}_zoom_auto/{z}/{x}/{y}.png`;
+  const paddedId = datasetId.padStart(4, '0');
+  const urlTemplate = `${TILE_BASE_URL}/${subFolder}/${paddedId}_${stringId}_zoom_auto/{z}/{x}/{y}.png`;
 
   setLayers((prev) => ({
     ...prev,

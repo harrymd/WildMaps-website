@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import type { Dataset, DatasetMap } from '../types';
-import { BUCKET_URL } from '../constants/mapConfig';
+import { DATA_ROOT } from '../constants/mapConfig';
 
-const PATH_RESULTS = `${BUCKET_URL}/data_outputs/raster_analysis`;
+const PATH_RESULTS = `${DATA_ROOT}/data_outputs/raster_analysis`;
 
 export interface DetailedDataState {
   loading: boolean;
@@ -33,7 +33,8 @@ export const useDetailedData = (
       setError(null);
 
       try {
-        const response = await fetch(`${PATH_RESULTS}/results_${datasetKey}.json`);
+        const paddedId = dataset.dataset_id.padStart(4, '0');
+        const response = await fetch(`${PATH_RESULTS}/results_${paddedId}_${dataset.string_id}.json`);
         if (!response.ok) {
           throw new Error(`Failed to load detailed data: ${response.statusText}`);
         }

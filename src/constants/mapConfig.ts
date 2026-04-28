@@ -18,5 +18,17 @@ export const BUCKET_URL: string = import.meta.env.VITE_BUCKET_URL ?? S3;
  */
 export const TILE_BUCKET_URL: string = import.meta.env.VITE_TILE_BUCKET_URL ?? BUCKET_URL;
 
+/**
+ * When VITE_USE_TESTING_PREFIX=true, all data paths are rooted under a
+ * "testing/" subdirectory on the bucket, e.g. testing/data_outputs/...
+ */
+const testingPrefix = import.meta.env.VITE_USE_TESTING_PREFIX === 'true' ? '/test' : '';
+
+/** Root for all non-tile assets (dictionaries, styles, result JSON). */
+export const DATA_ROOT: string = `${BUCKET_URL}${testingPrefix}`;
+
+/** Root for raster tile assets. */
+export const TILE_DATA_ROOT: string = `${TILE_BUCKET_URL}${testingPrefix}`;
+
 /** Path prefix for MapLibre GL style JSON files. */
-export const PATH_STYLES = `${BUCKET_URL}/data_inputs/styles`;
+export const PATH_STYLES = `${DATA_ROOT}/data_inputs/styles`;

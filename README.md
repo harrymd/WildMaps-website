@@ -99,6 +99,20 @@ src/
 
 ---
 
+## Deployment
+
+The app is hosted on Bluehost as a static site. To build and deploy in one step:
+
+```bash
+npm run deploy
+```
+
+This runs `npm run build` then rsyncs the `dist/` output to `~/public_html/demo/` on the Bluehost server (using the `bluehost` SSH host alias). The `.htaccess` file on the server is preserved across deploys (`--exclude='.htaccess'`).
+
+Prerequisite: an SSH host alias named `bluehost` must be configured in `~/.ssh/config`.
+
+---
+
 ## AWS S3 data sources
 
 All data is served from a public S3 bucket:
