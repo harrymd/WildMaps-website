@@ -52,7 +52,7 @@ src/
     AppContext.tsx      # Global state: all S3 data loaded here on startup
 
   constants/
-    mapConfig.ts       # BUCKET_URL and PATH_STYLES — single source of truth for S3 paths
+    mapConfig.ts       # BUCKET_URL, DATA_ROOT, TILE_DATA_ROOT, PATH_STYLES — S3 path constants
 
   hooks/
     useMap.ts                      # Core MapLibre hook: init, layer management, projection switching
@@ -73,11 +73,12 @@ src/
     SelectSpecies.tsx         → /species
     SelectDataset.tsx         → /dataset
     FinalScreen.tsx           → /final
+    SurveyPage.tsx            → /survey (standalone data submission form — no AppProvider)
     SelectAdm0.tsx, SelectAdm1.tsx  (exist but currently skipped in workflow)
 
   components/
     Layout.tsx          # Shell: two sidebars + centre map + router outlet
-    MapContainer.tsx    # Wraps useMap; renders map canvas, logo
+    MapContainer.tsx    # Wraps useMap; renders map canvas and logo
     Sidebar.tsx         # Reusable animated sidebar (left or right)
     BasemapControls/    # Right-sidebar UI + config for basemap/overlay options
     GeneralSelectComponent.tsx  # Reusable card-list selector used by most pages
@@ -107,9 +108,11 @@ The app is hosted on Bluehost as a static site. To build and deploy in one step:
 npm run deploy
 ```
 
-This runs `npm run build` then rsyncs the `dist/` output to `~/public_html/demo/` on the Bluehost server (using the `bluehost` SSH host alias). The `.htaccess` file on the server is preserved across deploys (`--exclude='.htaccess'`).
+This runs `npm run build` then rsyncs the `dist/` output to `~/public_html/demo/` on the Bluehost server (using the `bluehost` SSH host alias). The `.htaccess` file on the server is preserved across deploys (`--exclude='.htaccess'`). A trailing `ssh chmod 755` ensures the target directory stays world-traversable (macOS rsync otherwise copies the local `dist/` directory's 700 permissions).
 
-Prerequisite: an SSH host alias named `bluehost` must be configured in `~/.ssh/config`.
+**Prerequisites:**
+- An SSH host alias named `bluehost` in `~/.ssh/config`.
+- A `.env.production.local` file at the repo root containing `VITE_USE_TESTING_PREFIX=false`. Vite gives this file the highest priority for production builds, so it overrides any `VITE_USE_TESTING_PREFIX=true` set in `.env.local` for local dev. Without it, the deployed app fetches data from the S3 test prefix instead of production.
 
 ---
 
@@ -139,8 +142,8 @@ BUCKET_URL = https://wildcru-wildmaps.s3.eu-west-2.amazonaws.com
 |------|--------|---------|
 | `data_outputs/adm_bdry_info.json` | JSON | Country/ADM1 boundary metadata (bounding boxes, display names) |
 | `data_outputs/raster_analysis/results_summary.json` | JSON | Metadata for all datasets — loaded at startup |
-| `data_outputs/raster_analysis/results_{datasetKey}.json` | JSON | Per-dataset chart data — lazy-loaded on the final screen |
-| `data_outputs/raster_analysis/raster_tiles/SDM/{folder}/{key}_zoom_auto/{z}/{x}/{y}.png` | PNG tiles | Raster tiles for species distribution models |
+| `data_outputs/raster_analysis/results_{paddedId}_{stringId}.json` | JSON | Per-dataset chart data — lazy-loaded on the final screen |
+| `data_outputs/raster_analysis/raster_tiles/SDM/{folder}/{paddedId}_{stringId}_zoom_auto/{z}/{x}/{y}.png` | PNG tiles | Raster tiles for species distribution models |
 
 ---
 

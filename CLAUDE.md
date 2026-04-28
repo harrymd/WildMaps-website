@@ -42,7 +42,7 @@ src/
     AppContext.tsx      # Global state: all S3 data loaded here on startup
 
   constants/
-    mapConfig.ts        # BUCKET_URL and PATH_STYLES — single source of truth for S3 paths
+    mapConfig.ts        # BUCKET_URL, DATA_ROOT, TILE_DATA_ROOT, PATH_STYLES — S3 path constants
 
   hooks/
     useMap.ts                      # Core MapLibre hook: init, layer management, projection switching
@@ -68,7 +68,7 @@ src/
 
   components/
     Layout.tsx          # Shell: two sidebars + centre map + router outlet
-    MapContainer.tsx    # Wraps useMap; renders map canvas, logo, and survey button
+    MapContainer.tsx    # Wraps useMap; renders map canvas and logo
     Sidebar.tsx         # Reusable animated sidebar (left or right)
     BasemapControls/    # Right-sidebar UI + config.ts for basemap/overlay options
     GeneralSelectComponent.tsx  # Reusable card-list selector used by most pages
@@ -126,9 +126,9 @@ data_inputs/website_assets/ — Splash video, logo
 
 data_outputs/adm_bdry_info.json            — Country/region boundary metadata
 data_outputs/raster_analysis/
-  results_summary.json                     — All dataset metadata (loaded at startup)
-  results_{datasetKey}.json                — Per-dataset detail (lazy-loaded on FinalScreen)
-  raster_tiles/SDM/{folder}/{key}_zoom_auto/{z}/{x}/{y}.png
+  results_summary.json                               — All dataset metadata (loaded at startup)
+  results_{paddedId}_{stringId}.json                — Per-dataset detail (lazy-loaded on FinalScreen)
+  raster_tiles/SDM/{folder}/{paddedId}_{stringId}_zoom_auto/{z}/{x}/{y}.png
 ```
 
 ---
@@ -150,8 +150,11 @@ npm run test:watch # Vitest in watch mode
 ## Things worth knowing
 
 - **`/survey` route** is handled by `AppContent` in `App.tsx` before `AppProvider` or the loading screen are mounted. `SurveyPage` fetches `study_metadata_dictionary.csv` directly from S3 (does not use `AppContext`). The API endpoint is set via `VITE_SURVEY_API_URL` in `.env.local`; form submissions are saved to a private S3 bucket and trigger a team notification email via SES (eu-west-2).
-- **Map overlay elements** (logo, survey button) live inside `mapContainerRef` alongside MapLibre's canvas. `useMap.ts::adjustMapElements` translates them by querying CSS classes (`.map-bottom-right-image`, `.map-survey-button`) so they stay clear of sidebars. Any new overlay elements added to the map must follow this pattern.
-- **`study_metadata_dictionary.csv`** has three additional columns beyond the original three: `form_type` (`string|integer|choices|ratio`), `choices` (comma-separated option list), and `form_prompt` (optional question sub-text). `StudyMetadataDictionaryEntry` in `types/index.ts` reflects this.
+- **Survey button** ("Add your data") lives in `SelectStartingFilter` as a callout box rendered via the `preHeading` prop of `GeneralSelectComponent` — visible only on the initial Dataset browser step. It is not in the map overlay.
+- **Map overlay elements** (logo only now) live inside `mapContainerRef`. `useMap.ts::adjustMapElements` translates them by querying `.map-bottom-right-image` so they stay clear of sidebars. Any new overlay element added to the map must follow this CSS-class pattern.
+- **`GeneralSelectComponent`** accepts an optional `preHeading` prop (rendered above the `<h2>` heading). Only `SelectStartingFilter` uses it currently.
+- **`study_metadata_dictionary.csv`** has three additional columns beyond the original three: `form_type` (`string|integer|choices|ratio|predictors`), `choices` (comma-separated option list), and `form_prompt` (optional question sub-text). `StudyMetadataDictionaryEntry` in `types/index.ts` reflects this. The `predictors` type renders a structured repeating entry (name, resolution, units) instead of a free-text area.
+- **Deployment** requires a `.env.production.local` file at the repo root containing `VITE_USE_TESTING_PREFIX=false`. Vite gives `.env.production.local` highest priority for production builds, overriding the `VITE_USE_TESTING_PREFIX=true` typically set in `.env.local` for local dev. Without it the deployed app fetches from the S3 `test/` prefix. The deploy script uses `--no-perms` + a trailing `ssh chmod 755` because macOS rsync copies local directory permissions (700) to the server otherwise, causing 403 errors.
 - **Two selection orderings** are supported: Region-first and Superspecies-first. `navigationUtils.ts` encodes both route sequences.
 - **`SelectAdm0` and `SelectAdm1`** exist as pages but are not wired into the navigation workflow — ADM selection happens inside `FinalScreen` instead.
 - **`src/old/`** is gitignored — legacy files kept locally, not tracked.
