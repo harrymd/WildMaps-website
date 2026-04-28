@@ -200,7 +200,7 @@ export interface StudyMetadataDictionaryEntry {
   section_name: string;
   metadata_name: string;
   /** Input type for the submission form. */
-  form_type: 'string' | 'integer' | 'choices' | 'ratio';
+  form_type: 'string' | 'integer' | 'choices' | 'ratio' | 'predictors';
   /** Raw comma-separated option list; only populated when form_type === 'choices'. */
   choices: string;
   /** Optional prompt shown below the question heading; empty string if absent. */

@@ -48,13 +48,7 @@ export default function MapContainer({
           />
         </a>
 
-        {/* Submission button — queried by useMap as .map-survey-button for sidebar-aware translation */}
-        <button
-          onClick={() => window.open('/survey', '_blank', 'noopener,noreferrer')}
-          className="map-survey-button absolute bottom-11 right-2 z-[999] bg-green-800 hover:bg-green-700 active:bg-green-900 text-white text-xs font-medium px-3 py-1.5 rounded shadow-md transition-colors pointer-events-auto"
-        >
-          Add your data to this catalog
-        </button>
+
       </div>
     </div>
   );

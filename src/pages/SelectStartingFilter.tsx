@@ -9,6 +9,20 @@ const OPTIONS = [
   { value: 'superspecies', cells: ['... animal type (taxon)'] },
 ];
 
+const SurveyCallout = () => (
+  <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg flex items-center justify-between gap-3">
+    <p className="text-xs text-green-800 leading-snug">
+      Have SDM data to share? Add it to this catalog.
+    </p>
+    <button
+      onClick={() => window.open('/survey', '_blank', 'noopener,noreferrer')}
+      className="flex-shrink-0 bg-green-800 hover:bg-green-700 active:bg-green-900 text-white text-xs font-medium px-3 py-1.5 rounded shadow-sm transition-colors"
+    >
+      Add your data
+    </button>
+  </div>
+);
+
 /** First step: user chooses whether to filter by region first or taxon first. */
 const SelectStartingFilter = () => {
   const navigate = useNavigate();
@@ -39,6 +53,7 @@ const SelectStartingFilter = () => {
       tableHeaders={[]}
       customNextHandler={handleNext}
       customBackHandler={null} // null hides the Back button on the first page
+      preHeading={<SurveyCallout />}
     />
   );
 };

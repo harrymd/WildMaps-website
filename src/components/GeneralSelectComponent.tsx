@@ -37,6 +37,8 @@ interface GeneralSelectComponentProps {
   customBackHandler?: (() => void) | null;
   /** Override the default Next navigation. */
   customNextHandler?: ((value: string) => void) | null;
+  /** Optional JSX rendered above the page heading. */
+  preHeading?: React.ReactNode;
 }
 
 // ─── Component ─────────────────────────────────────────────────────────────────
@@ -56,6 +58,7 @@ const GeneralSelectComponent = ({
   onSelect = null,
   customBackHandler,
   customNextHandler,
+  preHeading,
 }: GeneralSelectComponentProps) => {
   const { data } = useAppContext();
   const { getParam, getAllParams, setParamAndNavigate } = useFilterState();
@@ -105,6 +108,7 @@ const GeneralSelectComponent = ({
     <div className="relative" style={{ height: 'calc(100% - 40px)' }}>
       {/* Scrollable content area */}
       <div className="overflow-y-auto" style={{ height: 'calc(100% - 60px)' }}>
+        {preHeading}
         <h2 className="text-2xl mb-4">Select {title}</h2>
         {contextDisplay && <div className="mb-4">{contextDisplay}</div>}
         {description && <p className="mb-4 text-gray-600">{description}</p>}

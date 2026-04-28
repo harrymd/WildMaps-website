@@ -195,12 +195,7 @@ const useMap = (
         (logo as HTMLElement).style.transform = translateLogo;
       }
 
-      // Shift the survey button in sync with the bottom-right controls
-      const surveyButton = mapContainer.querySelector('.map-survey-button');
-      if (surveyButton) {
-        (surveyButton as HTMLElement).style.transition = 'transform 0.3s ease-in-out';
-        (surveyButton as HTMLElement).style.transform = translateControls;
-      }
+
     };
 
     const debouncedAdjust = debounce(adjustMapElements, 100);

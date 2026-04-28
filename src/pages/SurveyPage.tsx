@@ -9,6 +9,15 @@ const DICT_URL = `${DATA_ROOT}/data_inputs/dictionaries/study_metadata_dictionar
 const LOGO_URL = `${BUCKET_URL}/data_inputs/website_assets/wildmaps_logo.png`;
 const SURVEY_API_URL: string = import.meta.env.VITE_SURVEY_API_URL ?? '';
 
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+interface PredictorEntry {
+  name: string;
+  resolution: string;
+  units: 'km' | 'm' | 'other';
+  otherUnit: string;
+}
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function parseChoices(raw: string): string[] {
@@ -35,6 +44,12 @@ interface QuestionProps {
   onChange: (value: string) => void;
   onOtherChange: (value: string) => void;
   onShowOtherChange: (show: boolean) => void;
+  // For 'choices' type: multi-select array
+  multiValue?: string[];
+  onMultiChange?: (values: string[]) => void;
+  // For 'predictors' type
+  predictorsValue?: PredictorEntry[];
+  onPredictorsChange?: (entries: PredictorEntry[]) => void;
 }
 
 function StringQuestion({ entry, value, onChange }: Pick<QuestionProps, 'entry' | 'value' | 'onChange'>) {
@@ -73,45 +88,50 @@ function IntegerQuestion({ entry, value, otherValue, showOther, onChange, onOthe
   );
 }
 
-function ChoicesQuestion({ entry, value, otherValue, showOther, onChange, onOtherChange, onShowOtherChange }: QuestionProps) {
+function ChoicesQuestion({ entry, otherValue, showOther, onOtherChange, onShowOtherChange, multiValue = [], onMultiChange = () => {} }: QuestionProps) {
   const choices = parseChoices(entry.choices);
+
+  const toggleChoice = (choice: string) => {
+    if (multiValue.includes(choice)) {
+      onMultiChange(multiValue.filter((c) => c !== choice));
+    } else {
+      onMultiChange([...multiValue, choice]);
+    }
+  };
+
   return (
     <div className="space-y-1.5">
       {choices.map((choice) => (
         <label key={choice} className="flex items-center gap-2 cursor-pointer">
           <input
-            type="radio"
-            name={entry.metadata_key}
-            value={choice}
-            checked={!showOther && value === choice}
-            onChange={() => { onShowOtherChange(false); onChange(choice); }}
+            type="checkbox"
+            checked={multiValue.includes(choice)}
+            onChange={() => toggleChoice(choice)}
             className="accent-green-700"
           />
           <span className="text-sm">{choice}</span>
         </label>
       ))}
-      <label className="flex items-start gap-2 cursor-pointer">
-        <input
-          type="radio"
-          name={entry.metadata_key}
-          value="Other"
-          checked={showOther}
-          onChange={() => { onShowOtherChange(true); onChange('Other'); }}
-          className="accent-green-700 mt-0.5"
-        />
-        <div className="flex-1">
+      <div className="mt-2 space-y-1">
+        <label className="flex items-center gap-2 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={showOther}
+            onChange={(e) => onShowOtherChange(e.target.checked)}
+            className="accent-green-700"
+          />
           <span className="text-sm">Other</span>
-          {showOther && (
-            <input
-              type="text"
-              value={otherValue}
-              onChange={(e) => onOtherChange(e.target.value)}
-              placeholder="Please specify..."
-              className="mt-1 w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-700"
-            />
-          )}
-        </div>
-      </label>
+        </label>
+        <input
+          type="text"
+          value={otherValue}
+          onChange={(e) => onOtherChange(e.target.value)}
+          placeholder={showOther ? 'Please specify...' : 'Specify if selecting Other'}
+          className={`w-full border rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-700 ${
+            showOther ? 'border-gray-300' : 'border-gray-200 bg-gray-50 text-gray-400'
+          }`}
+        />
+      </div>
     </div>
   );
 }
@@ -202,8 +222,107 @@ function OtherToggle({
   );
 }
 
-function QuestionBlock({ entry, value, otherValue, showOther, onChange, onOtherChange, onShowOtherChange }: QuestionProps) {
-  const sharedProps = { entry, value, otherValue, showOther, onChange, onOtherChange, onShowOtherChange };
+function PredictorsQuestion({ entry, predictorsValue = [], onPredictorsChange = () => {} }: QuestionProps) {
+  const updateEntry = (index: number, field: keyof PredictorEntry, value: string) => {
+    const updated = [...predictorsValue];
+    updated[index] = { ...updated[index], [field]: value };
+    onPredictorsChange(updated);
+  };
+
+  const addEntry = () => {
+    onPredictorsChange([...predictorsValue, { name: '', resolution: '', units: 'km', otherUnit: '' }]);
+  };
+
+  const removeEntry = (index: number) => {
+    onPredictorsChange(predictorsValue.filter((_, i) => i !== index));
+  };
+
+  return (
+    <div className="space-y-3">
+      {predictorsValue.map((predictor, index) => (
+        <div key={index} className="border border-gray-200 rounded-lg p-3 space-y-2 bg-gray-50">
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-gray-500 font-medium">Predictor {index + 1}</span>
+            {predictorsValue.length > 1 && (
+              <button
+                type="button"
+                onClick={() => removeEntry(index)}
+                className="text-xs text-red-500 hover:text-red-700"
+              >
+                Remove
+              </button>
+            )}
+          </div>
+          <div>
+            <label className="block text-xs text-gray-600 mb-1">
+              Name
+            </label>
+            <input
+              type="text"
+              value={predictor.name}
+              onChange={(e) => updateEntry(index, 'name', e.target.value)}
+              placeholder="e.g. Elevation"
+              className="w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-700"
+            />
+          </div>
+          <div className="flex gap-2 items-end">
+            <div className="flex-1">
+              <label className="block text-xs text-gray-600 mb-1">
+                Spatial resolution
+              </label>
+              <input
+                type="number"
+                value={predictor.resolution}
+                min={0}
+                onChange={(e) => updateEntry(index, 'resolution', e.target.value)}
+                placeholder="e.g. 90"
+                className="w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-700"
+              />
+            </div>
+            <div>
+              <label className="block text-xs text-gray-600 mb-1">
+                Units
+              </label>
+              <select
+                value={predictor.units}
+                onChange={(e) => updateEntry(index, 'units', e.target.value as PredictorEntry['units'])}
+                className="border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-700 bg-white"
+              >
+                <option value="km">km</option>
+                <option value="m">m</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+          </div>
+          {predictor.units === 'other' && (
+            <div>
+              <label className="block text-xs text-gray-600 mb-1">
+                Specify units
+              </label>
+              <input
+                type="text"
+                value={predictor.otherUnit}
+                onChange={(e) => updateEntry(index, 'otherUnit', e.target.value)}
+                placeholder="Please specify..."
+                className="w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-700"
+              />
+            </div>
+          )}
+        </div>
+      ))}
+      <button
+        type="button"
+        onClick={addEntry}
+        className="text-sm text-green-700 hover:text-green-900 font-medium flex items-center gap-1"
+      >
+        + Add predictor
+      </button>
+    </div>
+  );
+}
+
+function QuestionBlock({ entry, value, otherValue, showOther, onChange, onOtherChange, onShowOtherChange, multiValue, onMultiChange, predictorsValue, onPredictorsChange }: QuestionProps) {
+  const sharedProps = { entry, value, otherValue, showOther, onChange, onOtherChange, onShowOtherChange, multiValue, onMultiChange, predictorsValue, onPredictorsChange };
 
   return (
     <div className="py-4 border-b border-gray-100 last:border-0">
@@ -213,10 +332,11 @@ function QuestionBlock({ entry, value, otherValue, showOther, onChange, onOtherC
       {entry.form_prompt && (
         <p className="text-sm text-gray-500 mb-2">{entry.form_prompt}</p>
       )}
-      {entry.form_type === 'string'   && <StringQuestion  {...sharedProps} />}
-      {entry.form_type === 'integer'  && <IntegerQuestion {...sharedProps} />}
-      {entry.form_type === 'choices'  && <ChoicesQuestion {...sharedProps} />}
-      {entry.form_type === 'ratio'    && <RatioQuestion   {...sharedProps} />}
+      {entry.form_type === 'string'     && <StringQuestion     {...sharedProps} />}
+      {entry.form_type === 'integer'    && <IntegerQuestion    {...sharedProps} />}
+      {entry.form_type === 'choices'    && <ChoicesQuestion    {...sharedProps} />}
+      {entry.form_type === 'ratio'      && <RatioQuestion      {...sharedProps} />}
+      {entry.form_type === 'predictors' && <PredictorsQuestion {...sharedProps} />}
     </div>
   );
 }
@@ -239,6 +359,14 @@ export default function SurveyPage() {
   const [dynamicValues, setDynamicValues] = useState<Record<string, string>>({});
   const [otherValues,   setOtherValues]   = useState<Record<string, string>>({});
   const [showOther,     setShowOther]     = useState<Record<string, boolean>>({});
+
+  // Multi-select values for 'choices' type questions
+  const [multiValues, setMultiValues] = useState<Record<string, string[]>>({});
+
+  // Structured predictor entries
+  const [predictors, setPredictors] = useState<PredictorEntry[]>([
+    { name: '', resolution: '', units: 'km', otherUnit: '' },
+  ]);
 
   const [submitState, setSubmitState] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -281,16 +409,17 @@ export default function SurveyPage() {
 
   // ── Field helpers ─────────────────────────────────────────────────────────
 
-  const setDynamic  = (key: string) => (val: string)  => setDynamicValues((p) => ({ ...p, [key]: val }));
-  const setOther    = (key: string) => (val: string)  => setOtherValues((p)   => ({ ...p, [key]: val }));
-  const setShowOtherKey = (key: string) => (show: boolean) => setShowOther((p) => ({ ...p, [key]: show }));
+  const setDynamic      = (key: string) => (val: string)    => setDynamicValues((p) => ({ ...p, [key]: val }));
+  const setOther        = (key: string) => (val: string)    => setOtherValues((p)   => ({ ...p, [key]: val }));
+  const setShowOtherKey = (key: string) => (show: boolean)  => setShowOther((p)     => ({ ...p, [key]: show }));
+  const setMulti        = (key: string) => (vals: string[]) => setMultiValues((p)   => ({ ...p, [key]: vals }));
 
   // ── Build submission payload ───────────────────────────────────────────────
 
   const buildPayload = (): Record<string, string> => {
     const payload: Record<string, string> = {
-      submitted_at:   new Date().toISOString(),
-      submitter_name: submitterName.trim(),
+      submitted_at:    new Date().toISOString(),
+      submitter_name:  submitterName.trim(),
       submitter_email: submitterEmail.trim(),
       publication_link: pubLink.trim(),
       data_download_url: downloadUrl.trim(),
@@ -300,7 +429,20 @@ export default function SurveyPage() {
       const key = entry.metadata_key;
       const isOther = showOther[key] ?? false;
 
-      if (entry.form_type === 'ratio') {
+      if (entry.form_type === 'choices') {
+        const selected = [...(multiValues[key] ?? [])];
+        if (isOther) {
+          const otherText = (otherValues[key] ?? '').trim();
+          if (otherText) selected.push(`Other: ${otherText}`);
+        }
+        payload[key] = selected.join(', ');
+      } else if (entry.form_type === 'predictors') {
+        const parts = predictors.map((p) => {
+          const unit = p.units === 'other' ? p.otherUnit.trim() : p.units;
+          return `${p.name.trim()} (${p.resolution.trim()} ${unit})`;
+        });
+        payload[key] = parts.join('; ');
+      } else if (entry.form_type === 'ratio') {
         if (isOther) {
           payload[key] = otherValues[key] ?? '';
         } else {
@@ -324,16 +466,31 @@ export default function SurveyPage() {
     if (!consent) return false;
     if (!submitterName.trim() || !submitterEmail.trim() || !pubLink.trim() || !downloadUrl.trim()) return false;
     if (dictLoading || !!dictError) return false;
+
     for (const entry of dictionary) {
       const key = entry.metadata_key;
       const isOther = showOther[key] ?? false;
-      const filled = isOther
-        ? !!(otherValues[key] ?? '').trim()
-        : !!(dynamicValues[key] ?? '').trim();
-      if (!filled) return false;
+
+      if (entry.form_type === 'choices') {
+        const selected = multiValues[key] ?? [];
+        const hasAnySelection = selected.length > 0 || isOther;
+        if (!hasAnySelection) return false;
+        if (isOther && !(otherValues[key] ?? '').trim()) return false;
+      } else if (entry.form_type === 'predictors') {
+        if (predictors.length === 0) return false;
+        for (const p of predictors) {
+          if (!p.name.trim() || !p.resolution.trim()) return false;
+          if (p.units === 'other' && !p.otherUnit.trim()) return false;
+        }
+      } else {
+        const filled = isOther
+          ? !!(otherValues[key] ?? '').trim()
+          : !!(dynamicValues[key] ?? '').trim();
+        if (!filled) return false;
+      }
     }
     return true;
-  }, [consent, submitterName, submitterEmail, pubLink, downloadUrl, dictionary, dynamicValues, otherValues, showOther, dictLoading, dictError]);
+  }, [consent, submitterName, submitterEmail, pubLink, downloadUrl, dictionary, dynamicValues, otherValues, showOther, multiValues, predictors, dictLoading, dictError]);
 
   // ── Submit ────────────────────────────────────────────────────────────────
 
@@ -521,6 +678,10 @@ export default function SurveyPage() {
                   onChange={setDynamic(entry.metadata_key)}
                   onOtherChange={setOther(entry.metadata_key)}
                   onShowOtherChange={setShowOtherKey(entry.metadata_key)}
+                  multiValue={multiValues[entry.metadata_key] ?? []}
+                  onMultiChange={setMulti(entry.metadata_key)}
+                  predictorsValue={entry.form_type === 'predictors' ? predictors : undefined}
+                  onPredictorsChange={entry.form_type === 'predictors' ? setPredictors : undefined}
                 />
               ))}
             </div>
