@@ -108,7 +108,9 @@ The app is hosted on Bluehost as a static site. To build and deploy in one step:
 npm run deploy
 ```
 
-This runs `npm run build` then rsyncs the `dist/` output to `~/public_html/demo/` on the Bluehost server (using the `bluehost` SSH host alias). The `.htaccess` file on the server is preserved across deploys (`--exclude='.htaccess'`). A trailing `ssh chmod 755` ensures the target directory stays world-traversable (macOS rsync otherwise copies the local `dist/` directory's 700 permissions).
+This runs `npm run build` then rsyncs the `dist/` output to `~/public_html/demo/wildmaps/` on the Bluehost server (using the `bluehost` SSH host alias), so the app is served at `demo.hkuril.com/wildmaps`. The Vite `base` is set to `/wildmaps/` and the React Router uses `import.meta.env.BASE_URL` as its `basename`, so all asset URLs and client-side routes resolve under that prefix. The `.htaccess` file on the server is preserved across deploys (`--exclude='.htaccess'`); the SPA-fallback rewrite rule lives in `~/public_html/demo/wildmaps/.htaccess` (rewriting unknown paths under `/wildmaps/` to `index.html`). A trailing `ssh chmod 755` ensures the target directory stays world-traversable (macOS rsync otherwise copies the local `dist/` directory's 700 permissions).
+
+`demo.hkuril.com` itself serves a small static landing page (`~/public_html/demo/index.html`) that links through to `/wildmaps/`. That file is not part of the build and is uploaded manually.
 
 **Prerequisites:**
 - An SSH host alias named `bluehost` in `~/.ssh/config`.
