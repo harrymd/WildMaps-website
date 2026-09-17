@@ -114,7 +114,9 @@ This runs `npm run build` then rsyncs the `dist/` output to `~/public_html/demo/
 
 **Prerequisites:**
 - An SSH host alias named `bluehost` in `~/.ssh/config`.
-- A `.env.production.local` file at the repo root containing `VITE_USE_TESTING_PREFIX=false`. Vite gives this file the highest priority for production builds, so it overrides any `VITE_USE_TESTING_PREFIX=true` set in `.env.local` for local dev. Without it, the deployed app fetches data from the S3 test prefix instead of production.
+- A `.env.production.local` file at the repo root controlling which S3 prefix the deployed build reads from. Vite gives this file the highest priority for production builds, so it overrides whatever `VITE_USE_TESTING_PREFIX` is set to in `.env.local` for local dev.
+
+**Note:** `VITE_USE_TESTING_PREFIX` is currently set to `true` in `.env.production.local`, so `demo.hkuril.com/wildmaps` reads from the S3 `test/` prefix — the bucket root is frozen because another live deployment elsewhere consumes it directly and root's `data_outputs/raster_analysis/` files use an older, incompatible naming/schema (no numeric `dataset_id` + `string_id` split) that the current app code doesn't support. See "S3 `test/` vs. root split" below.
 
 ---
 
@@ -146,6 +148,19 @@ BUCKET_URL = https://wildcru-wildmaps.s3.eu-west-2.amazonaws.com
 | `data_outputs/raster_analysis/results_summary.json` | JSON | Metadata for all datasets — loaded at startup |
 | `data_outputs/raster_analysis/results_{paddedId}_{stringId}.json` | JSON | Per-dataset chart data — lazy-loaded on the final screen |
 | `data_outputs/raster_analysis/raster_tiles/SDM/{folder}/{paddedId}_{stringId}_zoom_auto/{z}/{x}/{y}.png` | PNG tiles | Raster tiles for species distribution models |
+
+---
+
+## S3 `test/` vs. root split
+
+The bucket holds two parallel copies of `data_inputs/` and `data_outputs/` — one at the bucket root, one under a `test/` prefix. `VITE_USE_TESTING_PREFIX` (see `src/constants/mapConfig.ts`) picks which one the app reads from: `true` → `test/`, `false`/unset → root.
+
+As of the last data sync, the two copies are **not** equivalent:
+- Root's `data_outputs/raster_analysis/results_summary.json` and per-dataset detail files use an older naming scheme (`results_{string_id}.json`, no numeric `dataset_id`). `test/`'s copy uses the current scheme (`results_{paddedId}_{stringId}.json`, numeric `dataset_id` + separate `string_id` field) that `useDetailedData.ts` expects.
+- `test/data_inputs/catalogs/` is missing `study_metadata_catalog.csv` on root.
+- `test/data_inputs/styles/` was missing several basemap/overlay styles that root has (`esri_world_imagery`, `mapzen_elevation_and_hillshade`, `worldpop`, `landcover`, `ecoregions`, `wdpa`) — these were copied (not moved) from root into `test/` so the deployed site, now pointed at `test/`, has all basemap options working.
+
+Root is currently **frozen** — another live deployment elsewhere reads from it directly, so it can't be overwritten or resynced without coordinating that separately. Until root is updated (or that other deployment is retired), the deployed WildMaps site stays pointed at `test/` via `.env.production.local`.
 
 ---
 
