@@ -53,6 +53,7 @@ src/
 
   constants/
     mapConfig.ts       # BUCKET_URL, DATA_ROOT, TILE_DATA_ROOT, PATH_STYLES — S3 path constants
+    methodologicalStandards.ts  # Checklist data model + scoring for the survey's "Methodological standards" section
 
   hooks/
     useMap.ts                      # Core MapLibre hook: init, layer management, projection switching
@@ -73,7 +74,8 @@ src/
     SelectSpecies.tsx         → /species
     SelectDataset.tsx         → /dataset
     FinalScreen.tsx           → /final
-    SurveyPage.tsx            → /survey (standalone data submission form — no AppProvider)
+    SurveyPage.tsx            → /survey (standalone two-page data submission form — no AppProvider)
+    SurveyPage.css            # Shared `.wm-survey` theme for both survey pages
     SelectAdm0.tsx, SelectAdm1.tsx  (exist but currently skipped in workflow)
 
   components/
@@ -83,6 +85,7 @@ src/
     BasemapControls/    # Right-sidebar UI + config for basemap/overlay options
     GeneralSelectComponent.tsx  # Reusable card-list selector used by most pages
     BarChart.tsx        # D3 stacked bar charts
+    MethodStandardsSection.tsx  # Survey page 2: Gold/Silver/Bronze methodological standards checklist
     *Legend.tsx / *ColorBar.tsx  # Map legend components
 
   utils/
@@ -171,3 +174,4 @@ Root is currently **frozen** — another live deployment elsewhere reads from it
 - **Map layers** are managed by `useMap.ts` in four named slots (bottom → top): `underlay` → `data` → `baselayer` → `overlay`. The map switches between globe (zoom < 4) and Mercator (zoom ≥ 4) projection automatically.
 - **No Redux or Zustand** — context + URL params + hook-local state covers everything.
 - **`SelectAdm0` and `SelectAdm1`** exist as pages but ADM selection is handled inline on `FinalScreen` instead.
+- **`/survey`** is a standalone two-page submission form: page 1 collects study metadata (driven by `study_metadata_dictionary.csv`), page 2 is a fixed "Methodological standards" checklist (`constants/methodologicalStandards.ts`) that gives submitters a live Gold/Silver/Bronze quality estimate. Only the raw checklist answers are submitted (prefixed `standards.`), not the calculated score, plus a hidden `form_version` field.

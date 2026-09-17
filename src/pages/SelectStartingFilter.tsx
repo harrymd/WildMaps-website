@@ -15,7 +15,7 @@ const SurveyCallout = () => (
       Have SDM data to share? Add it to this catalog.
     </p>
     <button
-      onClick={() => window.open('/survey', '_blank', 'noopener,noreferrer')}
+      onClick={() => window.open(`${import.meta.env.BASE_URL}survey`, '_blank', 'noopener,noreferrer')}
       className="flex-shrink-0 bg-green-800 hover:bg-green-700 active:bg-green-900 text-white text-xs font-medium px-3 py-1.5 rounded shadow-sm transition-colors"
     >
       Add your data

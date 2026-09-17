@@ -43,6 +43,7 @@ src/
 
   constants/
     mapConfig.ts        # BUCKET_URL, DATA_ROOT, TILE_DATA_ROOT, PATH_STYLES — S3 path constants
+    methodologicalStandards.ts  # Hardcoded checklist data model + Gold/Silver/Bronze scoring for SurveyPage's second section
 
   hooks/
     useMap.ts                      # Core MapLibre hook: init, layer management, projection switching
@@ -64,6 +65,7 @@ src/
     SelectDataset.tsx         → /dataset
     FinalScreen.tsx           → /final
     SurveyPage.tsx            → /survey (standalone data submission form — no loading screen, no AppProvider)
+    SurveyPage.css            # Scoped `.wm-survey` theme (Manrope font, teal/rust/purple palette) shared by both survey sections
     SelectAdm0.tsx, SelectAdm1.tsx  (exist but currently skipped in workflow)
 
   components/
@@ -74,6 +76,7 @@ src/
     GeneralSelectComponent.tsx  # Reusable card-list selector used by most pages
     BarChart.tsx        # D3 stacked bar charts
     StudyDesignSection.tsx  # Collapsible study design section on FinalScreen
+    MethodStandardsSection.tsx  # SurveyPage's second-page checklist UI (calculate-score widget + results tile)
     *Legend.tsx / *ColorBar.tsx  # Map legend components
 
   utils/
@@ -149,8 +152,11 @@ npm run test:watch # Vitest in watch mode
 
 ## Things worth knowing
 
-- **`/survey` route** is handled by `AppContent` in `App.tsx` before `AppProvider` or the loading screen are mounted. `SurveyPage` fetches `study_metadata_dictionary.csv` directly from S3 (does not use `AppContext`). The API endpoint is set via `VITE_SURVEY_API_URL` in `.env.local`; form submissions are saved to a private S3 bucket and trigger a team notification email via SES (eu-west-2).
+- **`/survey` route** is handled by `AppContent` in `App.tsx` before `AppProvider` or the loading screen are mounted. `SurveyPage` fetches `study_metadata_dictionary.csv` directly from S3 (does not use `AppContext`). The API endpoint is set via `VITE_SURVEY_API_URL` in `.env.local`; form submissions are saved to a private S3 bucket and trigger a team notification email via SES (eu-west-2). It links to `${import.meta.env.BASE_URL}survey`, not a hardcoded `/survey`, so it resolves correctly under the `/wildmaps/` base on both localhost and the deployed site.
 - **Survey button** ("Add your data") lives in `SelectStartingFilter` as a callout box rendered via the `preHeading` prop of `GeneralSelectComponent` — visible only on the initial Dataset browser step. It is not in the map overlay.
+- **`SurveyPage` is a two-page form, two separate features appended together**: page 1 is the existing study-metadata dictionary section; page 2 (`MethodStandardsSection.tsx`) is the "Methodological standards" checklist, ported from a standalone draft HTML tool (`../notes/chrishen_SDM_form_2026_09_17.html`). A stepper at the top and an intro callout on each page make clear these are distinct. Both pages share the `.wm-survey` theme in `SurveyPage.css` (this is the "harmonised" look — the checklist draft's palette/typography, not the original green Tailwind styling).
+- **Methodological standards checklist** (`constants/methodologicalStandards.ts`): a fixed, hardcoded question set (not CSV/dictionary-driven), with conditional questions (e.g. `evaluation.2` only shown when `evaluation.1 === 'no'`) and a client-side Gold/Silver/Bronze scoring function. The "Calculate score" button is kept purely as live feedback for the submitter — the calculated tier/score is **never submitted**; only the raw per-question `yes`/`no`/`na` answers are, under payload keys prefixed `standards.` (e.g. `standards.response.0`), so the score can be recalculated downstream if the scoring rules change. The results tile's message tells the user to scroll down, where the real "Submit" button (for both pages' answers) lives.
+- **`SURVEY_FORM_VERSION`** (`constants/methodologicalStandards.ts`, currently `'2.0'`) is sent as a hidden `form_version` field in every submission payload — bump it if the question set changes again.
 - **Map overlay elements** (logo only now) live inside `mapContainerRef`. `useMap.ts::adjustMapElements` translates them by querying `.map-bottom-right-image` so they stay clear of sidebars. Any new overlay element added to the map must follow this CSS-class pattern.
 - **`GeneralSelectComponent`** accepts an optional `preHeading` prop (rendered above the `<h2>` heading). Only `SelectStartingFilter` uses it currently.
 - **`study_metadata_dictionary.csv`** has three additional columns beyond the original three: `form_type` (`string|integer|choices|ratio|predictors`), `choices` (comma-separated option list), and `form_prompt` (optional question sub-text). `StudyMetadataDictionaryEntry` in `types/index.ts` reflects this. The `predictors` type renders a structured repeating entry (name, resolution, units) instead of a free-text area.

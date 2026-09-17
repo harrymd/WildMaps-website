@@ -1,0 +1,301 @@
+/* Scoped theme for the data-submission survey (SurveyPage + MethodStandardsSection).
+   Adapted from the WildMAPS SDM Quality Checklist draft — kept scoped under
+   .wm-survey so it never leaks into the rest of the (PT Sans-themed) app. */
+
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
+
+.wm-survey {
+  --teal: #1B93A7;
+  --teal-dark: #146F80;
+  --rust: #813D2F;
+  --purple: #44215F;
+  --green: #3DB44D;
+  --lime: #A3CD4A;
+  --ink: #2E2C26;
+  --ink-soft: #5B594E;
+  --paper: #FBFAF6;
+  --panel: #FFFFFF;
+  --line: #E4E0D3;
+  --gold: #C99A2E;
+  --silver: #9CA3A8;
+  --bronze: #8B4A32;
+  --focus: #1B93A7;
+
+  font-family: 'Manrope', -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  min-height: 100vh;
+}
+
+.wm-survey a { color: var(--teal-dark); }
+
+.wm-header {
+  background: var(--purple);
+  color: #fff;
+}
+
+.wm-eyebrow {
+  color: rgba(255,255,255,0.85);
+}
+
+.wm-panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.wm-intro {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--teal);
+  border-radius: 6px;
+  color: var(--ink-soft);
+}
+.wm-intro strong { color: var(--ink); }
+
+.wm-stepper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+  margin-bottom: 18px;
+}
+.wm-stepper .step {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1.5px solid var(--line);
+  font-weight: 600;
+}
+.wm-stepper .step.active {
+  border-color: var(--teal);
+  color: var(--teal-dark);
+  background: rgba(27,147,167,0.08);
+}
+.wm-stepper .step.done {
+  border-color: var(--green);
+  color: var(--green);
+}
+.wm-stepper .sep { color: var(--line); }
+
+.wm-section-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 6px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--rust);
+}
+.wm-section-head h2 {
+  font-size: 1.15rem;
+  font-weight: 800;
+  margin: 0;
+  color: var(--rust);
+}
+
+.wm-subsection h3 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--teal-dark);
+  margin: 0 0 10px;
+}
+
+.wm-field-label {
+  font-weight: 600;
+  color: var(--ink);
+  font-size: 0.92rem;
+  margin-bottom: 2px;
+  display: block;
+}
+.wm-field-note {
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+  margin-bottom: 6px;
+}
+
+.wm-survey input[type="text"],
+.wm-survey input[type="email"],
+.wm-survey input[type="url"],
+.wm-survey input[type="number"],
+.wm-survey select,
+.wm-survey textarea {
+  font-family: inherit;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--ink);
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  width: 100%;
+}
+.wm-survey input:focus-visible,
+.wm-survey select:focus-visible,
+.wm-survey textarea:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 1px;
+  border-color: var(--teal);
+}
+.wm-survey input[type="checkbox"] {
+  accent-color: var(--teal);
+}
+
+.wm-question {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 16px 18px;
+  margin-bottom: 12px;
+  transition: border-color .15s ease, box-shadow .2s ease;
+}
+.wm-question.flagged {
+  border-color: var(--rust);
+  box-shadow: 0 0 0 1px var(--rust) inset;
+}
+.wm-q-text {
+  font-size: 0.95rem;
+  color: var(--ink);
+  margin-bottom: 12px;
+}
+.wm-q-note {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+  font-weight: 400;
+  margin-top: 2px;
+}
+
+.wm-options {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.wm-opt { position: relative; }
+.wm-opt input {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  cursor: pointer;
+}
+.wm-opt label {
+  display: inline-block;
+  padding: 8px 18px;
+  border-radius: 999px;
+  border: 1.5px solid var(--line);
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  cursor: pointer;
+  user-select: none;
+  transition: all .15s ease;
+}
+.wm-opt input:checked + label { color: #fff; border-color: transparent; }
+.wm-opt.yes input:checked + label { background: var(--green); }
+.wm-opt.no input:checked + label { background: var(--rust); }
+.wm-opt.na input:checked + label { background: var(--ink-soft); }
+.wm-opt input:focus-visible + label { outline: 2px solid var(--focus); outline-offset: 2px; }
+.wm-opt label:hover { border-color: var(--teal); }
+
+.wm-progress-rail {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--paper);
+  padding: 14px 0 10px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+}
+.wm-progress-track { height: 6px; border-radius: 4px; background: var(--line); overflow: hidden; }
+.wm-progress-fill { height: 100%; background: linear-gradient(90deg, var(--teal), var(--green)); transition: width .25s ease; }
+.wm-progress-label { display: flex; justify-content: space-between; font-size: 0.78rem; color: var(--ink-soft); margin-top: 6px; }
+
+.wm-btn {
+  font-family: inherit;
+  font-size: 0.92rem;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 13px 28px;
+  border: none;
+  cursor: pointer;
+  transition: transform .12s ease, background .15s ease;
+}
+.wm-btn:active { transform: scale(0.98); }
+.wm-btn-primary { background: var(--teal); color: #fff; }
+.wm-btn-primary:hover { background: var(--teal-dark); }
+.wm-btn-primary:disabled { background: var(--line); color: var(--ink-soft); cursor: not-allowed; }
+.wm-btn-secondary { background: transparent; color: var(--ink-soft); border: 1.5px solid var(--line); }
+.wm-btn-secondary:hover { border-color: var(--rust); color: var(--rust); }
+
+.wm-validation-msg {
+  color: var(--rust);
+  font-size: 0.86rem;
+  font-weight: 600;
+  margin-top: 10px;
+}
+
+.wm-results { margin-top: 44px; }
+.wm-tile {
+  border-radius: 16px;
+  padding: 30px 26px;
+  text-align: center;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+}
+.wm-tile.gold { background: linear-gradient(155deg, #E3BE55, var(--gold)); }
+.wm-tile.silver { background: linear-gradient(155deg, #C6CBCE, var(--silver)); }
+.wm-tile.bronze { background: linear-gradient(155deg, #B0714F, var(--bronze)); }
+.wm-tile .medal { font-size: 2.4rem; display: block; margin-bottom: 4px; }
+.wm-tile .tier-name { font-size: 1.5rem; font-weight: 800; margin: 0; }
+.wm-tile .tier-score { font-size: 0.95rem; opacity: 0.92; margin-top: 6px; }
+.wm-tile .tier-override {
+  margin-top: 12px;
+  font-size: 0.84rem;
+  background: rgba(0,0,0,0.18);
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 999px;
+}
+.wm-tile .tier-next {
+  margin-top: 14px;
+  font-size: 0.85rem;
+  opacity: 0.95;
+}
+
+.wm-breakdown { margin-top: 24px; }
+.wm-breakdown h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 12px; color: var(--ink); }
+.wm-bar-row { margin-bottom: 12px; }
+.wm-bar-row .bar-label { display: flex; justify-content: space-between; font-size: 0.84rem; color: var(--ink-soft); margin-bottom: 5px; }
+.wm-bar-track { height: 9px; background: var(--line); border-radius: 5px; overflow: hidden; }
+.wm-bar-fill { height: 100%; background: var(--teal); border-radius: 5px; transition: width .4s ease; }
+
+.wm-tier-key { margin-top: 24px; display: flex; gap: 14px; flex-wrap: wrap; font-size: 0.78rem; color: var(--ink-soft); }
+.wm-tier-key span { display: inline-flex; align-items: center; gap: 6px; }
+.wm-tier-key i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.wm-tier-key .g i { background: var(--gold); }
+.wm-tier-key .s i { background: var(--silver); }
+.wm-tier-key .b i { background: var(--bronze); }
+
+/* Re-map leftover Tailwind gray/green/red utility classes (from the
+   study-metadata sub-components) onto the checklist palette, so both
+   sections read as one visual system without touching every className. */
+.wm-survey .text-gray-400,
+.wm-survey .text-gray-500,
+.wm-survey .text-gray-600 { color: var(--ink-soft) !important; }
+.wm-survey .text-gray-800 { color: var(--ink) !important; }
+.wm-survey .border-gray-100,
+.wm-survey .border-gray-200 { border-color: var(--line) !important; }
+.wm-survey .bg-gray-50 { background: var(--paper) !important; }
+.wm-survey .bg-gray-300 { background: var(--line) !important; }
+.wm-survey .text-green-700,
+.wm-survey .text-green-900,
+.wm-survey .hover\:text-green-900:hover { color: var(--teal-dark) !important; }
+.wm-survey .text-red-500,
+.wm-survey .text-red-700,
+.wm-survey .hover\:text-red-700:hover { color: var(--rust) !important; }
+.wm-survey .bg-red-50 { background: rgba(129,61,47,0.06) !important; }
+.wm-survey .border-red-200 { border-color: var(--rust) !important; }

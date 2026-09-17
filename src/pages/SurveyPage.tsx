@@ -2,6 +2,14 @@ import { useState, useEffect, useMemo, type FormEvent } from 'react';
 import Papa from 'papaparse';
 import type { StudyMetadataDictionaryEntry } from '../types';
 import { DATA_ROOT, BUCKET_URL } from '../constants/mapConfig';
+import {
+  SURVEY_FORM_VERSION,
+  STANDARDS_KEY_PREFIX,
+  visibleQuestionIds,
+  type ChecklistAnswer,
+} from '../constants/methodologicalStandards';
+import MethodStandardsSection from '../components/MethodStandardsSection';
+import './SurveyPage.css';
 
 // ─── Config ───────────────────────────────────────────────────────────────────
 
@@ -59,7 +67,7 @@ function StringQuestion({ entry, value, onChange }: Pick<QuestionProps, 'entry' 
       value={value}
       onChange={(e) => onChange(e.target.value)}
       rows={3}
-      className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-700 resize-vertical"
+      className="w-full"
     />
   );
 }
@@ -75,7 +83,7 @@ function IntegerQuestion({ entry, value, otherValue, showOther, onChange, onOthe
           min={0}
           step={1}
           onChange={(e) => onChange(e.target.value)}
-          className="border border-gray-300 rounded px-3 py-2 text-sm w-40 focus:outline-none focus:ring-2 focus:ring-green-700"
+          className="w-40"
         />
       )}
       <OtherToggle
@@ -107,7 +115,7 @@ function ChoicesQuestion({ entry, otherValue, showOther, onOtherChange, onShowOt
             type="checkbox"
             checked={multiValue.includes(choice)}
             onChange={() => toggleChoice(choice)}
-            className="accent-green-700"
+            className=""
           />
           <span className="text-sm">{choice}</span>
         </label>
@@ -118,7 +126,7 @@ function ChoicesQuestion({ entry, otherValue, showOther, onOtherChange, onShowOt
             type="checkbox"
             checked={showOther}
             onChange={(e) => onShowOtherChange(e.target.checked)}
-            className="accent-green-700"
+            className=""
           />
           <span className="text-sm">Other</span>
         </label>
@@ -127,9 +135,8 @@ function ChoicesQuestion({ entry, otherValue, showOther, onOtherChange, onShowOt
           value={otherValue}
           onChange={(e) => onOtherChange(e.target.value)}
           placeholder={showOther ? 'Please specify...' : 'Specify if selecting Other'}
-          className={`w-full border rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-700 ${
-            showOther ? 'border-gray-300' : 'border-gray-200 bg-gray-50 text-gray-400'
-          }`}
+          className="w-full"
+          style={showOther ? undefined : { opacity: 0.5 }}
         />
       </div>
     </div>
@@ -162,7 +169,7 @@ function RatioQuestion({ entry, value, otherValue, showOther, onChange, onOtherC
               step={1}
               value={value === '' ? '' : (isNaN(first) ? 80 : first)}
               onChange={(e) => handleFirstChange(e.target.value)}
-              className="border border-gray-300 rounded px-3 py-2 text-sm w-24 text-center focus:outline-none focus:ring-2 focus:ring-green-700"
+              className="w-24 text-center"
             />
           </div>
           <span className="text-gray-400 mt-5">:</span>
@@ -172,7 +179,8 @@ function RatioQuestion({ entry, value, otherValue, showOther, onChange, onOtherC
               type="number"
               value={second}
               readOnly
-              className="border border-gray-200 rounded px-3 py-2 text-sm w-24 text-center bg-gray-50 text-gray-500"
+              className="w-24 text-center"
+              style={{ opacity: 0.6 }}
             />
           </div>
         </div>
@@ -205,7 +213,7 @@ function OtherToggle({
           type="checkbox"
           checked={showOther}
           onChange={(e) => onShowOtherChange(e.target.checked)}
-          className="accent-green-700"
+          className=""
         />
         Other / not applicable
       </label>
@@ -215,7 +223,7 @@ function OtherToggle({
           value={otherValue}
           onChange={(e) => onOtherChange(e.target.value)}
           placeholder="Please specify..."
-          className="mt-2 w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-700"
+          className="mt-2 w-full"
         />
       )}
     </div>
@@ -262,7 +270,7 @@ function PredictorsQuestion({ entry, predictorsValue = [], onPredictorsChange = 
               value={predictor.name}
               onChange={(e) => updateEntry(index, 'name', e.target.value)}
               placeholder="e.g. Elevation"
-              className="w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-700"
+              className="w-full"
             />
           </div>
           <div className="flex gap-2 items-end">
@@ -276,7 +284,7 @@ function PredictorsQuestion({ entry, predictorsValue = [], onPredictorsChange = 
                 min={0}
                 onChange={(e) => updateEntry(index, 'resolution', e.target.value)}
                 placeholder="e.g. 90"
-                className="w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-700"
+                className="w-full"
               />
             </div>
             <div>
@@ -286,7 +294,7 @@ function PredictorsQuestion({ entry, predictorsValue = [], onPredictorsChange = 
               <select
                 value={predictor.units}
                 onChange={(e) => updateEntry(index, 'units', e.target.value as PredictorEntry['units'])}
-                className="border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-700 bg-white"
+                className=""
               >
                 <option value="km">km</option>
                 <option value="m">m</option>
@@ -304,7 +312,7 @@ function PredictorsQuestion({ entry, predictorsValue = [], onPredictorsChange = 
                 value={predictor.otherUnit}
                 onChange={(e) => updateEntry(index, 'otherUnit', e.target.value)}
                 placeholder="Please specify..."
-                className="w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-700"
+                className="w-full"
               />
             </div>
           )}
@@ -371,6 +379,14 @@ export default function SurveyPage() {
   const [submitState, setSubmitState] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [submitError, setSubmitError] = useState<string | null>(null);
 
+  // Which page of the form is showing: 1 = study metadata, 2 = methodological standards
+  const [page, setPage] = useState<1 | 2>(1);
+
+  // Methodological standards checklist answers (separate feature — see constants/methodologicalStandards.ts)
+  const [standardsAnswers, setStandardsAnswers] = useState<Record<string, ChecklistAnswer | undefined>>({});
+  const setStandardsAnswer = (qid: string, value: ChecklistAnswer) =>
+    setStandardsAnswers((p) => ({ ...p, [qid]: value }));
+
   // ── Fetch dictionary from S3 ───────────────────────────────────────────────
 
   useEffect(() => {
@@ -418,6 +434,7 @@ export default function SurveyPage() {
 
   const buildPayload = (): Record<string, string> => {
     const payload: Record<string, string> = {
+      form_version:    SURVEY_FORM_VERSION,
       submitted_at:    new Date().toISOString(),
       submitter_name:  submitterName.trim(),
       submitter_email: submitterEmail.trim(),
@@ -457,12 +474,20 @@ export default function SurveyPage() {
       }
     }
 
+    // Methodological standards answers — a separate feature from the study
+    // metadata dictionary above. The calculated Gold/Silver/Bronze score is
+    // intentionally NOT stored here, only the raw answers (it can be
+    // recalculated downstream if the scoring rules change).
+    for (const qid of visibleQuestionIds(standardsAnswers)) {
+      payload[`${STANDARDS_KEY_PREFIX}${qid}`] = standardsAnswers[qid] ?? '';
+    }
+
     return payload;
   };
 
   // ── Validation ────────────────────────────────────────────────────────────
 
-  const canSubmit = useMemo(() => {
+  const canSubmitPage1 = useMemo(() => {
     if (!consent) return false;
     if (!submitterName.trim() || !submitterEmail.trim() || !pubLink.trim() || !downloadUrl.trim()) return false;
     if (dictLoading || !!dictError) return false;
@@ -492,11 +517,16 @@ export default function SurveyPage() {
     return true;
   }, [consent, submitterName, submitterEmail, pubLink, downloadUrl, dictionary, dynamicValues, otherValues, showOther, multiValues, predictors, dictLoading, dictError]);
 
+  const canSubmitPage2 = useMemo(() => {
+    const visible = visibleQuestionIds(standardsAnswers);
+    return visible.length > 0 && visible.every((qid) => !!standardsAnswers[qid]);
+  }, [standardsAnswers]);
+
   // ── Submit ────────────────────────────────────────────────────────────────
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!canSubmit) return;
+    if (!canSubmitPage1 || !canSubmitPage2) return;
 
     if (!SURVEY_API_URL) {
       setSubmitError('Submission endpoint is not configured. Please contact the WildMaps team directly.');
@@ -528,10 +558,10 @@ export default function SurveyPage() {
 
   if (submitState === 'success') {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
-        <div className="bg-white rounded-xl shadow p-10 max-w-lg text-center">
+      <div className="wm-survey min-h-screen flex items-center justify-center p-6">
+        <div className="wm-panel p-10 max-w-lg text-center">
           <div className="text-5xl mb-4">✓</div>
-          <h2 className="text-2xl font-bold text-green-800 mb-3">Submission received</h2>
+          <h2 className="text-2xl font-bold mb-3" style={{ color: 'var(--teal-dark)' }}>Submission received</h2>
           <p className="text-gray-600">
             Thank you for submitting your data. We will process it and contact you at{' '}
             <strong>{submitterEmail}</strong> when it has been added to the WildMaps catalog.
@@ -542,10 +572,21 @@ export default function SurveyPage() {
     );
   }
 
+  const goToPage2 = () => {
+    if (!canSubmitPage1) return;
+    setPage(2);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const goToPage1 = () => {
+    setPage(1);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 pb-16">
+    <div className="wm-survey pb-16">
       {/* Header */}
-      <div className="bg-green-900 text-white px-6 py-5">
+      <div className="wm-header px-6 py-5">
         <div className="max-w-2xl mx-auto flex items-center gap-4">
           <img src={LOGO_URL} alt="WildMaps logo" className="h-8 opacity-90" />
           <h1 className="text-xl font-bold tracking-tight">Submit data to WildMAPS catalog</h1>
@@ -553,161 +594,203 @@ export default function SurveyPage() {
       </div>
 
       <div className="max-w-2xl mx-auto px-4 py-8">
-        {/* Preamble */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-          <p className="text-gray-700 leading-relaxed">
-            Use this form to submit your SDM data so it can appear on the WildMAPS catalog.
-            You will need a publication URL, and a data download URL with the raster files.
-            We will process the data and inform you when it has been added to the website.
-          </p>
+        {/* Step indicator — these are two distinct features appended to one form */}
+        <div className="wm-stepper">
+          <span className={`step ${page === 1 ? 'active' : 'done'}`}>1. Study metadata</span>
+          <span className="sep">→</span>
+          <span className={`step ${page === 2 ? 'active' : ''}`}>2. Methodological standards</span>
         </div>
 
-        {/* Form */}
         <form onSubmit={handleSubmit} noValidate>
 
-          {/* ── Fixed opening questions ────────────────────────────────────── */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6 space-y-5">
-            {/* Consent */}
-            <label className="flex items-start gap-3 cursor-pointer">
-              <input
-                type="checkbox"
-                required
-                checked={consent}
-                onChange={(e) => setConsent(e.target.checked)}
-                className="mt-0.5 w-4 h-4 accent-green-700 flex-shrink-0"
-              />
-              <span className="text-sm font-medium text-gray-800">
-                I confirm that all authors of the study are happy for the study data to be displayed on WildMAPS.
-              </span>
-            </label>
+          {/* ══════════════════════════ PAGE 1: Study metadata ══════════════════════════ */}
+          {page === 1 && (
+            <>
+              <div className="wm-intro p-5 mb-6">
+                <strong>Study metadata.</strong> Use this section to tell us about your study. You will need a
+                publication URL, and a data download URL with the raster files. We will process the data and
+                inform you when it has been added to the website.
+              </div>
 
-            {/* Your name */}
-            <div>
-              <label htmlFor="submitter_name" className="block text-sm font-medium text-gray-800 mb-1">
-                Your name
-              </label>
-              <p className="text-xs text-gray-500 mb-1.5">Please provide your name.</p>
-              <input
-                id="submitter_name"
-                type="text"
-                required
-                value={submitterName}
-                onChange={(e) => setSubmitterName(e.target.value)}
-                className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-700"
-              />
-            </div>
+              {/* ── Fixed opening questions ────────────────────────────────────── */}
+              <div className="wm-panel p-6 mb-6 space-y-5">
+                {/* Consent */}
+                <label className="flex items-start gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    required
+                    checked={consent}
+                    onChange={(e) => setConsent(e.target.checked)}
+                    className="mt-0.5 w-4 h-4 flex-shrink-0"
+                  />
+                  <span className="text-sm font-medium text-gray-800">
+                    I confirm that all authors of the study are happy for the study data to be displayed on WildMAPS.
+                  </span>
+                </label>
 
-            {/* Email */}
-            <div>
-              <label htmlFor="submitter_email" className="block text-sm font-medium text-gray-800 mb-1">
-                Your email
-              </label>
-              <p className="text-xs text-gray-500 mb-1.5">
-                Please give the email you'd like us to contact you with. This information will not be shared beyond the WildMAPS team.
-              </p>
-              <input
-                id="submitter_email"
-                type="email"
-                required
-                value={submitterEmail}
-                onChange={(e) => setSubmitterEmail(e.target.value)}
-                className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-700"
-              />
-            </div>
+                {/* Your name */}
+                <div>
+                  <label htmlFor="submitter_name" className="wm-field-label">
+                    Your name
+                  </label>
+                  <p className="wm-field-note">Please provide your name.</p>
+                  <input
+                    id="submitter_name"
+                    type="text"
+                    required
+                    value={submitterName}
+                    onChange={(e) => setSubmitterName(e.target.value)}
+                    className="w-full"
+                  />
+                </div>
 
-            {/* Publication link */}
-            <div>
-              <label htmlFor="publication_link" className="block text-sm font-medium text-gray-800 mb-1">
-                Publication link
-              </label>
-              <p className="text-xs text-gray-500 mb-1.5">Please provide a URL for the study, preferably the DOI.</p>
-              <input
-                id="publication_link"
-                type="url"
-                required
-                value={pubLink}
-                onChange={(e) => setPubLink(e.target.value)}
-                placeholder="https://doi.org/..."
-                className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-700"
-              />
-            </div>
+                {/* Email */}
+                <div>
+                  <label htmlFor="submitter_email" className="wm-field-label">
+                    Your email
+                  </label>
+                  <p className="wm-field-note">
+                    Please give the email you'd like us to contact you with. This information will not be shared beyond the WildMAPS team.
+                  </p>
+                  <input
+                    id="submitter_email"
+                    type="email"
+                    required
+                    value={submitterEmail}
+                    onChange={(e) => setSubmitterEmail(e.target.value)}
+                    className="w-full"
+                  />
+                </div>
 
-            {/* Data download URL */}
-            <div>
-              <label htmlFor="data_download_url" className="block text-sm font-medium text-gray-800 mb-1">
-                Data download URL
-              </label>
-              <p className="text-xs text-gray-500 mb-1.5">
-                Please give a link where we can download the raster files, with suitable access permissions.
-              </p>
-              <input
-                id="data_download_url"
-                type="url"
-                required
-                value={downloadUrl}
-                onChange={(e) => setDownloadUrl(e.target.value)}
-                placeholder="https://..."
-                className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-700"
-              />
-            </div>
-          </div>
+                {/* Publication link */}
+                <div>
+                  <label htmlFor="publication_link" className="wm-field-label">
+                    Publication link
+                  </label>
+                  <p className="wm-field-note">Please provide a URL for the study, preferably the DOI.</p>
+                  <input
+                    id="publication_link"
+                    type="url"
+                    required
+                    value={pubLink}
+                    onChange={(e) => setPubLink(e.target.value)}
+                    placeholder="https://doi.org/..."
+                    className="w-full"
+                  />
+                </div>
 
-          {/* ── Dynamic sections from dictionary ──────────────────────────── */}
-          {dictLoading && (
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 text-center text-sm text-gray-500">
-              Loading survey questions…
-            </div>
-          )}
-          {dictError && (
-            <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-sm text-red-700">
-              {dictError}
-            </div>
-          )}
-          {!dictLoading && !dictError && sections.map(([sectionName, entries]) => (
-            <div key={sectionName} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-4">
-              <h2 className="text-base font-semibold text-green-900 mb-1 pb-2 border-b border-gray-100">
-                {sectionName}
-              </h2>
-              {entries.map((entry) => (
-                <QuestionBlock
-                  key={entry.metadata_key}
-                  entry={entry}
-                  value={dynamicValues[entry.metadata_key] ?? ''}
-                  otherValue={otherValues[entry.metadata_key] ?? ''}
-                  showOther={showOther[entry.metadata_key] ?? false}
-                  onChange={setDynamic(entry.metadata_key)}
-                  onOtherChange={setOther(entry.metadata_key)}
-                  onShowOtherChange={setShowOtherKey(entry.metadata_key)}
-                  multiValue={multiValues[entry.metadata_key] ?? []}
-                  onMultiChange={setMulti(entry.metadata_key)}
-                  predictorsValue={entry.form_type === 'predictors' ? predictors : undefined}
-                  onPredictorsChange={entry.form_type === 'predictors' ? setPredictors : undefined}
-                />
+                {/* Data download URL */}
+                <div>
+                  <label htmlFor="data_download_url" className="wm-field-label">
+                    Data download URL
+                  </label>
+                  <p className="wm-field-note">
+                    Please give a link where we can download the raster files, with suitable access permissions.
+                  </p>
+                  <input
+                    id="data_download_url"
+                    type="url"
+                    required
+                    value={downloadUrl}
+                    onChange={(e) => setDownloadUrl(e.target.value)}
+                    placeholder="https://..."
+                    className="w-full"
+                  />
+                </div>
+              </div>
+
+              {/* ── Dynamic sections from dictionary ──────────────────────────── */}
+              {dictLoading && (
+                <div className="wm-panel p-6 text-center text-sm text-gray-500">
+                  Loading survey questions…
+                </div>
+              )}
+              {dictError && (
+                <div className="wm-panel p-6 text-sm bg-red-50 border-red-200" style={{ color: 'var(--rust)' }}>
+                  {dictError}
+                </div>
+              )}
+              {!dictLoading && !dictError && sections.map(([sectionName, entries]) => (
+                <div key={sectionName} className="wm-panel p-6 mb-4">
+                  <div className="wm-section-head">
+                    <h2 className="text-base">{sectionName}</h2>
+                  </div>
+                  {entries.map((entry) => (
+                    <QuestionBlock
+                      key={entry.metadata_key}
+                      entry={entry}
+                      value={dynamicValues[entry.metadata_key] ?? ''}
+                      otherValue={otherValues[entry.metadata_key] ?? ''}
+                      showOther={showOther[entry.metadata_key] ?? false}
+                      onChange={setDynamic(entry.metadata_key)}
+                      onOtherChange={setOther(entry.metadata_key)}
+                      onShowOtherChange={setShowOtherKey(entry.metadata_key)}
+                      multiValue={multiValues[entry.metadata_key] ?? []}
+                      onMultiChange={setMulti(entry.metadata_key)}
+                      predictorsValue={entry.form_type === 'predictors' ? predictors : undefined}
+                      onPredictorsChange={entry.form_type === 'predictors' ? setPredictors : undefined}
+                    />
+                  ))}
+                </div>
               ))}
-            </div>
-          ))}
 
-          {/* ── Submit ────────────────────────────────────────────────────── */}
-          {!dictLoading && !dictError && (
-            <div className="mt-6">
+              {!dictLoading && !dictError && (
+                <div className="mt-6">
+                  <button
+                    type="button"
+                    className="wm-btn wm-btn-primary w-full"
+                    disabled={!canSubmitPage1}
+                    onClick={goToPage2}
+                  >
+                    Proceed to next section
+                  </button>
+                  {!canSubmitPage1 && (
+                    <p className="mt-2 text-center text-xs text-gray-400">
+                      Please answer all questions before proceeding.
+                    </p>
+                  )}
+                </div>
+              )}
+            </>
+          )}
+
+          {/* ══════════════════════ PAGE 2: Methodological standards ══════════════════════ */}
+          {page === 2 && (
+            <>
+              <div className="wm-intro p-5 mb-6">
+                <strong>Methodological standards.</strong> This is a separate checklist from the study metadata
+                above — it estimates a Gold/Silver/Bronze quality rating for your model. Every "Yes" earns a
+                mark; where an "N/A" option is offered, choosing it removes that question from its section's
+                total. Answer every question, then use "Calculate score" to see your rating before submitting.
+              </div>
+
+              <div className="wm-panel p-6">
+                <MethodStandardsSection answers={standardsAnswers} onAnswer={setStandardsAnswer} />
+              </div>
+
+              <div className="wm-actions mt-8 flex items-center gap-3 flex-wrap">
+                <button type="button" className="wm-btn wm-btn-secondary" onClick={goToPage1}>
+                  Back
+                </button>
+                <button
+                  type="submit"
+                  disabled={!canSubmitPage1 || !canSubmitPage2 || submitState === 'submitting'}
+                  className="wm-btn wm-btn-primary flex-1"
+                >
+                  {submitState === 'submitting' ? 'Submitting…' : 'Submit'}
+                </button>
+              </div>
               {submitState === 'error' && submitError && (
-                <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+                <div className="mt-4 p-4 rounded-lg text-sm bg-red-50 border-red-200" style={{ color: 'var(--rust)', border: '1px solid var(--rust)' }}>
                   {submitError}
                 </div>
               )}
-              <button
-                type="submit"
-                disabled={!canSubmit || submitState === 'submitting'}
-                className="w-full py-3 bg-green-800 hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-colors text-sm"
-              >
-                {submitState === 'submitting' ? 'Submitting…' : 'Submit'}
-              </button>
-              {!canSubmit && (
-                <p className="mt-2 text-center text-xs text-gray-400">
-                  Please answer all questions before submitting.
+              {!canSubmitPage2 && (
+                <p className="mt-2 text-xs text-gray-400">
+                  Please answer all methodological standards questions before submitting.
                 </p>
               )}
-            </div>
+            </>
           )}
         </form>
       </div>
