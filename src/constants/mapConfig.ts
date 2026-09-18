@@ -32,3 +32,13 @@ export const TILE_DATA_ROOT: string = `${TILE_BUCKET_URL}${testingPrefix}`;
 
 /** Path prefix for MapLibre GL style JSON files. */
 export const PATH_STYLES = `${DATA_ROOT}/data_inputs/styles`;
+
+/**
+ * Base URL for the approved-submission-metadata bucket: one public JSON file
+ * per dataset (named `{file_label}.json`), holding the reviewed answers from
+ * the data-submission form. Separate bucket from BUCKET_URL, with no
+ * test/production prefix split.
+ */
+export const APPROVED_METADATA_ROOT: string =
+  import.meta.env.VITE_APPROVED_METADATA_BUCKET_URL ??
+  'https://wildcru-wildmaps-approved-775525057974-eu-west-2-an.s3.eu-west-2.amazonaws.com';

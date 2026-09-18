@@ -42,8 +42,8 @@ src/
     AppContext.tsx      # Global state: all S3 data loaded here on startup
 
   constants/
-    mapConfig.ts        # BUCKET_URL, DATA_ROOT, TILE_DATA_ROOT, PATH_STYLES — S3 path constants
-    methodologicalStandards.ts  # Hardcoded checklist data model + Gold/Silver/Bronze scoring for SurveyPage's second section
+    mapConfig.ts        # BUCKET_URL, DATA_ROOT, TILE_DATA_ROOT, PATH_STYLES, APPROVED_METADATA_ROOT — S3 path constants
+    methodologicalStandards.ts  # Hardcoded checklist data model + Gold/Silver/Bronze scoring, reused by both SurveyPage and the approved-metadata display
 
   hooks/
     useMap.ts                      # Core MapLibre hook: init, layer management, projection switching
@@ -75,7 +75,9 @@ src/
     BasemapControls/    # Right-sidebar UI + config.ts for basemap/overlay options
     GeneralSelectComponent.tsx  # Reusable card-list selector used by most pages
     BarChart.tsx        # D3 stacked bar charts
-    StudyDesignSection.tsx  # Collapsible study design section on FinalScreen
+    StudyDesignSection.tsx  # Collapsible "Study design and metadata" section on FinalScreen — reads approvedMetadata
+    MethodStandardScoreSection.tsx  # Collapsible "Methodological standard score" section on FinalScreen — full breakdown for the selected dataset
+    MethodStandardMedal.tsx  # Gold/Silver/Bronze medal (or ○ for unknown) — used on SelectDataset and MethodStandardScoreSection
     MethodStandardsSection.tsx  # SurveyPage's second-page checklist UI (calculate-score widget + results tile)
     *Legend.tsx / *ColorBar.tsx  # Map legend components
 
@@ -122,7 +124,7 @@ The map switches between **globe** projection (zoom < 4) and **Mercator** (zoom 
 BUCKET_URL = https://wildcru-wildmaps.s3.eu-west-2.amazonaws.com
 
 data_inputs/dictionaries/   — CSV lookups (species, superspecies, regions, subregions, study metadata fields)
-data_inputs/catalogs/       — CSV catalogs (study_metadata_catalog.csv keyed by dataset_id)
+data_inputs/catalogs/       — CSV catalogs
 data_inputs/styles/         — MapLibre style JSON files
 data_inputs/colour_ramps/   — Land use colour scheme CSV
 data_inputs/website_assets/ — Splash video, logo
@@ -133,6 +135,8 @@ data_outputs/raster_analysis/
   results_{paddedId}_{stringId}.json                — Per-dataset detail (lazy-loaded on FinalScreen)
   raster_tiles/SDM/{folder}/{paddedId}_{stringId}_zoom_auto/{z}/{x}/{y}.png
 ```
+
+A **separate** public bucket, `wildcru-wildmaps-approved-775525057974-eu-west-2-an` (see `APPROVED_METADATA_ROOT` in `constants/mapConfig.ts`), holds one JSON file per dataset — `{file_label}.json` (e.g. `0002_burns_2025_Borneo_Asian_elephant.json`), same key structure as a `SurveyPage` submission payload. This is reviewed/approved data, produced and uploaded from the WildMaps-processing repo (see its README/CLAUDE.md), not by the live survey form.
 
 ---
 
@@ -161,7 +165,7 @@ npm run test:watch # Vitest in watch mode
 - **`GeneralSelectComponent`** accepts an optional `preHeading` prop (rendered above the `<h2>` heading). Only `SelectStartingFilter` uses it currently.
 - **`study_metadata_dictionary.csv`** has three additional columns beyond the original three: `form_type` (`string|integer|choices|ratio|predictors`), `choices` (comma-separated option list), and `form_prompt` (optional question sub-text). `StudyMetadataDictionaryEntry` in `types/index.ts` reflects this. The `predictors` type renders a structured repeating entry (name, resolution, units) instead of a free-text area.
 - **Deployment** reads `VITE_USE_TESTING_PREFIX` from `.env.production.local` at the repo root — Vite gives this file highest priority for production builds, overriding whatever `.env.local` sets for local dev. It is currently `true` (**not** `false`), so `demo.hkuril.com/wildmaps` reads from the S3 `test/` prefix rather than root. This is a deliberate workaround, not the historical default — see the "S3 `test/` vs. root split" note below before changing it. The deploy script uses `--no-perms` + a trailing `ssh chmod 755` because macOS rsync copies local directory permissions (700) to the server otherwise, causing 403 errors.
-- **S3 `test/` vs. root split**: the bucket keeps parallel copies of `data_inputs/` and `data_outputs/` at root and under `test/`; `VITE_USE_TESTING_PREFIX` selects which. As of the last sync they diverge: root's `data_outputs/raster_analysis/` files use an older naming scheme (`results_{string_id}.json`, no numeric `dataset_id`) that `useDetailedData.ts` no longer matches (it requests `results_{paddedId}_{dataset.string_id}.json`, giving a 403 "Forbidden" against root); `study_metadata_catalog.csv` exists only under `test/data_inputs/catalogs/`, not at root, at all. Root is **frozen**: another live deployment elsewhere reads it directly, so it can't be resynced without coordinating separately. `test/data_inputs/styles/` was backfilled with the 6 style files (`esri_world_imagery`, `mapzen_elevation_and_hillshade`, `worldpop`, `landcover`, `ecoregions`, `wdpa`) that only existed at root, copied (not moved) so nothing at root was touched.
+- **S3 `test/` vs. root split**: the bucket keeps parallel copies of `data_inputs/` and `data_outputs/` at root and under `test/`; `VITE_USE_TESTING_PREFIX` selects which. As of the last sync they diverge: root's `data_outputs/raster_analysis/` files use an older naming scheme (`results_{string_id}.json`, no numeric `dataset_id`) that `useDetailedData.ts` no longer matches (it requests `results_{paddedId}_{dataset.string_id}.json`, giving a 403 "Forbidden" against root). Root is **frozen**: another live deployment elsewhere reads it directly, so it can't be resynced without coordinating separately. `test/data_inputs/styles/` was backfilled with the 6 style files (`esri_world_imagery`, `mapzen_elevation_and_hillshade`, `worldpop`, `landcover`, `ecoregions`, `wdpa`) that only existed at root, copied (not moved) so nothing at root was touched. (The now-unused `study_metadata_catalog.csv`, which used to be listed here as `test/`-only, has been deleted from S3 entirely — see "Approved metadata" below.)
 - **Deploy path** is `~/public_html/demo/wildmaps/` on Bluehost, so the app is served at `demo.hkuril.com/wildmaps`. The Vite `base` is `/wildmaps/` (in `vite.config.ts`) and `<Router basename={import.meta.env.BASE_URL}>` in `App.tsx` keeps client-side routes scoped to that prefix. The SPA-fallback `.htaccess` lives at `~/public_html/demo/wildmaps/.htaccess` on the server (excluded from rsync). `demo.hkuril.com/` itself serves a separate static `index.html` linking to `/wildmaps/` — uploaded manually, not part of the build.
 - **Two selection orderings** are supported: Region-first and Superspecies-first. `navigationUtils.ts` encodes both route sequences.
 - **`SelectAdm0` and `SelectAdm1`** exist as pages but are not wired into the navigation workflow — ADM selection happens inside `FinalScreen` instead.
@@ -169,5 +173,6 @@ npm run test:watch # Vitest in watch mode
 - **`AdmData` typing**: `AppContext` initialises `admData` as `{}` before the S3 fetch completes. Hooks that use it should cast with `admData as AdmData` after checking for key presence, since the context types it as `AdmData | Record<string, never>`.
 - **`useMap.ts`** uses imperative MapLibre DOM manipulation — avoid adding fast-changing props that would trigger frequent re-initialisations. The `projection` option is passed as `any` because MapLibre 5.6 supports it at runtime but the TS definitions don't yet include it.
 - **`BarChart.tsx`** uses imperative D3 DOM manipulation inside a `useEffect` — take care when re-rendering.
-- **`study_metadata_catalog.csv`** is keyed by `dataset_id` (string). `AppContext` converts it to `StudyMetadataCatalog`: a nested record `{ [dataset_id]: { [metadata_key]: string } }`. `StudyDesignSection` looks up the current `datasetKey` in this catalog.
+- **Approved metadata** (`AppContext.approvedMetadata` / `ensureApprovedMetadata`): replaces the old `study_metadata_catalog.csv` mechanism entirely. Lazy-fetched per dataset (keyed by the same `dataset_id` key used in `data`, not by `file_label` — the fetch itself resolves `file_label` internally) from the approved-metadata bucket, on first call from `StudyDesignSection`, `MethodStandardScoreSection`, or `SelectDataset` (which fetches for every dataset in the currently filtered list, to show a medal per row). Each entry has a `status` (`loading` | `loaded` | `missing` | `error`) plus the raw `payload` once loaded; `missing` (404/403) and `error` (anything else) get distinct user-facing messages. Fetches are deduped via a ref-backed set in `AppContext`, not the state itself, so concurrent callers for the same key don't double-fetch.
+- **Gold/Silver/Bronze reuse**: `methodologicalStandards.ts` exports `answersFromPayload` / `calculateChecklistResultFromPayload`, which extract `standards.*`-prefixed answers from any submission-shaped payload (live form state or a fetched approved-metadata JSON) and run the same scoring logic `SurveyPage` uses live. Returns `null` when a payload has no usable checklist answers at all — callers (`MethodStandardMedal`, `MethodStandardScoreSection`) treat that as "unknown" (empty circle), not Bronze.
 - All S3 assets are public; there is no auth layer.

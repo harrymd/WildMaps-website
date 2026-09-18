@@ -218,5 +218,36 @@ export function calculateChecklistResult(answers: Record<string, ChecklistAnswer
  * them clearly distinct from the study-metadata-dictionary-driven fields. */
 export const STANDARDS_KEY_PREFIX = 'standards.';
 
+/**
+ * Extracts checklist answers from a submission-shaped payload (keys prefixed
+ * with STANDARDS_KEY_PREFIX, e.g. from an approved-metadata JSON file) back
+ * into the bare-qid answers record calculateChecklistResult expects.
+ */
+export function answersFromPayload(
+  payload: Record<string, string> | undefined
+): Record<string, ChecklistAnswer | undefined> {
+  const answers: Record<string, ChecklistAnswer | undefined> = {};
+  if (!payload) return answers;
+  for (const qid of ALL_QUESTION_IDS) {
+    const value = payload[`${STANDARDS_KEY_PREFIX}${qid}`];
+    if (value === 'yes' || value === 'no' || value === 'na') answers[qid] = value;
+  }
+  return answers;
+}
+
+/**
+ * Calculates the Gold/Silver/Bronze result from a submission-shaped payload,
+ * or null if it contains no usable checklist answers at all (metadata not
+ * uploaded, or nothing yet answered) — callers should treat null as "unknown".
+ */
+export function calculateChecklistResultFromPayload(
+  payload: Record<string, string> | undefined
+): ChecklistResult | null {
+  const answers = answersFromPayload(payload);
+  const hasAnyAnswer = Object.values(answers).some((v) => v !== undefined);
+  if (!hasAnyAnswer) return null;
+  return calculateChecklistResult(answers);
+}
+
 /** Current version of the submission form. Bump when the question set changes. */
 export const SURVEY_FORM_VERSION = '2.0';

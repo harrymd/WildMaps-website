@@ -9,6 +9,7 @@ import { processChartData } from '../utils/chartDataUtils';
 import FinalSummary from '../components/FinalSummary';
 import FinalDatasetInfo from '../components/FinalDatasetInfo';
 import StudyDesignSection from '../components/StudyDesignSection';
+import MethodStandardScoreSection from '../components/MethodStandardScoreSection';
 import LocationSelector from '../components/LocationSelector';
 import NavigationButtons from '../components/NavigationButtons';
 import DataRangeInfo from '../components/DataRangeInfo';
@@ -163,6 +164,8 @@ const FinalScreen = () => {
         <FinalDatasetInfo />
 
         <StudyDesignSection />
+
+        <MethodStandardScoreSection />
       </div>
 
       <NavigationButtons onPrevious={handlePrevious} onReset={handleReset} />

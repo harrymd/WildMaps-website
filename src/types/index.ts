@@ -188,8 +188,9 @@ export interface AppContextValue {
   setLandUseColorSchemeData: React.Dispatch<React.SetStateAction<Record<string, LandUseColorEntry>>>;
   studyMetadataDictionary: StudyMetadataDictionaryEntry[];
   setStudyMetadataDictionary: React.Dispatch<React.SetStateAction<StudyMetadataDictionaryEntry[]>>;
-  studyMetadataCatalog: StudyMetadataCatalog;
-  setStudyMetadataCatalog: React.Dispatch<React.SetStateAction<StudyMetadataCatalog>>;
+  approvedMetadata: ApprovedMetadataMap;
+  /** Fetches the approved-metadata JSON for a dataset, if not already fetched/in-flight. */
+  ensureApprovedMetadata: (datasetKey: string, dataset: Dataset | undefined) => void;
 }
 
 // ─── Study metadata types ──────────────────────────────────────────────────────
@@ -208,10 +209,23 @@ export interface StudyMetadataDictionaryEntry {
 }
 
 /**
- * Parsed study_metadata_catalog.csv.
- * Outer key: dataset_id (string). Inner key: metadata_key. Value: raw string from CSV.
+ * Reviewed answers for one dataset's data-submission form, as approved and
+ * published to the approved-metadata bucket. Same key structure as the
+ * submission payload built by SurveyPage.tsx::buildPayload — dictionary
+ * metadata_key fields, fixed submitter fields, and `standards.`-prefixed
+ * methodological-standards checklist answers.
  */
-export type StudyMetadataCatalog = Record<string, Record<string, string>>;
+export type ApprovedSubmissionPayload = Record<string, string>;
+
+export type ApprovedMetadataStatus = 'loading' | 'loaded' | 'missing' | 'error';
+
+export interface ApprovedMetadataEntry {
+  status: ApprovedMetadataStatus;
+  payload?: ApprovedSubmissionPayload;
+}
+
+/** Keyed by the same dataset key used in DatasetMap (i.e. dataset_id). */
+export type ApprovedMetadataMap = Record<string, ApprovedMetadataEntry>;
 
 // ─── Navigation types ──────────────────────────────────────────────────────────
 

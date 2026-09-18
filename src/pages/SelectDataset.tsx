@@ -1,16 +1,45 @@
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import GeneralSelectComponent from '../components/GeneralSelectComponent';
+import MethodStandardMedal from '../components/MethodStandardMedal';
 import { useFilterState } from '../hooks/useFilterState';
 import { useAppContext } from '../context/AppContext';
+import { calculateChecklistResultFromPayload } from '../constants/methodologicalStandards';
 import type { DatasetMap } from '../types';
 
 /** Dataset selection — filters by all previously-chosen criteria, then navigates to FinalScreen. */
 const SelectDataset = () => {
-  const { setParamAndNavigate } = useFilterState();
-  const { speciesData } = useAppContext();
+  const { setParamAndNavigate, getAllParams } = useFilterState();
+  const { data, speciesData, approvedMetadata, ensureApprovedMetadata } = useAppContext();
   const navigate = useNavigate();
 
   void setParamAndNavigate; // used via GeneralSelectComponent internally
+
+  // Fetch approved metadata for every dataset currently visible in this filtered list,
+  // so a medal can be shown for each row without waiting for FinalScreen.
+  useEffect(() => {
+    const allParams = getAllParams();
+    let filtered = data;
+    if (allParams.superspecies) {
+      filtered = Object.fromEntries(
+        Object.entries(filtered).filter(([, entry]) => entry.superspecies === allParams.superspecies)
+      );
+    }
+    if (allParams.region) {
+      filtered = Object.fromEntries(
+        Object.entries(filtered).filter(([, entry]) => entry.regions?.includes(allParams.region))
+      );
+    }
+    if (allParams.subregion) {
+      filtered = Object.fromEntries(
+        Object.entries(filtered).filter(([, entry]) => entry.subregions?.includes(allParams.subregion))
+      );
+    }
+    for (const [key, entry] of Object.entries(filtered)) {
+      ensureApprovedMetadata(key, entry);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data]);
 
   const getDatasetOptions = (allParams: Record<string, string>, data: DatasetMap) => {
     let filtered = data;
@@ -48,9 +77,11 @@ const SelectDataset = () => {
         capitalized
       );
 
+      const tier = calculateChecklistResultFromPayload(approvedMetadata[key]?.payload)?.tier ?? null;
+
       return {
         value: key,
-        cells: [speciesDisplay, entry.source_text ?? 'No source'],
+        cells: [speciesDisplay, entry.source_text ?? 'No source', <MethodStandardMedal tier={tier} />],
       };
     });
   };
@@ -72,7 +103,7 @@ const SelectDataset = () => {
       title="Dataset"
       description="Click on a row to select a study (it will show on the map):"
       getOptions={getDatasetOptions}
-      tableHeaders={['Species', 'Source']}
+      tableHeaders={['Species', 'Source', 'Standard']}
       customNextHandler={handleDatasetNext}
     />
   );

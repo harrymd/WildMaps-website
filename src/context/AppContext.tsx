@@ -1,8 +1,9 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import Papa from 'papaparse';
-import { DATA_ROOT } from '../constants/mapConfig';
+import { DATA_ROOT, APPROVED_METADATA_ROOT } from '../constants/mapConfig';
 import type {
   AppContextValue,
+  Dataset,
   DatasetMap,
   SpeciesInfo,
   SuperSpeciesInfo,
@@ -11,7 +12,7 @@ import type {
   LandUseColorEntry,
   AdmData,
   StudyMetadataDictionaryEntry,
-  StudyMetadataCatalog,
+  ApprovedMetadataMap,
 } from '../types';
 
 const AppContext = createContext<AppContextValue | null>(null);
@@ -27,7 +28,6 @@ const PATH_DATA_OUTPUTS = `${DATA_ROOT}/data_outputs`;
 const PATH_RESULTS = `${PATH_DATA_OUTPUTS}/raster_analysis`;
 const PATH_DATA_INPUTS = `${DATA_ROOT}/data_inputs`;
 const PATH_DICTS = `${PATH_DATA_INPUTS}/dictionaries`;
-const PATH_CATALOGS = `${PATH_DATA_INPUTS}/catalogs`;
 
 export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const [data, setData] = useState<DatasetMap>({});
@@ -38,7 +38,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const [subregionData, setSubregionData] = useState<Record<string, SubregionInfo>>({});
   const [landUseColorSchemeData, setLandUseColorSchemeData] = useState<Record<string, LandUseColorEntry>>({});
   const [studyMetadataDictionary, setStudyMetadataDictionary] = useState<StudyMetadataDictionaryEntry[]>([]);
-  const [studyMetadataCatalog, setStudyMetadataCatalog] = useState<StudyMetadataCatalog>({});
+  const [approvedMetadata, setApprovedMetadata] = useState<ApprovedMetadataMap>({});
 
   // ── Administrative boundary data ─────────────────────────────────────────
 
@@ -257,33 +257,35 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
       .catch((err) => console.error('Error loading study metadata dictionary CSV:', err));
   }, []);
 
-  // ── Study metadata catalog ────────────────────────────────────────────────
+  // ── Approved-submission metadata (per-dataset, lazy-loaded) ───────────────
 
-  useEffect(() => {
-    fetch(`${PATH_CATALOGS}/study_metadata_catalog.csv`)
-      .then((res) => res.text())
-      .then((csvText) => {
-        Papa.parse<Record<string, string>>(csvText, {
-          header: true,
-          skipEmptyLines: true,
-          complete: (results) => {
-            const catalog: StudyMetadataCatalog = {};
-            for (const row of results.data) {
-              const id = String(row['dataset_id'] ?? '').trim();
-              if (id) {
-                const entry: Record<string, string> = {};
-                for (const [k, v] of Object.entries(row)) {
-                  if (k !== 'dataset_id') entry[k] = String(v ?? '');
-                }
-                catalog[id] = entry;
-              }
-            }
-            setStudyMetadataCatalog(catalog);
-          },
-          error: (err: unknown) => console.error('Error parsing study metadata catalog CSV:', err),
-        });
+  const requestedApprovedMetadataKeys = useRef<Set<string>>(new Set());
+
+  const ensureApprovedMetadata = useCallback((datasetKey: string, dataset: Dataset | undefined) => {
+    if (!dataset || requestedApprovedMetadataKeys.current.has(datasetKey)) return;
+    requestedApprovedMetadataKeys.current.add(datasetKey);
+
+    setApprovedMetadata((prev) => ({ ...prev, [datasetKey]: { status: 'loading' } }));
+
+    const paddedId = dataset.dataset_id.padStart(4, '0');
+    const fileLabel = `${paddedId}_${dataset.string_id}`;
+
+    fetch(`${APPROVED_METADATA_ROOT}/${fileLabel}.json`)
+      .then((res) => {
+        if (res.status === 403 || res.status === 404) {
+          setApprovedMetadata((prev) => ({ ...prev, [datasetKey]: { status: 'missing' } }));
+          return null;
+        }
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
       })
-      .catch((err) => console.error('Error loading study metadata catalog CSV:', err));
+      .then((payload: Record<string, string> | null) => {
+        if (payload) setApprovedMetadata((prev) => ({ ...prev, [datasetKey]: { status: 'loaded', payload } }));
+      })
+      .catch((err) => {
+        console.error('Error loading approved metadata:', err);
+        setApprovedMetadata((prev) => ({ ...prev, [datasetKey]: { status: 'error' } }));
+      });
   }, []);
 
   const value: AppContextValue = {
@@ -295,7 +297,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
     subregionData, setSubregionData,
     landUseColorSchemeData, setLandUseColorSchemeData,
     studyMetadataDictionary, setStudyMetadataDictionary,
-    studyMetadataCatalog, setStudyMetadataCatalog,
+    approvedMetadata, ensureApprovedMetadata,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

@@ -52,8 +52,8 @@ src/
     AppContext.tsx      # Global state: all S3 data loaded here on startup
 
   constants/
-    mapConfig.ts       # BUCKET_URL, DATA_ROOT, TILE_DATA_ROOT, PATH_STYLES — S3 path constants
-    methodologicalStandards.ts  # Checklist data model + scoring for the survey's "Methodological standards" section
+    mapConfig.ts       # BUCKET_URL, DATA_ROOT, TILE_DATA_ROOT, PATH_STYLES, APPROVED_METADATA_ROOT — S3 path constants
+    methodologicalStandards.ts  # Checklist data model + Gold/Silver/Bronze scoring, shared by the survey form and the approved-metadata display
 
   hooks/
     useMap.ts                      # Core MapLibre hook: init, layer management, projection switching
@@ -85,6 +85,9 @@ src/
     BasemapControls/    # Right-sidebar UI + config for basemap/overlay options
     GeneralSelectComponent.tsx  # Reusable card-list selector used by most pages
     BarChart.tsx        # D3 stacked bar charts
+    StudyDesignSection.tsx  # "Study design and metadata" section on FinalScreen — reads approved-metadata bucket
+    MethodStandardScoreSection.tsx  # "Methodological standard score" section on FinalScreen — full checklist breakdown
+    MethodStandardMedal.tsx  # Gold/Silver/Bronze medal (or ○ for unknown), shown on SelectDataset and FinalScreen
     MethodStandardsSection.tsx  # Survey page 2: Gold/Silver/Bronze methodological standards checklist
     *Legend.tsx / *ColorBar.tsx  # Map legend components
 
@@ -152,6 +155,16 @@ BUCKET_URL = https://wildcru-wildmaps.s3.eu-west-2.amazonaws.com
 | `data_outputs/raster_analysis/results_{paddedId}_{stringId}.json` | JSON | Per-dataset chart data — lazy-loaded on the final screen |
 | `data_outputs/raster_analysis/raster_tiles/SDM/{folder}/{paddedId}_{stringId}_zoom_auto/{z}/{x}/{y}.png` | PNG tiles | Raster tiles for species distribution models |
 
+### Approved metadata (separate bucket)
+
+Reviewed study-design and methodological-standards answers for each dataset live in a **separate** public bucket, not under `BUCKET_URL`:
+
+```
+APPROVED_METADATA_ROOT = https://wildcru-wildmaps-approved-775525057974-eu-west-2-an.s3.eu-west-2.amazonaws.com
+```
+
+One JSON file per dataset, `{file_label}.json` (e.g. `0002_burns_2025_Borneo_Asian_elephant.json`), with the same key structure as a `/survey` submission payload. These files are produced and uploaded from the **WildMaps-processing** repo (see its README) after a submission has been manually reviewed — they are not written by the live survey form itself, which posts to the separate, private submissions bucket via the survey Lambda. Fetched lazily per dataset by `AppContext.ensureApprovedMetadata`, cached in `AppContext.approvedMetadata`.
+
 ---
 
 ## S3 `test/` vs. root split
@@ -175,3 +188,4 @@ Root is currently **frozen** — another live deployment elsewhere reads from it
 - **No Redux or Zustand** — context + URL params + hook-local state covers everything.
 - **`SelectAdm0` and `SelectAdm1`** exist as pages but ADM selection is handled inline on `FinalScreen` instead.
 - **`/survey`** is a standalone two-page submission form: page 1 collects study metadata (driven by `study_metadata_dictionary.csv`), page 2 is a fixed "Methodological standards" checklist (`constants/methodologicalStandards.ts`) that gives submitters a live Gold/Silver/Bronze quality estimate. Only the raw checklist answers are submitted (prefixed `standards.`), not the calculated score, plus a hidden `form_version` field.
+- **Approved metadata**: once a submission is reviewed, WildMaps-processing publishes a JSON file per dataset to the approved-metadata bucket (see "Approved metadata (separate bucket)" above), which the website reads back — powering the Gold/Silver/Bronze medal (or ○ for unknown) on `SelectDataset`, and the "Study design and metadata" / "Methodological standard score" sections on `FinalScreen`. `methodologicalStandards.ts`'s `calculateChecklistResultFromPayload` reuses the same scoring logic the live form uses for its "Calculate score" preview.
