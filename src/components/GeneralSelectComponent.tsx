@@ -29,8 +29,8 @@ interface GeneralSelectComponentProps {
   getOptions: (allParams: Record<string, string>, data: DatasetMap) => SelectOption[];
   /** Optional JSX to render above the option list (e.g. context breadcrumbs). */
   getContextDisplay?: ((allParams: Record<string, string>) => React.ReactNode) | null;
-  /** Column headers displayed for multi-cell options. */
-  tableHeaders?: string[];
+  /** Column headers displayed for multi-cell options. May be a string or a React element. */
+  tableHeaders?: React.ReactNode[];
   /** Called immediately when the user clicks an option (before navigation). */
   onSelect?: ((value: string) => void) | null;
   /** Override the default Back navigation. Pass null to hide the Back button. */
@@ -112,6 +112,19 @@ const GeneralSelectComponent = ({
         <h2 className="text-2xl mb-4">Select {title}</h2>
         {contextDisplay && <div className="mb-4">{contextDisplay}</div>}
         {description && <p className="mb-4 text-gray-600">{description}</p>}
+
+        {tableHeaders.length > 1 && (
+          <div
+            className="grid gap-2 px-2 mb-2"
+            style={{ gridTemplateColumns: `repeat(${tableHeaders.length}, 1fr)` }}
+          >
+            {tableHeaders.map((header, index) => (
+              <div key={index} className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                {header}
+              </div>
+            ))}
+          </div>
+        )}
 
         <div className="space-y-2 mb-4 px-2">
           {options.map((option) => {

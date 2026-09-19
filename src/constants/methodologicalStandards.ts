@@ -203,7 +203,7 @@ export function calculateChecklistResult(answers: Record<string, ChecklistAnswer
   if (answers['evaluation.0'] === 'no') {
     tier = 'bronze';
     overrideNote = 'Set to Bronze automatically because model predictions were not validated.';
-  } else if (overallPct >= 85) {
+  } else if (overallPct >= 80) {
     tier = 'gold';
   } else if (overallPct >= 60) {
     tier = 'silver';
@@ -250,4 +250,38 @@ export function calculateChecklistResultFromPayload(
 }
 
 /** Current version of the submission form. Bump when the question set changes. */
-export const SURVEY_FORM_VERSION = '2.0';
+export const SURVEY_FORM_VERSION = '2.1';
+
+/** Practitioner guidance shown alongside the Gold/Silver/Bronze score, on both the
+ * dataset-selection screen (info pop-up) and the final screen's score section. */
+export interface StandardGuidanceRow {
+  tier: ChecklistTier;
+  scoreRange: string;
+  guidance: string[];
+}
+
+export const STANDARD_GUIDANCE_ROWS: StandardGuidanceRow[] = [
+  {
+    tier: 'gold',
+    scoreRange: '80–100%',
+    guidance: [
+      'Predictions are reliable within the constraints of the existing data. More data is preferable to validate predictions before being used in practise.',
+      'Predictions are not intercomparable and should only be used after consulting with author.',
+    ],
+  },
+  {
+    tier: 'silver',
+    scoreRange: '60–79%',
+    guidance: [
+      'Predictions may not be generalisable beyond the scope and context of a specific question.',
+      'Should not be used to inform policy decisions. More data will be needed to validate predictions. Predictions between models are not intercomparable. Consult author before any use in practise.',
+    ],
+  },
+  {
+    tier: 'bronze',
+    scoreRange: 'Less than 60%',
+    guidance: [
+      'Predictions are not reliable and may change substantially if new data is used. Predictions between models are not intercomparable. Should not used for informing conservation in practise.',
+    ],
+  },
+];

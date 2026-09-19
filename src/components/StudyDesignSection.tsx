@@ -5,7 +5,6 @@ import { useAppContext } from '../context/AppContext';
 
 const FIXED_FIELDS: { key: string; label: string }[] = [
   { key: 'submitter_name', label: 'Submitted by' },
-  { key: 'submitter_email', label: 'Submitter email' },
   { key: 'publication_link', label: 'Publication' },
   { key: 'data_download_url', label: 'Data download URL' },
 ];

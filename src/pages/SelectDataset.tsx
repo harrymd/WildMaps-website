@@ -1,7 +1,9 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Info } from 'lucide-react';
 import GeneralSelectComponent from '../components/GeneralSelectComponent';
 import MethodStandardMedal from '../components/MethodStandardMedal';
+import StandardsGuidanceModal from '../components/StandardsGuidanceModal';
 import { useFilterState } from '../hooks/useFilterState';
 import { useAppContext } from '../context/AppContext';
 import { calculateChecklistResultFromPayload } from '../constants/methodologicalStandards';
@@ -12,6 +14,7 @@ const SelectDataset = () => {
   const { setParamAndNavigate, getAllParams } = useFilterState();
   const { data, speciesData, approvedMetadata, ensureApprovedMetadata } = useAppContext();
   const navigate = useNavigate();
+  const [showStandardInfo, setShowStandardInfo] = useState(false);
 
   void setParamAndNavigate; // used via GeneralSelectComponent internally
 
@@ -96,16 +99,36 @@ const SelectDataset = () => {
     navigate(`/final?${currentParams.toString()}`);
   };
 
+  const standardHeader = (
+    <span className="flex items-center gap-1">
+      Standard
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          setShowStandardInfo(true);
+        }}
+        aria-label="What do Gold/Silver/Bronze mean?"
+        className="text-gray-400 hover:text-blue-600"
+      >
+        <Info size={14} />
+      </button>
+    </span>
+  );
+
   return (
-    <GeneralSelectComponent
-      route="/dataset"
-      paramKey="datasetKey"
-      title="Dataset"
-      description="Click on a row to select a study (it will show on the map):"
-      getOptions={getDatasetOptions}
-      tableHeaders={['Species', 'Source', 'Standard']}
-      customNextHandler={handleDatasetNext}
-    />
+    <>
+      <GeneralSelectComponent
+        route="/dataset"
+        paramKey="datasetKey"
+        title="Dataset"
+        description="Click on a row to select a study (it will show on the map):"
+        getOptions={getDatasetOptions}
+        tableHeaders={['Species', 'Source', standardHeader]}
+        customNextHandler={handleDatasetNext}
+      />
+      {showStandardInfo && <StandardsGuidanceModal onClose={() => setShowStandardInfo(false)} />}
+    </>
   );
 };
 

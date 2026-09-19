@@ -4,6 +4,7 @@ import { useFilterState } from '../hooks/useFilterState';
 import { useAppContext } from '../context/AppContext';
 import { CHECKLIST_SECTIONS, calculateChecklistResultFromPayload } from '../constants/methodologicalStandards';
 import MethodStandardMedal from './MethodStandardMedal';
+import StandardsGuidanceTable from './StandardsGuidanceTable';
 
 const TIER_LABEL: Record<string, string> = { gold: 'Gold', silver: 'Silver', bronze: 'Bronze' };
 
@@ -65,6 +66,10 @@ const MethodStandardScoreSection = () => {
                 <p className="mb-3 text-gray-600 italic">{result.overrideNote}</p>
               )}
 
+              <div className="mb-4 overflow-x-auto">
+                <StandardsGuidanceTable />
+              </div>
+
               <h4 className="font-semibold text-gray-700 mb-2">Section breakdown</h4>
               <div className="space-y-2 mb-3">
                 {CHECKLIST_SECTIONS.map((section) => {
@@ -100,10 +105,6 @@ const MethodStandardScoreSection = () => {
                   })}
                 </div>
               ))}
-
-              <p className="mt-3 text-xs text-gray-400">
-                Gold — 85% and above · Silver — 60% to 84% · Bronze — below 60%, or predictions not validated.
-              </p>
             </div>
           )}
         </div>

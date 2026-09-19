@@ -89,6 +89,8 @@ src/
     MethodStandardScoreSection.tsx  # "Methodological standard score" section on FinalScreen — full checklist breakdown
     MethodStandardMedal.tsx  # Gold/Silver/Bronze medal (or ○ for unknown), shown on SelectDataset and FinalScreen
     MethodStandardsSection.tsx  # Survey page 2: Gold/Silver/Bronze methodological standards checklist
+    StandardsGuidanceTable.tsx  # Reusable Gold/Silver/Bronze practitioner-guidance table, shared by the pop-up and FinalScreen
+    StandardsGuidanceModal.tsx  # Blocking pop-up (closable only via 'X') wrapping StandardsGuidanceTable, opened from SelectDataset's 'Standard' column header
     *Legend.tsx / *ColorBar.tsx  # Map legend components
 
   utils/
@@ -189,3 +191,4 @@ Root is currently **frozen** — another live deployment elsewhere reads from it
 - **`SelectAdm0` and `SelectAdm1`** exist as pages but ADM selection is handled inline on `FinalScreen` instead.
 - **`/survey`** is a standalone two-page submission form: page 1 collects study metadata (driven by `study_metadata_dictionary.csv`), page 2 is a fixed "Methodological standards" checklist (`constants/methodologicalStandards.ts`) that gives submitters a live Gold/Silver/Bronze quality estimate. Only the raw checklist answers are submitted (prefixed `standards.`), not the calculated score, plus a hidden `form_version` field.
 - **Approved metadata**: once a submission is reviewed, WildMaps-processing publishes a JSON file per dataset to the approved-metadata bucket (see "Approved metadata (separate bucket)" above), which the website reads back — powering the Gold/Silver/Bronze medal (or ○ for unknown) on `SelectDataset`, and the "Study design and metadata" / "Methodological standard score" sections on `FinalScreen`. `methodologicalStandards.ts`'s `calculateChecklistResultFromPayload` reuses the same scoring logic the live form uses for its "Calculate score" preview.
+- **Gold/Silver/Bronze practitioner guidance**: `STANDARD_GUIDANCE_ROWS` (`constants/methodologicalStandards.ts`) — a fixed table explaining what each tier means for a practitioner, keyed to the same score cutoffs as `calculateChecklistResult` (gold ≥80%, silver ≥60%, bronze below). Rendered via the shared `StandardsGuidanceTable` component: as a blocking pop-up (`StandardsGuidanceModal`, closable only via its 'X') from an info button next to the 'Standard' column header on `SelectDataset`, and inline in `MethodStandardScoreSection` on `FinalScreen`.

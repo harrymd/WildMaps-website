@@ -758,10 +758,12 @@ export default function SurveyPage() {
           {page === 2 && (
             <>
               <div className="wm-intro p-5 mb-6">
-                <strong>Methodological standards.</strong> This is a separate checklist from the study metadata
-                above — it estimates a Gold/Silver/Bronze quality rating for your model. Every "Yes" earns a
-                mark; where an "N/A" option is offered, choosing it removes that question from its section's
-                total. Answer every question, then use "Calculate score" to see your rating before submitting.
+                <strong>Methodological standards.</strong> This is a tool that serves to score the overall
+                reliability of predictions for a general purpose based on the methodological standards. This
+                assessment serves to guide potential users and practitioners on the general interpretation and
+                generalisability of model predictions. Methods are ranked Gold, Silver or Bronze, based on the
+                overall score, where each section contributes an equal 25% to the total score. Use N/A where
+                relevant to you study.
               </div>
 
               <div className="wm-panel p-6">
