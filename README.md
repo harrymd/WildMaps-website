@@ -86,7 +86,8 @@ src/
     GeneralSelectComponent.tsx  # Reusable card-list selector used by most pages
     BarChart.tsx        # D3 stacked bar charts
     StudyDesignSection.tsx  # "Study design and metadata" section on FinalScreen — reads approved-metadata bucket
-    MethodStandardScoreSection.tsx  # "Methodological standard score" section on FinalScreen — full checklist breakdown
+    MethodStandardScoreSection.tsx  # "Methodological standard score: details" section at the bottom of FinalScreen — full checklist breakdown
+    MethodStandardScoreSummary.tsx  # Compact "Methodological standard score" summary near the top of FinalScreen (medal + tier + overall %)
     MethodStandardMedal.tsx  # Gold/Silver/Bronze medal (or ○ for unknown), shown on SelectDataset and FinalScreen
     MethodStandardsSection.tsx  # Survey page 2: Gold/Silver/Bronze methodological standards checklist
     StandardsGuidanceTable.tsx  # Reusable Gold/Silver/Bronze practitioner-guidance table, shared by the pop-up and FinalScreen

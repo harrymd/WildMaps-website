@@ -150,8 +150,8 @@ export default function MethodStandardsSection({ answers, onAnswer }: MethodStan
           </div>
 
           <div className="wm-tier-key">
-            <span className="g"><i></i>Gold — 85% and above</span>
-            <span className="s"><i></i>Silver — 60% to 84%</span>
+            <span className="g"><i></i>Gold — 80% and above</span>
+            <span className="s"><i></i>Silver — 60% to 79%</span>
             <span className="b"><i></i>Bronze — below 60%, or predictions not validated</span>
           </div>
         </div>

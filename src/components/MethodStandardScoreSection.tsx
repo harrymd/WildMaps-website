@@ -31,7 +31,7 @@ const MethodStandardScoreSection = () => {
         onClick={() => setIsOpen((prev) => !prev)}
         className="flex items-center gap-1 text-lg font-semibold hover:text-gray-600 transition-colors"
       >
-        <span>Methodological standard score</span>
+        <span>Methodological standard score: details</span>
         <span className="text-sm font-normal text-gray-500 ml-1">
           {isOpen ? '(click to collapse)' : '(click to expand)'}
         </span>

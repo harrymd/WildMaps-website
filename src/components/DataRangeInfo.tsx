@@ -31,7 +31,7 @@ const DataRangeInfo = () => {
     <div className="mb-4">
       <p>
         The data ranges from 0 to {displayMax.toFixed(3)} and the 99<sup>th</sup> percentile of
-        the data is {display99.toFixed(3)}. The habitat suitability is divided into four classes:
+        the data is {display99.toFixed(3)}. The relative habitat suitability is divided into four classes:
       </p>
       <ul className="my-2 ml-4">
         {SUITABILITY_CLASSES.slice().reverse().map((cls, index) => (

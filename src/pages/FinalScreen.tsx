@@ -10,6 +10,7 @@ import FinalSummary from '../components/FinalSummary';
 import FinalDatasetInfo from '../components/FinalDatasetInfo';
 import StudyDesignSection from '../components/StudyDesignSection';
 import MethodStandardScoreSection from '../components/MethodStandardScoreSection';
+import MethodStandardScoreSummary from '../components/MethodStandardScoreSummary';
 import LocationSelector from '../components/LocationSelector';
 import NavigationButtons from '../components/NavigationButtons';
 import DataRangeInfo from '../components/DataRangeInfo';
@@ -112,6 +113,8 @@ const FinalScreen = () => {
           onAdm0Change={handleAdm0Change}
           onAdm1Change={handleAdm1Change}
         />
+
+        <MethodStandardScoreSummary />
 
         <BarChart
           data={chartData_areas_transposed}
